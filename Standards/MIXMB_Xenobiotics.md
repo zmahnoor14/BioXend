@@ -1,4 +1,8 @@
-# MIX-MB(X): Xenobiotics Component Standard
+# Minimum Information about Xenobiotics-Microbiome Biotransformation -- MIX-MB(X)
+## Xenobiotics Component Standard
+
+This document identifies Minimum Information (MI) required to report xenobiotics involved in "Microbial Biotransformation of Xenobiotics", ensuring comprehensive documentation of xenobiotics used in biotransformation studies and information on the relevant assay information.
+
 **Author:** Mahnoor Zulfiqar
 **Version:** 0.1.0  
 **Release Date:** February 5, 2026 (Draft)  
@@ -10,7 +14,7 @@
 - MIX-MB(B) v0.1.0
 
 **Breaking Changes:** N/A
-
+**Alignment:** ChEMBL, ChEBI, ChemONT, MSI Standards, FAIR principles
 ---
 
 ## 1. Overview
@@ -899,78 +903,23 @@ confidence_score: "High"
 
 ---
 
-## 5. Data Formats
+## 5. Data Validation Rules
 
-
-### 5.2 ISA-Tab Format
-
-For complex experimental metadata, use [ISA-Tab](https://isa-tools.org/) format:
-
-**Structure:**
-- `i_investigation.txt` - Study overview
-- `s_study.txt` - Sample information
-- `a_assay.txt` - Assay details
-
-**Key Characteristics:**
-```
-Study Characteristic[Organism]: Escherichia coli
-Study Characteristic[Strain]: K-12 MG1655
-Study Characteristic[Growth Medium]: M9 minimal medium
-Protocol REF: Biotransformation Protocol
-Parameter Value[Substrate]: Ibuprofen
-Parameter Value[Concentration]: 100 µM
-Parameter Value[Incubation Time]: 24 hours
-```
-
-### 5.3 mzML Format
-
-For mass spectrometry data, use [mzML](http://www.psidev.info/mzml) (Proteomics Standards Initiative):
-
-**Requirements:**
-- Instrument metadata
-- Acquisition parameters
-- Peak lists (m/z, intensity, retention time)
-- CV terms from PSI-MS ontology
-
-### 5.4 nmrML Format
-
-For NMR spectroscopy data, use [nmrML](http://nmrml.org/):
-
-**Requirements:**
-- Acquisition parameters (pulse sequence, field strength)
-- Processing parameters
-- Spectral data (chemical shift, intensity)
-- Sample metadata
-
----
-
-
----
-
-## 8. Data Validation Rules
-
-### 8.1 Chemical Structure Validation
+### 5.1 Chemical Structure Validation
 
 - SMILES must be valid and canonical
 - InChI Key must match SMILES structure
 - Molecular formula must be calculable from structure
 - Molecular weight must be within 0.1 Da of calculated value
 
-### 8.2 Biological Data Validation
-
-- NCBI TaxID must be valid and current
-- Genus and species must match TaxID
-- Temperature must be between -20°C and 100°C
-- pH must be between 0 and 14
-
-### 8.3 Quantitative Data Validation
+### 5.2 Quantitative Data Validation
 
 - Concentrations must be positive values
 - Units must be from Unit Ontology (UO)
 - Standard deviation cannot exceed mean value
 - Replicates required (n≥3 for statistical analysis)
 
-### 8.4 Cross-referencing Validation
+### 5.3 Cross-referencing Validation
 
 - All CIDX in ACTIVITY.tsv must exist in COMPOUND_RECORD.tsv
 - All AIDX in ACTIVITY.tsv must exist in ASSAY.tsv
@@ -979,7 +928,7 @@ For NMR spectroscopy data, use [nmrML](http://nmrml.org/):
 
 ---
 
-## 9. Data Quality Tiers
+## 6. Data Quality Tiers
 
 ### Tier 1: Gold Standard (Publication-Ready)
 - All Level A and B information complete
@@ -1002,9 +951,9 @@ For NMR spectroscopy data, use [nmrML](http://nmrml.org/):
 
 ---
 
-## 11. Implementation Guidelines
+## 7. Implementation Guidelines
 
-### 11.1 Data Collection Workflow
+### 7.1 Data Collection Workflow
 
 1. **Pre-experiment:** Define experimental design, ensure all metadata fields can be captured
 2. **During experiment:** Record all parameters in real-time using electronic lab notebooks
@@ -1012,54 +961,49 @@ For NMR spectroscopy data, use [nmrML](http://nmrml.org/):
 4. **Validation:** Check all required fields before submission
 5. **Deposition:** Submit to appropriate repositories (ChEMBL, MetaboLights, etc.)
 
-### 11.2 Software Tools
+### 7.2 Software Tools
 
 **Recommended Tools:**
 - **Chemical structure handling:** RDKit, OpenBabel, ChemDraw
 - **Ontology annotation:** Zooma, OLS (Ontology Lookup Service)
 - **Data validation:** ISA tools, ChEMBL loader validation
 - **MS data processing:** MZmine, XCMS, MS-DIAL
-- **NMR data processing:** NMRProcFlow, Chenomx
 
-### 11.3 Repository Submission
+### 7.3 Repository Submission
 
 **Primary Repositories:**
-- **ChEMBL:** Bioactivity data submission portal
-- **MetaboLights:** Metabolomics experiments and derived data
-- **GNPS:** Mass spectrometry data and molecular networking
-- **Zenodo:** General scientific data with DOI assignment
+- **ChEMBL:** Bioactivity data submission portal (required)
+- **MetaboLights:** Metabolomics experiments and derived data (required)
+- **GNPS:** Mass spectrometry data and molecular networking (optional)
+- **Zenodo:** General scientific data with DOI assignment (optional)
 
 ---
 
-## 12. Version History
+## 8. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-02-05 | Initial release: Core standards defined |
-| 1.2.1 | 2026-03-15 | Stable release: Updated and refined standards |
+| 0.1.0 | 2026-02-05 | Draft |
 
 ---
 
-## 13. References
-
+## 9. References
 1. ChEMBL Database Guidelines: https://www.ebi.ac.uk/chembl/
 2. Metabolomics Standards Initiative: https://metabolomicssociety.org/resources/metabolomics-standards-initiative
 3. Bioschemas Specifications: https://bioschemas.org/
 4. ChEBI Ontology: https://www.ebi.ac.uk/chebi/
 5. ClassyFire Chemical Taxonomy: http://classyfire.wishartlab.com/
-6. ISA Framework: https://isa-tools.org/
 7. FAIR Principles: https://www.go-fair.org/fair-principles/
 8. Unit Ontology: https://bioportal.bioontology.org/ontologies/UO
-9. BioAssay Ontology: http://www.bioassayontology.org/
 
 ---
 
-## 14. Contact and Contributions
+## 10. Contact and Contributions
 
 For questions, suggestions, or contributions to this standard, please contact:
 - **Maintainer:** Mahnoor Zulfiqar
 - **Institution:** NFDI4Microbiota
-- **Email:** [Contact information]
-- **Repository:** [GitHub repository URL]
+- **Email:** [Contact information](mailto:zmahnoor14@gmail.com)
+- **Repository:** [[GitHub repository URL](https://github.com/zmahnoor14/BioXend)]
 
 This standard is a living document and will be updated based on community feedback and evolving best practices.

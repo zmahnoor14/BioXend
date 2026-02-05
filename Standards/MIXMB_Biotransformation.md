@@ -17,6 +17,7 @@ This document identifies Minimum Information (MI) required to report the biotran
 
 ---
 
+
 ## 1. Overview
 
 MIX-MB(B) establishes minimum information standards for documenting biotransformation experiments where microorganisms metabolize xenobiotic compounds. This standard ensures:
@@ -35,6 +36,7 @@ This standard covers:
 - Time-course experiments
 - Dose-response studies
 - Product identification and quantification
+- Type of Biotransformation
 
 ### 1.2 Relationship to Other Standards
 
@@ -45,10 +47,15 @@ MIX-MB(X)              MIX-MB(B)              MIX-MB(M)
    Product               Assay                  Enzyme
    Structure             Activity               Strain
 ```
+### 1.1 How is this document organised?
 
+### 1.2 Which sections are important for contributors?
+
+### 1.3 Which sections are important for the data submitors?
 ---
 
 ## 2. Bioschemas
+Samples, study, 
 
 ### 2.1 BioChemEntity Profile (Biotransformation Reaction)
 
@@ -996,75 +1003,7 @@ statistical_analysis:
 
 ---
 
-## 11. Minimum Required Information Checklist
 
-### 11.1 Assay Design (Level A - Essential)
-
-- [ ] Assay identifier (AIDX) with naming convention
-- [ ] Complete assay description
-- [ ] Assay type (whole cell, lysate, enzyme)
-- [ ] Experimental format (endpoint, time-course, dose-response)
-- [ ] Link to organism (NCBI TaxID, strain)
-- [ ] Link to substrate (CIDX, chemical structure)
-
-### 11.2 Experimental Conditions (Level A - Essential)
-
-- [ ] Substrate concentration with units
-- [ ] Cell/protein concentration
-- [ ] Reaction volume
-- [ ] Temperature
-- [ ] Atmosphere (aerobic/anaerobic)
-- [ ] Incubation time
-- [ ] pH (if controlled)
-
-### 11.3 Analytical Method (Level A - Essential)
-
-- [ ] Detection platform (LC-MS, GC-MS, NMR, etc.)
-- [ ] Instrument details
-- [ ] Method parameters (column, gradient, etc.)
-- [ ] Quantification method (standard curve, internal standard)
-- [ ] LOQ and LOD
-
-### 11.4 Activity Data (Level A - Essential)
-
-- [ ] Activity type (substrate depletion, product formation)
-- [ ] Quantitative value with units
-- [ ] Standard deviation or error
-- [ ] Number of replicates (biological and technical)
-- [ ] Statistical significance (p-value)
-
-### 11.5 Controls (Level A - Essential)
-
-- [ ] Negative control (heat-killed or medium only)
-- [ ] Positive control (known transformation)
-- [ ] Blank samples
-- [ ] Internal standard (for quantitative assays)
-
-### 11.6 Product Information (Level B - Recommended)
-
-- [ ] Product identification (name, structure)
-- [ ] MSI identification level
-- [ ] MS² or NMR data
-- [ ] Transformation type (hydroxylation, reduction, etc.)
-- [ ] Proposed pathway
-
-### 11.7 Quality Assurance (Level B - Recommended)
-
-- [ ] Method validation parameters
-- [ ] Recovery percentages
-- [ ] Reproducibility (CV%)
-- [ ] Acceptance criteria met
-- [ ] Outlier handling
-
-### 11.8 Enhanced Data (Level C - Optional)
-
-- [ ] Kinetic parameters (Km, Vmax, kcat)
-- [ ] Mechanistic studies (inhibitors, cofactor requirements)
-- [ ] Enzyme identification (gene, protein)
-- [ ] Computational modeling
-- [ ] Additional analytical techniques
-
----
 
 ## 12. Example Complete Record
 
@@ -1357,8 +1296,8 @@ results <- groupChromPeaks(peaks, param=PeakDensityParam())
 For questions, suggestions, or contributions to this standard, please contact:
 - **Maintainer:** Mahnoor Zulfiqar
 - **Institution:** NFDI4Microbiota
-- **Email:** [Contact information]
-- **Repository:** [GitHub repository URL]
+- **Email:** [Contact information](mailto:zmahnoor14@gmail.com)
+- **Repository:** [[GitHub repository URL](https://github.com/zmahnoor14/BioXend)]
 
 This standard bridges MIX-MB(X) and MIX-MB(M) to provide comprehensive documentation of microbial xenobiotic biotransformation processes. It is a living document that will be updated based on community feedback and evolving best practices.
 

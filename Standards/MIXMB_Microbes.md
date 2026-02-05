@@ -3,6 +3,7 @@
 
 This document identifies Minimum Information (MI) required to report microbial organisms involved in "Microbial Biotransformation of Xenobiotics", ensuring comprehensive documentation of bacterial, archaeal, and fungal species/strains used in biotransformation studies and information on the assays.
 
+**Author:** Mahnoor Zulfiqar
 **Version:** 0.1.0  
 **Release Date:** February 5, 2026 (Draft)  
 **Status:** Draft Standard  
@@ -27,10 +28,16 @@ MIX-MB(M) establishes minimum information standards for reporting microbial orga
 
 This standard complements MIX-MB(X) for xenobiotics documentation.
 
+### 1.1 How is this document organised?
+
+### 1.2 Which sections are important for contributors?
+
+### 1.3 Which sections are important for the data submitors?
+
 ---
 
 ## 2. Bioschemas
-
+includes: Gene, Protein, 
 ### 2.1 Taxon Profile
 
 Use [Bioschemas Taxon](https://bioschemas.org/types/Taxon/) for microorganism annotation:
@@ -620,82 +627,7 @@ Culture_002	Clostridium sporogenes	ATCC 15579	1509	BHI + hemin	37°C	anaerobic	P
 
 ---
 
-## 6. Minimum Required Information Checklist
 
-### 6.1 Organism Identification (Level A - Essential)
-
-- [ ] Scientific name (Genus species)
-- [ ] NCBI Taxonomy ID
-- [ ] Taxonomic lineage (Domain to Species)
-- [ ] Strain designation
-- [ ] Culture collection number (if available)
-- [ ] Type strain status (yes/no)
-
-### 6.2 Strain Characteristics (Level A - Essential)
-
-- [ ] Gram stain (positive/negative/not applicable)
-- [ ] Cell morphology (rod, coccus, spiral, etc.)
-- [ ] Oxygen requirement (aerobic, anaerobic, facultative)
-- [ ] Optimal growth temperature
-- [ ] Motility (motile/non-motile)
-
-### 6.3 Cultivation Conditions (Level A - Essential)
-
-- [ ] Culture medium (name and composition)
-- [ ] Growth temperature with units
-- [ ] Atmospheric conditions (O₂, CO₂ levels)
-- [ ] Culture duration
-- [ ] Growth phase at harvest
-- [ ] Cell density at harvest (OD₆₀₀ or CFU/mL)
-
-### 6.4 Quality Control (Level A - Essential)
-
-- [ ] Purity verification method
-- [ ] Identity confirmation method (16S rRNA, MALDI-TOF)
-- [ ] Viability assessment
-- [ ] Contamination check results
-
-### 6.5 Isolation & Provenance (Level B - Recommended)
-
-- [ ] Original isolation source
-- [ ] Geographic origin
-- [ ] Isolation date/year
-- [ ] Environmental context (ENVO terms)
-- [ ] Host organism (if host-associated)
-- [ ] Storage conditions
-
-### 6.6 Genomic Information (Level B - Recommended)
-
-- [ ] Genome sequencing status
-- [ ] GenBank/RefSeq accession
-- [ ] Genome size and GC content
-- [ ] Plasmid presence/absence
-- [ ] Known genetic modifications
-
-### 6.7 Metabolic Capabilities (Level B - Recommended)
-
-- [ ] Key metabolic pathways
-- [ ] Known biotransformation enzymes
-- [ ] Substrate utilization profile
-- [ ] Growth on minimal media
-
-### 6.8 Safety & Regulatory (Level B - Recommended)
-
-- [ ] Biosafety level
-- [ ] Risk group classification
-- [ ] Pathogenicity status
-- [ ] GMO status and modifications
-
-### 6.9 Enhanced Metadata (Level C - Optional)
-
-- [ ] Phenotype ontology annotations
-- [ ] Antibiotic resistance profile
-- [ ] Protein expression data
-- [ ] Transcriptomic data available
-- [ ] Metabolomic characterization
-- [ ] Previous biotransformation studies
-
----
 
 ## 7. Controlled Vocabularies
 
@@ -1048,32 +980,8 @@ For ChEMBL submission, combine information:
 For questions, suggestions, or contributions to this standard, please contact:
 - **Maintainer:** Mahnoor Zulfiqar
 - **Institution:** NFDI4Microbiota
-- **Email:** [Contact information]
-- **Repository:** [GitHub repository URL]
-
-This standard complements MIX-MB(X) for xenobiotics and is a living document that will be updated based on community feedback and evolving best practices.
+- **Email:** [Contact information](mailto:zmahnoor14@gmail.com)
+- **Repository:** [[GitHub repository URL](https://github.com/zmahnoor14/BioXend)]
 
 ---
 
-## Appendix A: Quick Reference Card
-
-### Essential Checklist for Rapid Assessment
-
-**Organism Identity:**
-- [ ] NCBI TaxID: _______
-- [ ] Scientific name: _______
-- [ ] Strain: _______
-
-**Growth:**
-- [ ] Medium: _______
-- [ ] Temperature: _______
-- [ ] Atmosphere: _______
-- [ ] Phase: _______
-- [ ] OD₆₀₀: _______
-
-**Quality:**
-- [ ] Purity verified: Yes/No
-- [ ] Identity confirmed: Yes/No
-- [ ] Method: _______
-
-**Data Quality Tier:** Gold / Silver / Bronze
