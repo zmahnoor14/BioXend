@@ -168,7 +168,7 @@ strain:
   
 ```
 
-### 3.3 Additional Ontology Requirements
+### 3.2 Additional Ontology Requirements
 
 - **Assay Ontology (BAO):** Biotransformation assay types
   - BAO:0000697 (metabolism assay)
@@ -183,7 +183,7 @@ strain:
   - Use NCBI TaxID for all organisms
   - Include strain information where applicable
 
-### 3.2 MIxS (Minimum Information about any Sequence)
+### 3.3 MIxS (Minimum Information about any Sequence)
 
 Compliance with [Genomic Standards Consortium (GSC)](https://www.gensc.org/pages/standards-intro.html) MIxS standards:
 
@@ -214,6 +214,85 @@ mixs_compliance:
 
   
 ```
+
+### 3.4 Environment Ontology (ENVO)
+
+**Required for Habitat Description:**
+- **Biome:** ENVO biome classification
+- **Environmental Feature:** Specific habitat
+- **Environmental Material:** Substrate material
+
+**Common ENVO Terms:**
+```
+Human-associated environments:
+- ENVO:00002043 - gastrointestinal tract
+- ENVO:00002042 - oral cavity
+- ENVO:00002045 - skin
+
+Environmental sources:
+- ENVO:00002007 - sediment
+- ENVO:00001998 - soil
+- ENVO:00002019 - freshwater environment
+- ENVO:00002030 - aquatic environment
+```
+
+### 3.5 Phenotype Ontology (PATO/OMP)
+
+**Microbial Phenotype Characteristics:**
+- **Gram stain:** PATO:0001654 (gram-positive) or PATO:0001655 (gram-negative)
+- **Cell shape:** PATO terms for morphology
+- **Motility:** OMP:0000001 (motile) vs non-motile
+- **Spore formation:** Presence/absence
+- **Oxygen requirement:**
+  - Aerobic (PATO:0001903)
+  - Anaerobic (PATO:0001904)
+  - Facultative (PATO:0002224)
+
+**Example:**
+```yaml
+phenotype:
+  gram_stain: "PATO:0001655 (gram-negative)"
+  cell_shape: "rod-shaped"
+  motility: "motile"
+  oxygen_requirement: "PATO:0002224 (facultative anaerobe)"
+  spore_formation: false
+  flagella: true
+```
+
+### 3.6 Gene Ontology (GO) & Enzyme Commission (EC)
+
+**For Biotransformation Genes/Enzymes:**
+- **GO Terms:** Molecular function, biological process
+- **EC Numbers:** Enzyme classification
+- **UniProt ID:** Protein identification
+
+**Example:**
+```yaml
+enzyme_information:
+  gene_name: "porA"
+  locus_tag: "EF_1234"
+  go_terms:
+    - "GO:0016491 (oxidoreductase activity)"
+    - "GO:0009058 (biosynthetic process)"
+  ec_number: "EC 1.1.1.1"
+  uniprot_id: "P12345"
+  function: "Nitroreductase involved in drug metabolism"
+```
+
+### 3.7 Antibiotic Resistance Ontology (ARO)
+
+**For Clinical/Environmental Strains:**
+```yaml
+antibiotic_resistance:
+  profile: "ampicillin resistant, chloramphenicol sensitive"
+  aro_terms:
+    - "ARO:3000007 (beta-lactamase resistance)"
+  resistance_genes:
+    - gene: "blaZ"
+      mechanism: "antibiotic inactivation"
+```
+
+---
 
 ## 4. MSI Metabolomics Standards
 
@@ -252,93 +331,9 @@ sample:
   volume: "50 mL"
 ```
 
-3. BioAssay Ontology (BAO)
-Referenced in document header but not documented in ontologies section
-Relevant for: Assay type classification, biotransformation assay identification
-Term: BAO:0002989 (biotransformation assay)
-4. NCBI Taxonomy (if not in MIX-MB(M))
-### 3.3 Environment Ontology (ENVO)
+## 5. Growth and Cultivation Standards
 
-**Required for Habitat Description:**
-- **Biome:** ENVO biome classification
-- **Environmental Feature:** Specific habitat
-- **Environmental Material:** Substrate material
-
-**Common ENVO Terms:**
-```
-Human-associated environments:
-- ENVO:00002043 - gastrointestinal tract
-- ENVO:00002042 - oral cavity
-- ENVO:00002045 - skin
-
-Environmental sources:
-- ENVO:00002007 - sediment
-- ENVO:00001998 - soil
-- ENVO:00002019 - freshwater environment
-- ENVO:00002030 - aquatic environment
-```
-
-### 3.4 Phenotype Ontology (PATO/OMP)
-
-**Microbial Phenotype Characteristics:**
-- **Gram stain:** PATO:0001654 (gram-positive) or PATO:0001655 (gram-negative)
-- **Cell shape:** PATO terms for morphology
-- **Motility:** OMP:0000001 (motile) vs non-motile
-- **Spore formation:** Presence/absence
-- **Oxygen requirement:** 
-  - Aerobic (PATO:0001903)
-  - Anaerobic (PATO:0001904)
-  - Facultative (PATO:0002224)
-
-**Example:**
-```yaml
-phenotype:
-  gram_stain: "PATO:0001655 (gram-negative)"
-  cell_shape: "rod-shaped"
-  motility: "motile"
-  oxygen_requirement: "PATO:0002224 (facultative anaerobe)"
-  spore_formation: false
-  flagella: true
-```
-
-### 3.5 Gene Ontology (GO) & Enzyme Commission (EC)
-
-**For Biotransformation Genes/Enzymes:**
-- **GO Terms:** Molecular function, biological process
-- **EC Numbers:** Enzyme classification
-- **UniProt ID:** Protein identification
-
-**Example:**
-```yaml
-enzyme_information:
-  gene_name: "porA"
-  locus_tag: "EF_1234"
-  go_terms:
-    - "GO:0016491 (oxidoreductase activity)"
-    - "GO:0009058 (biosynthetic process)"
-  ec_number: "EC 1.1.1.1"
-  uniprot_id: "P12345"
-  function: "Nitroreductase involved in drug metabolism"
-```
-
-### 3.6 Antibiotic Resistance Ontology (ARO)
-
-**For Clinical/Environmental Strains:**
-```yaml
-antibiotic_resistance:
-  profile: "ampicillin resistant, chloramphenicol sensitive"
-  aro_terms:
-    - "ARO:3000007 (beta-lactamase resistance)"
-  resistance_genes:
-    - gene: "blaZ"
-      mechanism: "antibiotic inactivation"
-```
-
----
-
-## 4. Growth and Cultivation Standards
-
-### 4.1 Culture Medium Specification
+### 5.1 Culture Medium Specification
 
 **Required Information:**
 - **Medium Type:** Defined/complex/synthetic
@@ -385,7 +380,7 @@ culture_medium:
   ph: 7.0
 ```
 
-### 4.2 Growth Conditions
+### 5.2 Growth Conditions
 
 **Required Parameters:**
 
@@ -421,7 +416,7 @@ growth_conditions:
   sampling_timepoint: "stationary phase"
 ```
 
-### 4.3 Growth Phase Documentation
+### 5.3 Growth Phase Documentation
 
 **Required:**
 - **Growth Phase:** Lag, exponential, stationary, death
@@ -440,7 +435,7 @@ growth_phase:
   doubling_time: "45 minutes (exponential phase)"
 ```
 
-### 4.4 Quality Control
+### 5.4 Quality Control
 
 **Required Checks:**
 - **Purity:** Contamination testing
@@ -468,9 +463,13 @@ quality_control:
 
 ---
 
-## 5. Data Formats
+## 6. Data Formats
 
-### 5.1 ChEMBL ASSAY.tsv Format
+1. https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/chembl-data-questions
+2. 
+
+
+### 6.1 ChEMBL ASSAY.tsv Format
 
 Microbial information in biotransformation assays:
 
@@ -495,7 +494,7 @@ A001_Ecoli_K12	Biotransformation of ibuprofen by E. coli K-12 MG1655 in anaerobi
 A002_Csporogenes	Metabolism of diclofenac by Clostridium sporogenes ATCC 15579	Metabolism	Clostridium sporogenes	1509	ATCC 15579	whole cell	REF_001
 ```
 
-### 5.2 Extended Microbial Metadata (JSON/YAML)
+### 6.2 Extended Microbial Metadata (JSON/YAML)
 
 **Comprehensive strain information:**
 
@@ -588,7 +587,7 @@ history:
     - "Complete genome sequence available since 1997"
 ```
 
-### 5.3 ISA-Tab Sample File (s_samples.txt)
+### 6.3 ISA-Tab Sample File (s_samples.txt)
 
 Microbial sample metadata in ISA-Tab format:
 
@@ -598,9 +597,9 @@ Culture_001	Escherichia coli	K-12 MG1655	511145	LB broth	37°C	aerobic	P001_cult
 Culture_002	Clostridium sporogenes	ATCC 15579	1509	BHI + hemin	37°C	anaerobic	P002_anaerobic_cultivation	Sample_002
 ```
 
-### 5.4 Microbial Database Submission Formats
+### 6.4 Microbial Database Submission Formats
 
-#### 5.4.1 BioSample (NCBI) XML
+#### 6.4.1 BioSample (NCBI) XML
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
@@ -957,7 +956,7 @@ For ChEMBL submission, combine information:
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 1.0 | 2026-02-05 | Initial release: Core microbial standards defined |
+| 0.1.0 | 2026-02-05 | Initial draft: Core microbial standards defined |
 
 ---
 

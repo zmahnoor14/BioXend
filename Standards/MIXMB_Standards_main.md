@@ -3,108 +3,198 @@
 **MIX-MB Standard Version:** 0.1  
 **Release Date:** February 5, 2026 (Draft)  
 **Status:** Draft Standard  
-**DOI:** 10.5281/zenodo.XXXXXXX (to be assigned upon stable release)
+**DOI:** XXXXXXX (to be assigned upon stable release)
 
 ---
-The standards follow overall important information necessary for xenobiotics-microbiome biotransformations -- together with ChEMBL comptabible submission checklist.
+
+## Abstract
+
+Microbial biotransformation of xenobiotics — the enzymatic conversion of drugs, environmental contaminants, and dietary compounds by microorganisms — is a research area of growing importance for human health, toxicology, and drug development. Despite increasing scientific output, data from these studies are rarely reported in a standardised or FAIR-compliant manner, limiting their reuse and integration across laboratories and databases.
+
+The **Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)** standard defines the minimum metadata and data elements required to describe, share, and deposit xenobiotic biotransformation experiments. MIX-MB covers three interconnected aspects of every study: the chemical substrate (MIX-MB(X)), the microbial organism or community (MIX-MB(M)), and the biotransformation assay and its outcomes (MIX-MB(B)). Together, these components ensure that study results are reproducible, comparable across research groups, and directly depositable into community databases such as [ChEMBL](https://www.ebi.ac.uk/chembl/).
+
+This document is the top-level overview of the MIX-MB standard. It describes the component sub-standards, the ChEMBL submission file specifications, controlled vocabularies, and data quality tiers. It is intended for researchers generating biotransformation data, data curators, and software developers building tools that process or submit such data.
+
+---
+
+## Scope and Applicability
+
+### In scope
+MIX-MB applies to experimental studies that measure the biotransformation of one or more xenobiotic compounds by microbial organisms or microbial-derived systems. This includes:
+
+- **In vitro assays** — single bacterial strain, and purified enzyme reactions
+- **Community-level assays** — mixed microbial communities (e.g. gut microbiota, soil communities)
+- **Time-course experiments** — measuring substrate depletion or product formation over time
+- **Dose-response experiments** — measuring activity across a range of substrate concentrations
+- **Product identification studies** — structural characterisation of biotransformation products
+- **Non-xenobiotic substrates** — The standard focuses on Xenobiotics, however, the same fgramework can also be used for endogenous metabolites transformed by the bacteria
+- **In vivo animal or human studies** — metabolic data from whole organisms without isolated microbial components
+
+The standard applies to all microbial kingdoms: bacteria, archaea, and fungi.
+
+### Out of scope
+
+MIX-MB does not currently cover:
+
+- **Purely computational predictions** of biotransformation (e.g. metabolite prediction tools with no experimental validation)
+- **Metabolomics, Genomics or transcriptomics data** describing biotransformation enzymes or metabolites — these should follow [MIxS](https://www.gensc.org/pages/standards-policies/checklists.html) or equivalent sequence standards. This standard is for reporting bioactivity. and not for the experimental omics data (which have already their own established standards)
+- **Ex vivo assays** — tissue or organ preparations with microbial activity
+
+### Applicability note
+
+Compliance with MIX-MB is recommended for studies intended for submission to public bioactivity databases (e.g. ChEMBL) or publications in journals that require FAIR data deposition. The standard defines three compliance tiers (Gold, Silver, Bronze) described in each component sub-standard.
+---
+
+## How to Use This Document
+
+Different readers will need different parts of this standard. Use the table below to navigate directly to the sections most relevant to you.
+
+| I am a… | I want to… | Start here |
+|---------|-----------|-----------|
+| **Data submitter** (researcher depositing study data) | Understand what metadata and files to prepare | [ChEMBL Submission Files](#chembl-submission-files), [Controlled Vocabularies](#controlled-vocabularies) |
+| **Experimental scientist** (designing or reporting a study) | Know what to record during and after experiments | [MIX-MB(X)](MIXMB_Xenobiotics.md), [MIX-MB(M)](MIXMB_Microbes.md), [MIX-MB(B)](MIXMB_Biotransformation.md) |
+| **Tool / software developer** | Implement parsers, validators, or submission pipelines | [ChEMBL Submission Files](#chembl-submission-files) (column definitions), [Controlled Vocabularies](#controlled-vocabularies) |
+| **Reviewer / curator** | Assess whether a dataset is MIX-MB compliant | [Scope and Applicability](#scope-and-applicability), compliance tiers in each component sub-standard |
+| **Contributor** (proposing changes to the standard) | Understand the versioning policy and contribution process | [Versioning.md](Versioning.md), [CONTRIBUTING.md](../CONTRIBUTING.md) |
+
+---
 
 ## Component Standards
 
 This standard comprises three interconnected sub-standards:
 
-| Component | Version | Status | Last Updated | Document |
+| Component | Version | Status | Last Updated (YYYY-MM-DD) | Document |
 |-----------|---------|--------|--------------|----------|
-| **MIX-MB(X)** - Xenobiotics | 0.1.0 | Draft | 2026-02-05 | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
-| **MIX-MB(M)** - Microbes | 0.1.0 | Draft | 2026-02-05 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
-| **MIX-MB(B)** - Biotransformation | 0.1.0 | Draft | 2026-02-05 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
+| **MIX-MB(X)** - Xenobiotics | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
+| **MIX-MB(M)** - Microbes | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
+| **MIX-MB(B)** - Biotransformation | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
 
 ---
 
-## Version Compatibility Matrix
 
-| MIX-MB Version | MIX-MB(X) | MIX-MB(M) | MIX-MB(B) | Release Date | Status | Notes |
-|----------------|-----------|-----------|-----------|--------------|--------|-------|
-| 0.1 | 0.1.0 | 0.1.0 | 0.1.0 | 2026-02-05 | Draft | Initial draft for community review |
-| 1.0 | 1.0.0 | 1.0.0 | 1.0.0 | TBD | Planned | First stable release |
-| 1.1 | 1.0.0+ | 1.1.0+ | 1.0.0+ | Planned | Future | Updated microbe cultivation standards |
-| 2.0 | 2.0.0 | 2.0.0 | 2.0.0 | Planned | Future | Major update: all components revised |
+## ChEMBL Submission Files
+MIX-MB standards provide guidelines on FAIR data and metadata associated with xenobiotics-microbiome biotransformation research, where the outcomes can be easily converted to ChEMBL database submission ready files. [ChEMBL](https://www.ebi.ac.uk/chembl/) is a database of bioactivity assocviated with small molecules, and is used within academia and industry as a highly curated repository. The standards are integrated into a [Template](Standards/Templates/Template.xlsx). Here are some details on different files required by ChEMBL. <br>
+Information on ChEMBL: https://chembl.gitbook.io/chembl-interface-documentation 
+ChEMBL submission guidelines: https://chembl.gitbook.io/chembl-data-deposition-guide 
 
-**Legend:**
-- **Draft:** Pre-release, breaking changes expected
-- **Planned:** Future release
-- **+** symbol: Indicates forward compatibility (e.g., 1.0.0+ means 1.0.0 or higher)
+**FAQs:**
+1. General Questions: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/general-questions
+2. Compounds: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/drug-and-compound-questions
+3. Assay and activities: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/chembl-data-questions
+4. Targets: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/target-questions
+
+### Study metadata files
+
+#### REFERENCE.tsv
+Reference file provides provenance of the study, including the DOI/ PMID, title, abstract, authors, journal, or dataset (if unpublished). For details please refer to the tutorial provided by ChEMBL on how to generate the [REFERENCE.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/reference.tsv). 
+
+| Column | Required | Type | Description |
+|--------|----------|------|-------------|
+| RIDX | Yes | String | Reference identifier |
+| DOI | Yes | String | Digital Object Identifier |
+| TITLE | Yes | String | Publication title |
+| AUTHORS | Yes | String | Author list |
+| ABSTRACT | Yes | String | Publication abstract |
+| YEAR | Yes | Integer | Publication year |
+| JOURNAL_NAME | No | String | Journal name |
+| VOLUME | No | String | Volume number |
+| REF_TYPE | Yes | String | Publication, Patent, Dataset, Book |
+| DATA_LICENCE | No | String | Data license (e.g., CC0, CC-BY) |
+
+#### INFO.txt
+Optional file with free text space to mention any additional information about the study. For details please refer to the tutorial provided by ChEMBL on how to generate the [INFO.txt file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/supplementary-data-files/info.txt).
+
+### Xenobiotics metadata files
+
+#### COMPOUND_RECORD.tsv
+
+These files contain reference identifiers and chemical identifiers, along with the name of the compound. For details please refer to the tutorial provided by ChEMBL on how to generate the [COMPOUND_RECORD.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/compound_record.tsv).
+
+| Column | Required | Type | Description |
+|--------|----------|------|-------------|
+| CIDX | Yes | String | Compound index |
+| COMPOUND_NAME | Yes | String | Preferred compound name |
+| RIDX | Yes | String | Reference identifier |
+| COMPOUND_KEY | No | String | Unique compound key |
+| SRC_ID | No | String | Source database ID |
+
+#### COMPOUND_CTAB.sdf
+
+The CTAB is an sdf file (V2000 molfile format) storing the chemical strcuture of the compounds mentioned in the `COMPOUNDS_RECORD.tsv`, together with the same chemical identifiers. For details please refer to the tutorial provided by ChEMBL on how to generate the [COMPOUND_CTAB.sdf file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/compound_ctab.sdf).
+
+**Requirements:**
+- Canonical SMILES
+- 2D or 3D coordinates
+- InChI and InChI Key
+- Associated CIDX for linkage
+
+### Microbe/ Assay metadata files
+
+#### ASSAY.tsv
+`ASSAY.tsv` file gives description of the assay along with the microorganism, microbial community or microbial protein. For details please refer to the tutorial provided by ChEMBL on how to generate the [ASSAY.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/assay.tsv). 
+
+| Column | Required | Type | Description |
+|--------|----------|------|-------------|
+| AIDX | Yes | String | Assay identifier |
+| DESCRIPTION | Yes | String | Assay description |
+| ASSAY_TYPE | Yes | String | Biotransformation/Metabolism |
+| ASSAY_ORGANISM | Yes | String | Microorganism name |
+| ASSAY_TAX_ID | Yes | Integer | NCBI Taxonomy ID |
+| ASSAY_STRAIN | No | String | Strain designation |
+| ASSAY_CELL_TYPE | No | String | Cell type/compartment |
+| RIDX | Yes | String | Reference identifier |
+
+#### ASSAY_PARAM.tsv
+Assay parameters associated with `ASSAY.tsv` are mentioned within this optional file. For details please refer to the tutorial provided by ChEMBL on how to generate the [ASSAY_PARAM.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/supplementary-data-files/assay_param.tsv-adding-additional-assay-information.).
+
+| Column | Required | Type | Description |
+|--------|----------|------|-------------|
+| AIDX | Yes | String | Assay identifier |
+| TYPE | Yes | String | Parameter type |
+| RELATION | No | String | =, <, >, ~, etc. |
+| VALUE | Yes | Numeric | Parameter value |
+| UNITS | No | String | Unit of measurement |
+| TEXT_VALUE | No | String | Qualitative description |
+| COMMENTS | No | String | Additional notes |
+
+**Common Parameters:**
+- Temperature (°C)
+- Incubation time (hours)
+- pH
+- Cell density (OD600, CFU/mL)
+- Substrate concentration (µM, mM)
+
+### Biotransformation metadata file(s)
+
+#### ACTIVITY.tsv
+All biotransformation events occurring between `COMPOUND` and `ASSAY`, are mentioned in the `ACTIVITY.tsv`, including no biotransformation detected events. For details please refer to the tutorial provided by ChEMBL on how to generate the [ACTIVITY.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/activity.tsv).
+
+| Column | Required | Type | Description |
+|--------|----------|------|-------------|
+| CIDX | Yes | String | Compound identifier |
+| AIDX | Yes | String | Assay identifier |
+| RIDX | Yes | String | Reference identifier |
+| TEXT_VALUE | No | String | Qualitative result |
+| RELATION | No | String | =, <, >, ~ |
+| VALUE | No | Numeric | Quantitative value |
+| UNITS | No | String | Unit of measurement |
+| TYPE | Yes | String | Activity type |
+| ACTION_TYPE | No | String | SUBSTRATE, PRODUCT, etc. |
+| ACTIVITY_COMMENT | No | String | Notes on activity |
+
+**Activity Types for Biotransformation:**
+- `Biotransformation` - General transformation
+- `Metabolism` - Metabolic conversion
+- `Substrate` - Compound consumed
+- `Product` - Compound produced
+- `Inhibition` - Transformation inhibited
+
+
+#### Other optional activity files -  not part of the MIX-MB template
+`ACTIVITY_PROPERTIES.tsv` - Adding context to experimental results. <br>
+`ACTIVITY_SUPP.tsv` - Multiplex assays, supporting data, and complex results sets. <br>
 
 ---
-
-## Version History
-
-### Version 0.1 (2026-02-05) - Draft
-
-**Status:** Draft Standard (Pre-release, breaking changes expected)
-
-**Component Versions:**
-- MIX-MB(X) v0.1.0
-- MIX-MB(M) v0.1.0  
-- MIX-MB(B) v0.1.0
-
-**Draft Notes:**
-- Initial draft of MIX-MB standards for community review
-- Comprehensive coverage of xenobiotics, microbes, and biotransformation processes
-- Alignment with ChEMBL, MSI, MIxS, and FAIR principles
-- Complete Bioschemas integration
-- Extensive ontology support (ChEBI, ChemOnt, BAO, GO, ENVO)
-- Detailed data format specifications for ChEMBL submission
-
----
-
-## REFERENCE.tsv
-**Associated data to be filled within the template.**
-For details please refer to the tutorial provided by ChEMBL on how to generate (REFERENCE.tsv file)[https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/reference.tsv]. 
-
-## COMPOUND_RECORD.tsv
-**Associated data to be provided as a CSV file.**
-For details please refer to the tutorial provided by ChEMBL on how to generate (COMPOUND_RECORD.tsv file)[https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/compound_record.tsv].
-
-To ensure your data is clear and traceable, we require a **CSV (Comma Separated Values) file** containing information about the chemical compounds used in your study. 
-
-### Required and Optional Columns
-
-Your CSV file must include the following columns:
-
-| Column Name | Requirement | Description | Purpose |
-| :--- | :--- | :--- | :--- |
-| **SMILES** | **Required** | The **Simplified Molecular-Input Line-Entry System (SMILES)** string for the compound. This is the standardized, text-based way to represent the molecular structure. | Ensures **unambiguous** identification of the chemical structure. |
-| **Names** | **Required** | The most **common or accepted name** of the chemical compound (e.g., *Acetaminophen*, *Propoxur*, *Propochlor*). | Provides a **standard, recognizable identifier** for the compound. |
-| **Study\_ID** | **Optional** | A **unique identifier, synonym, or code** that you used to refer to this specific compound *within your own study or reference materials* (e.g., *prop\_1*, *Comp-A*, *Ref\_ID\_45*). | Crucial for **traceability**. If a user of your data wants to cross-reference a compound mentioned in your original paper (e.g., finding the structure for "prop\_1" in your study), they can easily do so. |
-
----
-
-### Example CSV File Structure
-
-Please provide a CSV file that looks like the following example.
-
-| SMILES | Names | Study_ID |
-| :--- | :--- | :--- |
-| $\text{CCC(C)Nc1ccc(Cl)c(OC)c1}$ | Propochlor | prop\_1 |
-| $\text{CC(=O)Nc1ccc(O)cc1}$ | Acetaminophen | APAP |
-| $\text{COc1ccc(NC(C)=O)cc1}$ | Phenacetin | Compound-B |
-
-**CSV File Content (To be saved as a .csv file):**
-```csv
-SMILES,Names,Study_ID
-CCC(C)Nc1ccc(Cl)c(OC)c1,Propochlor,prop_1
-CC(=O)Nc1ccc(O)cc1,Acetaminophen,APAP
-COc1ccc(NC(C)=O)cc1,Phenacetin,Compound-B
-```
-// Note: ChEMBL requires a chemical stucture for submission, hence empty SMILES would not be ideal.
-
-## COMPOUND_CTAB.sdf
-For details please refer to the tutorial provided by ChEMBL on how to generate (COMPOUND_CTAB.sdf file)[https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/compound_ctab.sdf]
-The COMPOUND_CTAB.sdf is based on COMPOUND_RECORD
-
-## ASSAY.tsv
-
-
 
 ## 7. Controlled Vocabularies not defined by any ontologies?
 
@@ -139,203 +229,3 @@ Use standardized terms:
 - `No Activity` - No biotransformation detected
 - `Inhibition` - Transformation inhibited
 - `Stimulation` - Transformation enhanced
-
-### 5.1 ChEMBL Submission Format
-
-**Required Files:**
-
-#### 5.1.1 REFERENCE.tsv
-Publication metadata following ChEMBL specifications:
-
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| RIDX | Yes | String | Reference identifier |
-| DOI | Yes | String | Digital Object Identifier |
-| TITLE | Yes | String | Publication title |
-| AUTHORS | Yes | String | Author list |
-| ABSTRACT | Yes | String | Publication abstract |
-| YEAR | Yes | Integer | Publication year |
-| JOURNAL_NAME | No | String | Journal name |
-| VOLUME | No | String | Volume number |
-| REF_TYPE | Yes | String | Publication, Patent, Dataset, Book |
-| DATA_LICENCE | No | String | Data license (e.g., CC0, CC-BY) |
-
-#### 5.1.2 COMPOUND_RECORD.tsv
-Compound information:
-
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| CIDX | Yes | String | Compound index |
-| COMPOUND_NAME | Yes | String | Preferred compound name |
-| RIDX | Yes | String | Reference identifier |
-| COMPOUND_KEY | No | String | Unique compound key |
-| SRC_ID | No | String | Source database ID |
-
-#### 5.1.3 COMPOUND_CTAB.sdf
-MOL/SDF file containing chemical structures in CTAB format.
-
-**Requirements:**
-- Canonical SMILES
-- 2D or 3D coordinates
-- InChI and InChI Key
-- Associated CIDX for linkage
-
-#### 5.1.4 ASSAY.tsv
-Biotransformation assay description:
-
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| AIDX | Yes | String | Assay identifier |
-| DESCRIPTION | Yes | String | Assay description |
-| ASSAY_TYPE | Yes | String | Biotransformation/Metabolism |
-| ASSAY_ORGANISM | Yes | String | Microorganism name |
-| ASSAY_TAX_ID | Yes | Integer | NCBI Taxonomy ID |
-| ASSAY_STRAIN | No | String | Strain designation |
-| ASSAY_CELL_TYPE | No | String | Cell type/compartment |
-| RIDX | Yes | String | Reference identifier |
-
-#### 5.1.5 ASSAY_PARAM.tsv
-Experimental parameters:
-
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| AIDX | Yes | String | Assay identifier |
-| TYPE | Yes | String | Parameter type |
-| RELATION | No | String | =, <, >, ~, etc. |
-| VALUE | Yes | Numeric | Parameter value |
-| UNITS | No | String | Unit of measurement |
-| TEXT_VALUE | No | String | Qualitative description |
-| COMMENTS | No | String | Additional notes |
-
-**Common Parameters:**
-- Temperature (°C)
-- Incubation time (hours)
-- pH
-- Cell density (OD600, CFU/mL)
-- Substrate concentration (µM, mM)
-
-#### 5.1.6 ACTIVITY.tsv
-Biotransformation activity data:
-
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| CIDX | Yes | String | Compound identifier |
-| AIDX | Yes | String | Assay identifier |
-| RIDX | Yes | String | Reference identifier |
-| TEXT_VALUE | No | String | Qualitative result |
-| RELATION | No | String | =, <, >, ~ |
-| VALUE | No | Numeric | Quantitative value |
-| UNITS | No | String | Unit of measurement |
-| TYPE | Yes | String | Activity type |
-| ACTION_TYPE | No | String | SUBSTRATE, PRODUCT, etc. |
-| ACTIVITY_COMMENT | No | String | Notes on activity |
-
-**Activity Types for Biotransformation:**
-- `Biotransformation` - General transformation
-- `Metabolism` - Metabolic conversion
-- `Substrate` - Compound consumed
-- `Product` - Compound produced
-- `Inhibition` - Transformation inhibited
-## 10. Example Complete Record
-
-```yaml
-# MIX-MB(X) Compliant Record
-
-# Reference Information
-reference:
-  ridx: "HumanMicrobiome_DrugMetabolism_2019"
-  doi: "10.1038/s41586-019-1291-3"
-  title: "Mapping human microbiome drug metabolism by gut bacteria and their genes"
-  authors: "Zimmermann M, Zimmermann-Kogadeeva M, Wegmann R, Goodman AL"
-  year: 2019
-  journal: "Nature"
-  ref_type: "Publication"
-  data_licence: "CC-BY-4.0"
-
-# Compound Information
-compound:
-  cidx: "C001"
-  compound_name: "Ibuprofen"
-  chembl_id: "CHEMBL1201246"
-  inchi_key: "HEFNNWSXXWATRW-UHFFFAOYSA-N"
-  smiles: "CC(C)Cc1ccc(cc1)C(C)C(=O)O"
-  molecular_formula: "C13H18O2"
-  molecular_weight: 206.28
-  chebi_id: "CHEBI:5855"
-  chebi_role: ["xenobiotic", "non-steroidal anti-inflammatory drug"]
-  classyfire:
-    kingdom: "Organic compounds"
-    superclass: "Benzenoids"
-    class: "Benzene and substituted derivatives"
-
-# Microorganism Information
-organism:
-  assay_organism: "Clostridium sporogenes"
-  ncbi_taxid: 1509
-  strain: "ATCC 15579"
-  assay_tax_id: 1509
-
-# Assay Information
-assay:
-  aidx: "A001_Csporogenes_ATCC15579"
-  description: "Biotransformation of ibuprofen by Clostridium sporogenes"
-  assay_type: "Biotransformation"
-  assay_cell_type: "whole cell"
-  
-# Experimental Conditions
-parameters:
-  - type: "Temperature"
-    value: 37
-    units: "°C"
-  - type: "Incubation time"
-    value: 24
-    units: "hours"
-  - type: "pH"
-    value: 7.0
-    units: "pH"
-  - type: "Substrate concentration"
-    value: 100
-    units: "µM"
-  - type: "Cell density"
-    value: 0.8
-    units: "OD600"
-
-# Growth Conditions
-growth_conditions:
-  medium: "BHI (Brain Heart Infusion)"
-  atmosphere: "anaerobic"
-  growth_phase: "stationary"
-
-# Analytical Method
-analytical_method:
-  platform: "LC-MS/MS"
-  instrument: "Thermo Q Exactive Plus Orbitrap"
-  ionization: "ESI negative mode"
-  column: "Waters Acquity UPLC BEH C18"
-  
-# Activity Data
-activity:
-  cidx: "C001"
-  aidx: "A001_Csporogenes_ATCC15579"
-  ridx: "HumanMicrobiome_DrugMetabolism_2019"
-  type: "Biotransformation"
-  action_type: "SUBSTRATE"
-  text_value: "Compound metabolized"
-  transformation_type: "reduction"
-  biological_replicates: 3
-  technical_replicates: 2
-
-# Product Information
-product:
-  cidx: "P001"
-  compound_name: "2-(4-isobutylphenyl)propionic acid (reduced)"
-  identification_level: "Level 2"
-  ms2_match: "HMDB library"
-  confidence: "High"
-
-# Data Quality
-quality_tier: "Gold Standard"
-validation_status: "Passed"
-```
-
----

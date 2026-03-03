@@ -542,7 +542,7 @@ For biotransformation products characterised with mass spectrometry (MS), use th
     {
       "@type": "PropertyValue",
       "name": "MSI Identification Level",
-      "value": "Level 0",
+      "value": "Level 5",
       "description": "Unidentified - Spectral data only, no structural hypothesis"
     },
     {
@@ -927,6 +927,8 @@ confidence_score: "High"
 - ChEMBL IDs must be valid (if provided)
 
 ---
+# ChEMBL data format: 
+Important Links: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/drug-and-compound-questions
 
 ## 6. Data Quality Tiers
 
