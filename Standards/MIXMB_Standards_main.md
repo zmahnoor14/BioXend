@@ -43,6 +43,7 @@ MIX-MB does not currently cover:
 ### Applicability note
 
 Compliance with MIX-MB is recommended for studies intended for submission to public bioactivity databases (e.g. ChEMBL) or publications in journals that require FAIR data deposition. The standard defines three compliance tiers (Gold, Silver, Bronze) described in each component sub-standard.
+
 ---
 
 ## How to Use This Document
@@ -63,19 +64,20 @@ Different readers will need different parts of this standard. Use the table belo
 
 This standard comprises three interconnected sub-standards:
 
-| Component | Version | Status | Last Updated (YYYY-MM-DD) | Document |
-|-----------|---------|--------|--------------|----------|
-| **MIX-MB(X)** - Xenobiotics | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
-| **MIX-MB(M)** - Microbes | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
-| **MIX-MB(B)** - Biotransformation | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
+| Component | Description | Version | Status | Last Updated (YYYY-MM-DD) | Document |
+|-----------|-------------|---------|--------|--------------------------|----------|
+| **MIX-MB(X)** - Xenobiotics | Minimum metadata required to describe the chemical substrate, including structural identity, physicochemical properties, and source information. | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
+| **MIX-MB(M)** - Microbes | Minimum metadata required to describe the microbial organism or community used in the experiment, including taxonomy, strain, and culture conditions. | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
+| **MIX-MB(B)** - Biotransformation | Minimum metadata required to describe the biotransformation assay design, experimental conditions, and quantitative or qualitative activity outcomes. | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
+
 
 ---
 
 
 ## ChEMBL Submission Files
-MIX-MB standards provide guidelines on FAIR data and metadata associated with xenobiotics-microbiome biotransformation research, where the outcomes can be easily converted to ChEMBL database submission ready files. [ChEMBL](https://www.ebi.ac.uk/chembl/) is a database of bioactivity assocviated with small molecules, and is used within academia and industry as a highly curated repository. The standards are integrated into a [Template](Standards/Templates/Template.xlsx). Here are some details on different files required by ChEMBL. <br>
-Information on ChEMBL: https://chembl.gitbook.io/chembl-interface-documentation 
-ChEMBL submission guidelines: https://chembl.gitbook.io/chembl-data-deposition-guide 
+MIX-MB standards provide guidelines on FAIR data and metadata associated with xenobiotics-microbiome biotransformation research, where the outcomes can be easily converted to ChEMBL database submission ready files. [ChEMBL](https://www.ebi.ac.uk/chembl/) is a database of bioactivity assocviated with small molecules, and is used within academia and industry as a highly curated repository. The standards are integrated into a [Template](Standards/Templates/Template.xlsx). Here are some details on different files required by ChEMBL.
+* Information on ChEMBL: https://chembl.gitbook.io/chembl-interface-documentation 
+* ChEMBL submission guidelines: https://chembl.gitbook.io/chembl-data-deposition-guide 
 
 **FAQs:**
 1. General Questions: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/general-questions
@@ -195,7 +197,7 @@ All biotransformation events occurring between `COMPOUND` and `ASSAY`, are menti
 `ACTIVITY_SUPP.tsv` - Multiplex assays, supporting data, and complex results sets. <br>
 
 ---
-
+<!--
 ## 7. Controlled Vocabularies not defined by any ontologies?
 
 ### 7.1 Transformation Types
@@ -229,3 +231,8 @@ Use standardized terms:
 - `No Activity` - No biotransformation detected
 - `Inhibition` - Transformation inhibited
 - `Stimulation` - Transformation enhanced
+
+#### TO DOs:
+1. Vocabulary section?
+2.
+-->
