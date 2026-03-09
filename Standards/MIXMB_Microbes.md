@@ -1,11 +1,12 @@
 # Minimum Information about Xenobiotics-Microbiome Biotransformation -- MIX-MB(M)
-## Microbial Component Standards
 
-This document identifies Minimum Information (MI) required to report microbial organisms involved in "Microbial Biotransformation of Xenobiotics", ensuring comprehensive documentation of bacterial, archaeal, and fungal species/strains used in biotransformation studies and information on the assays.
+## Microbial Component Standards (M)
+
+This document identifies Minimum Information (MI) required to report microbial organisms involved in biotransformation of xenobiotics, ensuring comprehensive documentation of bacterial, and archaeal species/strains used in biotransformation studies and information on the assays.
 
 **Author:** Mahnoor Zulfiqar
 **Version:** 0.1.0  
-**Release Date:** February 5, 2026 (Draft)  
+**Release Date:** March 5, 2026 (Draft)  
 **Status:** Draft Standard  
 **Part of:** MIX-MB Standard v0.1  
 **Replaces:** N/A  
@@ -13,8 +14,43 @@ This document identifies Minimum Information (MI) required to report microbial o
 - MIX-MB(X) v0.1.0
 - MIX-MB(B) v0.1.0
 
-**Breaking Changes:** N/A  
 **Alignment:** NCBI Taxonomy, MIxS, GSC Standards, ChEMBL, FAIR principles
+[Fix]
+---
+
+## Table of Contents
+
+- [1. Overview](#1-overview)
+  - [1.1 How is this document organised?](#11-how-is-this-document-organised)
+  - [1.2 Which sections are important for contributors?](#12-which-sections-are-important-for-contributors)
+  - [1.3 Which sections are important for data submitters?](#13-which-sections-are-important-for-data-submitters)
+  - [1.4 Identifiers and Cross-Referencing](#14-identifiers-and-cross-referencing)
+- [2. Bioschemas](#2-bioschemas)
+  - [2.1 Taxon Profile](#21-taxon-profile)
+  - [2.2 TaxonName Profile](#22-taxonname-profile)
+  - [2.3 Sample Profile](#23-sample-profile)
+  - [2.4 Gene Profile](#24-gene-profile)
+  - [2.5 Protein Profile](#25-protein-profile)
+  - [2.6 ProteinAnnotation Profile](#26-proteinannotation-profile)
+- [3. Ontologies and Standards](#3-ontologies-and-standards)
+  - [3.1 NCBI Taxonomy](#31-ncbi-taxonomy)
+  - [3.2 Additional Ontology Requirements](#32-additional-ontology-requirements)
+  - [3.3 MIxS (Minimum Information about any Sequence)](#33-mixs-minimum-information-about-any-sequence)
+  - [3.4 Environment Ontology (ENVO)](#34-environment-ontology-envo)
+  - [3.5 Phenotype Ontology (PATO/OMP)](#35-phenotype-ontology-patoomp)
+  - [3.6 Gene Ontology (GO) & Enzyme Commission (EC)](#36-gene-ontology-go--enzyme-commission-ec)
+  - [3.7 Antibiotic Resistance Ontology (ARO)](#37-antibiotic-resistance-ontology-aro)
+- [7. Controlled Vocabularies](#7-controlled-vocabularies)
+  - [7.1 Oxygen Requirements](#71-oxygen-requirements)
+  - [7.2 Cell Morphology](#72-cell-morphology)
+  - [7.3 Sample Types](#73-sample-types)
+  - [7.4 Growth Phases](#74-growth-phases)
+- [4. Data Validation Rules](#4-data-validation-rules)
+- [5. Data Quality Tiers](#5-data-quality-tiers)
+- [6. How to use the Template](#6-how-to-use-the-template)
+- [7. Version History](#7-version-history)
+- [8. References](#8-references)
+- [9. Contact and Contributions](#9-contact-and-contributions)
 
 ---
 
@@ -30,98 +66,331 @@ This standard complements MIX-MB(X) for xenobiotics documentation.
 
 ### 1.1 How is this document organised?
 
+- **Section 1** — Introduction to MIX-MB(M) for Microbes and how to use it.
+- **Section 2** — Bioschemas profiles: what metadata fields to use for microbial organisms and strains, with JSON examples (Taxon, BioSample, Study profiles).
+- **Section 3** — Ontologies and standards: which controlled vocabularies and identifiers to use (NCBI Taxonomy, MIxS, ENVO, PATO/OMP, GO/EC, ARO, BAO, Unit Ontology).Controlled vocabularies: standard terms for oxygen requirements, cell morphology, sample types, and growth phases.
+- **Section 4** — Growth and cultivation standards: how to document culture media, growth conditions, growth phases, and quality control.
+- **Section 5** — Data validation rules
+- **Section 6** — Data quality tiers
+- **Section 7** — How to use template
+
+
 ### 1.2 Which sections are important for contributors?
 
-### 1.3 Which sections are important for the data submitors?
+If you want to propose changes to the standard, focus on **Sections 2 and 3** (the metadata fields and ontologies), then follow the contribution process in [Versioning.md](Versioning.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Changes require a 7-day community review and 2 independent endorsements.
+
+### 1.3 Which sections are important for data submitters?
+
+If you are preparing data for submission, you need:
+- **Section 2.1** — required Taxon fields for the organism (NCBI TaxID, scientific name, rank)
+- **Section 2.2** — BioSample fields for strain-specific information (strain designation, culture collection numbers)
+- **Section 3.1** — NCBI Taxonomy requirements: TaxID, full lineage, and strain-level details
+- **Section 5** — how to document cultivation conditions (medium, temperature, atmosphere) and quality control
+- **Section 6.1** — how to populate the ChEMBL ASSAY.tsv format for microbial assays
+- **Section 8** — validation checklist before you submit
+- **[Template.xlsx](Templates/Template.xlsx)** — colour-coded submission template (green = mandatory, blue = recommended, yellow = optional), specifically the **Assay** sheet.
+
+### 1.4 Identifiers and Cross-Referencing
+
+**This is the first practical step: name your organisms properly before filling in any other field.**
+
+#### Organism Identifiers
+
+Each microbial organism in a MIX-MB submission must be identified with an **NCBI TaxID** — the primary organism identifier used across all MIX-MB files. This value populates `ASSAY_TAX_ID` in `ASSAY.tsv`.
+
+**Identifier priority order:**
+
+| Priority | Identifier | Field | Example |
+|----------|-----------|-------|---------|
+| 1 | **NCBI TaxID** | `identifier` / `ASSAY_TAX_ID` | `1351` |
+| 2 | **LPSN scientific name** | `name` / `ASSAY_ORGANISM` | `Enterococcus faecalis` |
+| 3 | **Culture collection ID** | `additionalProperty` → `culture_collection` | `ATCC 19433` |
+| 4 | **Genome assembly accession** | `additionalProperty` → `genome_assembly` | `GCA_000007785.1` |
+
+NCBI TaxID is **mandatory** for all organisms. If a strain does not yet have a registered TaxID (e.g. a novel isolate), report at the lowest available taxonomic rank and note the absence of a strain-level TaxID in `ACTIVITY_COMMENT`.
+
+#### Assay Index (AIDX)
+
+Each assay — representing one organism × condition combination — is assigned an **AIDX**, which links `ASSAY.tsv`, `ASSAY_PARAM.tsv`, and `ACTIVITY.tsv`.
+
+**Minting rules:**
+- Format: `[FirstAuthorLastName]_[Genus]_[species]_[ConditionOrNote]`, e.g. `Zimmermann_Actinomyces_graevenitzii_biotransformation`
+- AIDXs must be unique within a study
+- Use only ASCII letters, digits, underscores, and hyphens — no spaces
+- Each distinct organism–condition combination gets its own AIDX; do not reuse AIDXs across different strain batches or oxygen conditions
+
+#### Minting Scheme for Uncharacterised or Novel Organisms
+
+| Situation | AIDX format | `ASSAY_ORGANISM` value | `ASSAY_TAX_ID` |
+|-----------|------------|----------------------|----------------|
+| Known species, known strain | `[Author]_[Genus]_[species]_[Strain]` | Full binomial name | Registered species TaxID |
+| Known species, undesignated strain | `[Author]_[Genus]_[species]_unknown_strain` | Full binomial name | Species-level TaxID |
+| Novel isolate (unclassified) | `[Author]_unclassified_[IsolateID]` | `unclassified bacteria` | `2` (root Bacteria) or closest assigned TaxID |
+| Mixed / community assay | `[Author]_mixed_community_[SourceDescription]` | `mixed microbial community` | `1` (root) or metagenome TaxID |
+
+#### sameAs Linking Policy
+
+Use `sameAs` to cross-reference the organism across external databases. For organisms, the NCBI Taxonomy URL is the **mandatory** `sameAs` target.
+
+| Database | URL pattern | Example |
+|----------|-----------|---------|
+| NCBI Taxonomy | `https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={TaxID}` | `https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1351` |
+| LPSN | `https://lpsn.dsmz.de/species/{genus}-{species}` | `https://lpsn.dsmz.de/species/enterococcus-faecalis` |
+| BacDive | `https://bacdive.dsmz.de/strain/{ID}` | `https://bacdive.dsmz.de/strain/12345` |
+| Wikidata | `https://www.wikidata.org/wiki/{QID}` | `https://www.wikidata.org/wiki/Q132537` |
+
+**Rules:**
+- NCBI Taxonomy URL is mandatory for all organisms with a registered TaxID
+- Include LPSN for prokaryotes where available
+- For novel isolates with no registered external record, omit `sameAs` until an accession is obtained (e.g. upon NCBI BioSample registration)
+- BioSample or ENA accessions belong in the Sample profile `@id` field, not in `sameAs`
+- Do not use `sameAs` for speculative taxonomic assignments
 
 ---
 
 ## 2. Bioschemas
-includes: Gene, Protein, 
+
+MIX-MB(M) integrates established Bioschemas profiles for structured, FAIR-compliant annotation of microbial organisms, strains, and their biotransformation-relevant molecular components. Bioschemas fulfils the Findability and Interoperability aspects of FAIR.
+
+The following profiles are used:
+
+| Profile | Bioschemas Group | Version | Use in MIX-MB(M) |
+|---------|-----------------|---------|------------------|
+| [Taxon](https://bioschemas.org/profiles/Taxon/1.0-RELEASE) | Biodiversity | 1.0-RELEASE | Organism taxonomy identification |
+| [TaxonName](https://bioschemas.org/profiles/TaxonName/1.0-RELEASE) | Biodiversity | 1.0-RELEASE | Structured scientific name representation |
+| [Sample](https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10) | Samples | 0.2-RELEASE | Microbial culture sample metadata |
+| [Gene](https://bioschemas.org/profiles/Gene/1.0-RELEASE) | Genes | 1.0-RELEASE | Biotransformation-related genes |
+| [Protein](https://bioschemas.org/profiles/Protein/0.11-RELEASE) | Proteins | 0.11-RELEASE | Biotransformation enzymes |
+| [ProteinAnnotation](https://bioschemas.org/profiles/ProteinAnnotation/0.6-DRAFT) | Proteins | 0.6-DRAFT | Enzyme functional annotations |
+
+**_NOTE:_** Taxon, TaxonName, and Sample profiles map to the `ASSAY.tsv` and `ASSAY_PARAM.tsv` ChEMBL submission files. Gene, Protein, and ProteinAnnotation profiles are for extended metadata (Section 6.2) and are optional but strongly recommended for Gold-standard submissions.
+
+---
+
 ### 2.1 Taxon Profile
 
-Use [Bioschemas Taxon](https://bioschemas.org/types/Taxon/) for microorganism annotation:
+Use [Bioschemas Taxon 1.0-RELEASE](https://bioschemas.org/profiles/Taxon/1.0-RELEASE) to identify and classify the microbial organism involved in the biotransformation study.
 
-**Required Properties:**
-- `@type`: Taxon
-- `identifier`: NCBI Taxonomy ID (mandatory)
-- `name`: Scientific binomial name (Genus species)
-- `taxonRank`: Taxonomic rank (species, subspecies, strain)
-- `parentTaxon`: Higher taxonomic classification
+**Minimum Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `@context` | URL | ONE | `"https://schema.org/"` |
+| `@type` | Text | ONE | `"Taxon"` |
+| `@id` | IRI | ONE | Globally unique IRI (e.g., NCBI Taxonomy URL) |
+| `dct:conformsTo` | IRI | ONE | `"https://bioschemas.org/profiles/Taxon/1.0-RELEASE"` |
+| `name` | Text | ONE | Currently valid scientific name for the taxon |
 
 **Recommended Properties:**
-- `alternateName`: Synonyms, former names
-- `url`: Link to taxonomy databases (NCBI, LPSN, MycoBank)
-- `childTaxon`: Known subspecies or strains
-- `hasDefinedTerm`: Associated ontology terms (e.g., habitat, phenotype)
 
-**Example:**
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "Taxon",
-  "identifier": "txid562",
-  "name": "Escherichia coli",
-  "alternateName": ["E. coli", "Bacterium coli"],
-  "taxonRank": "species",
-  "parentTaxon": {
-    "@type": "Taxon",
-    "name": "Escherichia",
-    "identifier": "txid561",
-    "taxonRank": "genus"
-  },
-  "url": "https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=562"
-}
-```
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `taxonRank` | PropertyValue, Text, URL | MANY | Taxonomic rank, preferably as URI from a controlled vocabulary |
+| `parentTaxon` | Taxon, Text, URL | ONE | Closest parent taxon |
+| `sameAs` | URL | MANY | Reference URLs identifying the taxon (NCBI, Wikidata, etc.) |
+| `scientificName` | TaxonName | ONE | Structured TaxonName object (see Section 2.2) |
 
-### 2.2 BioSample Profile
+**Optional Properties (MIX-MB(M) relevant):**
 
-Use [Bioschemas BioSample](https://bioschemas.org/types/BioSample/) for strain-specific information:
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `identifier` | PropertyValue, Text, URL | ONE | Authority identifier (e.g., NCBI TaxID, GBIF) |
+| `alternateName` | Text | MANY | Synonyms or former names |
+| `alternateScientificName` | TaxonName | MANY | Synonym scientific names |
+| `childTaxon` | Taxon, Text, URL | MANY | Known subspecies or strains |
+| `dwc:vernacularName` | Text | MANY | Common name (e.g., "E. coli") |
+| `url` | URL | ONE | Link to the taxon record in a reference database |
+| `description` | Text | ONE | Free-text description of the taxon |
 
-**Required Properties:**
-- `@type`: BioSample
-- `identifier`: Strain identifier (culture collection number)
-- `name`: Strain designation
-- `taxonomicRange`: Link to Taxon
-- `additionalProperty`: Key characteristics (antibiotic resistance, auxotrophy)
+**_NOTE:_** `name` and `identifier` from this profile map directly to `ASSAY_ORGANISM` and `ASSAY_TAX_ID` in `ASSAY.tsv`.
 
-**Example:**
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "BioSample",
-  "identifier": "ATCC 25922",
-  "name": "Escherichia coli ATCC 25922",
-  "taxonomicRange": {
-    "@type": "Taxon",
-    "identifier": "txid562",
-    "name": "Escherichia coli"
-  },
-  "additionalProperty": [
-    {
-      "@type": "PropertyValue",
-      "name": "gram_stain",
-      "value": "negative"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "oxygen_requirement",
-      "value": "facultative anaerobe"
-    }
-  ],
-  "url": "https://www.atcc.org/products/25922"
-}
-```
+---
 
-### 2.3 Study Profile
+### 2.2 TaxonName Profile
 
-Use for experimental context:
+Use [Bioschemas TaxonName 1.0-RELEASE](https://bioschemas.org/profiles/TaxonName/1.0-RELEASE) as a structured representation of the organism's scientific name — used as the value of `scientificName` in Section 2.1.
 
-**Required Properties:**
-- `@type`: Study
-- `studySubject`: BioSample being studied
-- `studyDesign`: Experimental design description
-- `studyDomain`: "microbiology", "biotransformation"
+**Minimum Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `@context` | URL | ONE | `"https://schema.org/"` |
+| `@type` | Text | ONE | `"TaxonName"` |
+| `@id` | IRI | ONE | Globally unique IRI (e.g., LPSN URL) |
+| `dct:conformsTo` | IRI | ONE | `"https://bioschemas.org/profiles/TaxonName/1.0-RELEASE"` |
+
+**Recommended Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `name` | Text | ONE | Taxon name without authorship or date information |
+| `taxonRank` | PropertyValue, Text, URL | MANY | Taxonomic rank, preferably as URI |
+| `author` | Person, Organization | MANY | Authorship and date details per nomenclatural rules |
+| `sameAs` | URL | MANY | URLs to additional name records (LPSN, Index Fungorum, etc.) |
+| `url` | URL | ONE | Webpage for this taxon name record |
+
+**Optional Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `identifier` | PropertyValue, Text, URL | ONE | Authority identifiers (GBIF, WoRMS, etc.) |
+| `isBasedOn` | CreativeWork, Product, URL | MANY | Publication or resource underlying this name |
+| `description` | Text | ONE | Description of the name or nomenclatural context |
+
+
+---
+
+### 2.3 Sample Profile
+
+Use [Bioschemas Sample 0.2-RELEASE](https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10) for individual microbial culture samples used in biotransformation assays. Each sample represents a specific strain in a specific cultivation condition.
+
+**Minimum Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `@context` | URL | ONE | `"https://schema.org/"` |
+| `@type` | Text | ONE | `"Sample"` |
+| `@id` | IRI | ONE | Globally unique IRI (e.g., NCBI BioSample URL) |
+| `dct:conformsTo` | IRI | ONE | `"https://bioschemas.org/profiles/Sample/0.2-RELEASE-2018_11_10"` |
+| `identifier` | PropertyValue, Text, URL | MANY | Unique sample identifier (e.g., `biosample:SAMN12345`, AIDX) |
+
+**Recommended Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `url` | URL | ONE | URL of the sample record in a database or biobank |
+
+**Optional Properties (MIX-MB(M) relevant — use `additionalProperty`):**
+
+| `additionalProperty` name | Value | Description |
+|--------------------------|-------|-------------|
+| `strain` | Text | Strain designation (e.g., K-12 substr. MG1655, ATCC 25922) |
+| `culture_collection` | Text | Culture collection identifier (e.g., ATCC, DSMZ, CGSC) |
+| `oxygen_requirement` | CV term | Oxygen condition (see Section 7.1 for controlled vocabulary) |
+| `growth_medium` | Text | Medium name (e.g., BHI, M9 minimal medium, LB broth) |
+| `incubation_temperature` | Text | Growth temperature with unit (e.g., "37°C") |
+| `sample_type` | CV term | Sample type (see Section 7.3 for controlled vocabulary) |
+| `harvest_phase` | CV term | Growth phase at harvest (see Section 7.4 for controlled vocabulary) |
+| `biosafety_level` | Text | BSL classification (e.g., "BSL-1", "BSL-2") |
+
+
+
+**_NOTE:_** This profile maps to `ASSAY.tsv` (strain, cell type, assay organism fields) and `ASSAY_PARAM.tsv` (growth conditions) for ChEMBL submission.
+
+---
+
+### 2.4 Gene Profile
+
+Use [Bioschemas Gene 1.0-RELEASE](https://bioschemas.org/profiles/Gene/1.0-RELEASE) to annotate biotransformation-relevant genes in the microbial genome (e.g., genes encoding nitroreductases, azoreductases, dehalogenases, or other xenobiotic-metabolising enzymes).
+
+**Minimum Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `@context` | URL | ONE | `"https://schema.org/"` |
+| `@type` | Text | ONE | `"Gene"` |
+| `@id` | IRI | ONE | Globally unique IRI (e.g., NCBI Gene URL) |
+| `dct:conformsTo` | IRI | ONE | `"https://bioschemas.org/profiles/Gene/1.0-RELEASE"` |
+| `identifier` | PropertyValue, Text, URL | ONE | Gene identifier (e.g., NCBI Gene ID, locus tag) |
+| `name` | Text | ONE | Gene symbol or name (e.g., "nfsA", "porA") |
+
+**Recommended Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `description` | Text | ONE | Gene function description |
+| `encodesBioChemEntity` | BioChemEntity | MANY | Protein(s) or RNA encoded by this gene |
+| `isPartOfBioChemEntity` | BioChemEntity | MANY | Chromosome or genome this gene belongs to |
+| `url` | URL | ONE | Link to the gene record in NCBI Gene or equivalent |
+
+**Optional Properties (MIX-MB(M) relevant):**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `hasMolecularFunction` | DefinedTerm, PropertyValue, URL | MANY | GO molecular function term |
+| `isInvolvedInBiologicalProcess` | DefinedTerm, PropertyValue, URL | MANY | GO biological process term |
+| `taxonomicRange` | DefinedTerm, Taxon, Text, URL | MANY | Organism(s) expressing this gene |
+| `hasBioPolymerSequence` | Text | ONE | Nucleotide sequence (FASTA) |
+| `alternateName` | Text | MANY | Alternative gene names or synonyms |
+| `sameAs` | URL | MANY | Same gene in other databases (UniProt gene page, Ensembl, etc.) |
+
+
+
+---
+
+### 2.5 Protein Profile
+
+Use [Bioschemas Protein 0.11-RELEASE](https://bioschemas.org/profiles/Protein/0.11-RELEASE) to describe enzymes responsible for xenobiotic biotransformation encoded by the microorganism.
+
+**Minimum Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `@context` | URL | ONE | `"https://schema.org/"` |
+| `@type` | Text | ONE | `"Protein"` |
+| `@id` | IRI | ONE | Globally unique IRI (e.g., UniProt URL) |
+| `dct:conformsTo` | IRI | ONE | `"https://bioschemas.org/profiles/Protein/0.11-RELEASE"` |
+| `identifier` | PropertyValue, Text, URL | ONE | Protein identifier (e.g., UniProt accession, PDB ID) |
+| `name` | Text | ONE | Protein name |
+
+**Recommended Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `description` | Text | ONE | Protein function; start with "Function: [...]" |
+| `isEncodedByBioChemEntity` | Gene | MANY | Gene(s) encoding this protein |
+| `taxonomicRange` | DefinedTerm, Taxon, Text, URL | MANY | Organism(s) expressing this protein |
+| `url` | URL | ONE | Link to the protein record (UniProt, etc.) |
+
+**Optional Properties (MIX-MB(M) relevant):**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `hasMolecularFunction` | DefinedTerm, PropertyValue, URL | MANY | GO molecular function term |
+| `isInvolvedInBiologicalProcess` | DefinedTerm, PropertyValue, URL | MANY | GO biological process term |
+| `isLocatedInSubcellularLocation` | DefinedTerm, PropertyValue, URL | MANY | Subcellular localisation |
+| `bioChemInteraction` | BioChemEntity | MANY | Interacting molecules (substrates, cofactors) |
+| `hasBioPolymerSequence` | Text | ONE | Amino acid sequence (FASTA) |
+| `alternateName` | Text | MANY | Protein synonyms |
+| `sameAs` | URL | MANY | Same protein in other databases (PDB, STRING, etc.) |
+
+
+---
+
+### 2.6 ProteinAnnotation Profile
+
+Use [Bioschemas ProteinAnnotation 0.6-DRAFT](https://bioschemas.org/profiles/ProteinAnnotation/0.6-DRAFT) to annotate specific functional features of biotransformation enzymes — such as active sites, binding sites, EC number assignments, or domain annotations.
+
+**Minimum Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `@context` | URL | ONE | `"https://schema.org/"` |
+| `@type` | Text | ONE | `"ProteinAnnotation"` |
+| `@id` | IRI | ONE | Globally unique IRI (e.g., UniProt feature URL) |
+| `dct:conformsTo` | IRI | ONE | `"https://bioschemas.org/profiles/ProteinAnnotation/0.6-DRAFT"` |
+| `identifier` | PropertyValue, Text, URL | ONE | Annotation identifier |
+
+**Recommended Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `name` | Text | ONE | Name of the annotation (e.g., "Active site", "FMN binding") |
+| `additionalType` | URL | MANY | Nature of annotation (e.g., domain, active site, variant) |
+| `description` | Text | ONE | Description of the annotated feature |
+| `creationMethod` | PropertyValue | ONE | Method used to generate the annotation (experimental / predicted) |
+| `url` | URL | ONE | Link to annotation in database |
+
+**Optional Properties (MIX-MB(M) relevant):**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `hasCategoryCode` | CategoryCode | MANY | Controlled vocabulary term (e.g., EC number) |
+| `location` | PropertyValue, Text, URL | MANY | Position in sequence (residue number, range) |
+| `isPartOfBioChemEntity` | BioChemEntity, URL | MANY | Protein this annotation belongs to |
+| `subcellularLocation` | URL | MANY | Subcellular compartment |
+| `additionalProperty` | PropertyValue | MANY | Extra annotation details |
+
 
 ---
 
@@ -292,341 +561,8 @@ antibiotic_resistance:
       mechanism: "antibiotic inactivation"
 ```
 
----
-
-## 4. MSI Metabolomics Standards
-
-Compliance with [Metabolomics Standards Initiative (MSI)](https://metabolomicssociety.org/resources/metabolomics-standards-initiative):
-
-### 4.1 Biological Context (MSI Level 1)
-
-**Required Information:**
-- **Organism:**
-  - Scientific name
-  - NCBI Taxonomy ID
-  - Strain designation
-  - Growth conditions (medium, temperature, oxygen)
-  
-- **Sample Information:**
-  - Sample type (pure culture, cell lysate, supernatant)
-  - Biomass or cell density
-  - Growth phase (exponential, stationary)
-  - Sample preparation method
-
-**Example:**
-```yaml
-organism:
-  species: "Escherichia coli"
-  ncbi_taxid: 562
-  strain: "K-12 MG1655"
-  growth_conditions:
-    medium: "M9 minimal medium"
-    temperature: "37°C"
-    oxygen: "aerobic"
-    incubation_time: "16h"
-sample:
-  type: "culture supernatant"
-  od600: 1.2
-  growth_phase: "stationary"
-  volume: "50 mL"
-```
-
-## 5. Growth and Cultivation Standards
-
-### 5.1 Culture Medium Specification
-
-**Required Information:**
-- **Medium Type:** Defined/complex/synthetic
-- **Medium Name:** Standard name (e.g., LB, TSB, M9)
-- **Composition:** Complete list of components with concentrations
-- **pH:** Initial and final (if measured)
-- **Sterilization Method:** Autoclaving, filter sterilization
-
-**Example:**
-```yaml
-culture_medium:
-  medium_name: "Brain Heart Infusion (BHI)"
-  medium_type: "complex"
-  supplier: "BD Difco"
-  catalog_number: "237500"
-  preparation:
-    powder_concentration: "37 g/L"
-    distilled_water: "1 L"
-    ph_adjustment: "7.4 ± 0.2"
-    sterilization: "autoclave 121°C, 15 min"
-  
-  supplements:
-    - compound: "hemin"
-      concentration: "5 µg/mL"
-    - compound: "vitamin K1"
-      concentration: "1 µg/mL"
-```
-
-**Minimal Medium Example:**
-```yaml
-culture_medium:
-  medium_name: "M9 minimal medium"
-  medium_type: "defined"
-  base_salts:
-    - "Na2HPO4·7H2O: 12.8 g/L"
-    - "KH2PO4: 3 g/L"
-    - "NaCl: 0.5 g/L"
-    - "NH4Cl: 1 g/L"
-  supplements:
-    - "MgSO4: 2 mM"
-    - "CaCl2: 0.1 mM"
-    - "glucose: 0.4% (w/v)"
-    - "thiamine: 1 mg/L"
-  ph: 7.0
-```
-
-### 5.2 Growth Conditions
-
-**Required Parameters:**
-
-| Parameter | Required | Unit | Description |
-|-----------|----------|------|-------------|
-| Temperature | Yes | °C | Incubation temperature |
-| Atmosphere | Yes | Text | Aerobic, anaerobic, microaerophilic |
-| Oxygen level | If anaerobic | % | O₂ concentration |
-| CO₂ level | If applicable | % | CO₂ concentration |
-| Shaking/agitation | Yes | rpm | Shaking speed (if applicable) |
-| Culture volume | Yes | mL | Volume in vessel |
-| Vessel type | Yes | Text | Flask type, tube, plate |
-| Inoculum size | Yes | CFU/mL or % | Starting cell density |
-| Growth duration | Yes | hours | Total incubation time |
-
-**Example:**
-```yaml
-growth_conditions:
-  temperature: "37°C"
-  atmosphere: "anaerobic"
-  oxygen_level: "<0.1%"
-  co2_level: "10%"
-  h2_level: "5%"
-  anaerobic_method: "anaerobic chamber (Coy Laboratory Products)"
-  shaking: "static (no shaking)"
-  culture_volume: "50 mL"
-  vessel_type: "serum bottle (125 mL, sealed with butyl rubber stopper)"
-  inoculum:
-    source: "overnight culture"
-    size: "1% (v/v)"
-    initial_od600: "0.05"
-  growth_duration: "24 hours"
-  sampling_timepoint: "stationary phase"
-```
-
-### 5.3 Growth Phase Documentation
-
-**Required:**
-- **Growth Phase:** Lag, exponential, stationary, death
-- **Cell Density:** OD₆₀₀ or CFU/mL
-- **Measurement Method:** Spectrophotometry, plate counting
-- **Viability:** Live/dead cell count (if applicable)
-
-**Example:**
-```yaml
-growth_phase:
-  harvest_phase: "stationary phase"
-  harvest_time: "24 hours post-inoculation"
-  od600: "1.2 ± 0.1"
-  cfu_per_ml: "2.5 × 10⁹"
-  viability: ">95% (live/dead staining)"
-  doubling_time: "45 minutes (exponential phase)"
-```
-
-### 5.4 Quality Control
-
-**Required Checks:**
-- **Purity:** Contamination testing
-- **Identity:** Verification method (16S rRNA, MALDI-TOF)
-- **Viability:** CFU counts, microscopy
-- **Reproducibility:** Batch-to-batch consistency
-
-**Example:**
-```yaml
-quality_control:
-  contamination_check:
-    method: "plating on selective media"
-    result: "no contamination detected"
-  identity_verification:
-    method: "16S rRNA gene sequencing"
-    result: "99.8% identity to Escherichia coli"
-    accession: "NR_024570.1"
-  morphology_check:
-    method: "Gram staining and microscopy"
-    result: "gram-negative rods, typical morphology"
-  storage:
-    method: "glycerol stock at -80°C"
-    glycerol_concentration: "15% (v/v)"
-```
 
 ---
-
-## 6. Data Formats
-
-1. https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/chembl-data-questions
-2. 
-
-
-### 6.1 ChEMBL ASSAY.tsv Format
-
-Microbial information in biotransformation assays:
-
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| AIDX | Yes | String | Assay identifier (include strain in ID) |
-| DESCRIPTION | Yes | String | Full assay description |
-| ASSAY_TYPE | Yes | String | "Biotransformation", "Metabolism" |
-| ASSAY_ORGANISM | Yes | String | Scientific name (Genus species) |
-| ASSAY_TAX_ID | Yes | Integer | NCBI Taxonomy ID |
-| ASSAY_STRAIN | Recommended | String | Strain designation |
-| ASSAY_TISSUE | No | String | Tissue/organ (for host-associated) |
-| ASSAY_CELL_TYPE | Recommended | String | Cell type or compartment |
-| ASSAY_SUBCELLULAR_FRACTION | No | String | Lysate, membrane, cytosol, etc. |
-| SRC_ASSAY_ID | No | String | Source database assay ID |
-| RIDX | Yes | String | Reference identifier |
-
-**Example:**
-```tsv
-AIDX	DESCRIPTION	ASSAY_TYPE	ASSAY_ORGANISM	ASSAY_TAX_ID	ASSAY_STRAIN	ASSAY_CELL_TYPE	RIDX
-A001_Ecoli_K12	Biotransformation of ibuprofen by E. coli K-12 MG1655 in anaerobic conditions	Biotransformation	Escherichia coli	562	K-12 MG1655	whole cell	REF_001
-A002_Csporogenes	Metabolism of diclofenac by Clostridium sporogenes ATCC 15579	Metabolism	Clostridium sporogenes	1509	ATCC 15579	whole cell	REF_001
-```
-
-### 6.2 Extended Microbial Metadata (JSON/YAML)
-
-**Comprehensive strain information:**
-
-```yaml
-# Strain Record
-strain_id: "ECOLI_K12_MG1655"
-biosample_accession: "SAMN02604091"
-
-# Taxonomy
-taxonomy:
-  ncbi_taxid: 511145
-  scientific_name: "Escherichia coli str. K-12 substr. MG1655"
-  common_name: "E. coli K-12"
-  rank: "no rank"
-  lineage:
-    - "Bacteria"
-    - "Pseudomonadota"
-    - "Gammaproteobacteria"
-    - "Enterobacterales"
-    - "Enterobacteriaceae"
-    - "Escherichia"
-
-# Strain Information
-strain_info:
-  strain_designation: "K-12 substr. MG1655"
-  type_strain: false
-  collection_numbers:
-    - "ATCC 47076"
-    - "CGSC 7740"
-  isolation_source: "Human intestinal isolate K-12, F- lambda-"
-  geographic_origin: "Stanford, California, USA"
-  isolation_year: 1922
-  isolated_by: "d'Herelle"
-
-# Genomic Information
-genome:
-  sequenced: true
-  assembly_accession: "GCA_000005845.2"
-  refseq_accession: "NC_000913.3"
-  genome_size: "4.64 Mb"
-  gc_content: "50.8%"
-  chromosome_count: 1
-  plasmid_count: 0
-  gene_count: 4321
-
-# Phenotype
-phenotype:
-  gram_stain: "negative"
-  cell_shape: "rod"
-  motility: "motile"
-  flagella: "peritrichous"
-  oxygen_requirement: "facultative anaerobe"
-  optimal_temperature: "37°C"
-  temperature_range: "20-42°C"
-  optimal_ph: "7.0"
-  ph_range: "6.0-8.0"
-
-# Safety & Regulation
-biosafety:
-  biosafety_level: "BSL-1"
-  risk_group: "1"
-  pathogenicity: "non-pathogenic laboratory strain"
-  gmo_status: "not genetically modified (wild-type)"
-
-# Availability
-availability:
-  culture_collections:
-    - name: "ATCC"
-      catalog_id: "47076"
-      url: "https://www.atcc.org/products/47076"
-    - name: "CGSC"
-      catalog_id: "7740"
-      url: "https://cgsc.biology.yale.edu/"
-  
-# Growth Requirements
-cultivation:
-  recommended_medium: "LB broth"
-  alternative_media: ["M9 minimal medium", "TSB"]
-  growth_temperature: "37°C"
-  atmosphere: "aerobic with shaking"
-  doubling_time: "~20 minutes (rich medium)"
-
-# Historical Context
-history:
-  parent_strain: "Escherichia coli K-12"
-  derivative_of: "E. coli K-12 F- lambda-"
-  notable_features:
-    - "Most widely studied bacterial organism"
-    - "Model organism for molecular biology"
-    - "Complete genome sequence available since 1997"
-```
-
-### 6.3 ISA-Tab Sample File (s_samples.txt)
-
-Microbial sample metadata in ISA-Tab format:
-
-```
-Source Name	Characteristics[Organism]	Characteristics[Strain]	Characteristics[NCBI Taxonomy ID]	Characteristics[Growth Medium]	Characteristics[Temperature]	Characteristics[Atmosphere]	Protocol REF	Sample Name
-Culture_001	Escherichia coli	K-12 MG1655	511145	LB broth	37°C	aerobic	P001_cultivation	Sample_001
-Culture_002	Clostridium sporogenes	ATCC 15579	1509	BHI + hemin	37°C	anaerobic	P002_anaerobic_cultivation	Sample_002
-```
-
-### 6.4 Microbial Database Submission Formats
-
-#### 6.4.1 BioSample (NCBI) XML
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<BioSample schema_version="2.0">
-  <SampleId>
-    <SPUID spuid_namespace="NFDI4Microbiota">Sample_001</SPUID>
-  </SampleId>
-  <Descriptor>
-    <Title>Escherichia coli K-12 MG1655 for drug biotransformation study</Title>
-    <Description>Pure culture of E. coli K-12 used in xenobiotic metabolism screen</Description>
-  </Descriptor>
-  <Organism taxonomy_id="511145">
-    <OrganismName>Escherichia coli str. K-12 substr. MG1655</OrganismName>
-  </Organism>
-  <Attributes>
-    <Attribute attribute_name="strain">K-12 substr. MG1655</Attribute>
-    <Attribute attribute_name="isolation source">laboratory stock</Attribute>
-    <Attribute attribute_name="collection date">2023-06-15</Attribute>
-    <Attribute attribute_name="geographic location">Germany</Attribute>
-    <Attribute attribute_name="culture collection">ATCC 47076</Attribute>
-  </Attributes>
-</BioSample>
-```
-
----
-
-
 
 ## 7. Controlled Vocabularies
 
@@ -670,297 +606,31 @@ Standard terms:
 
 ---
 
-## 8. Data Validation Rules
+## 4. Data Validation Rules
 
-### 8.1 Taxonomic Validation
-
-- NCBI TaxID must be valid and current (check against NCBI Taxonomy database)
-- Scientific name must match TaxID exactly
-- Strain designation should be from recognized culture collections
-- Taxonomic lineage must be complete and consistent
-
-### 8.2 Cultivation Parameters Validation
-
-- Temperature: Must be between -20°C and 100°C
-- pH: Must be between 0 and 14
-- Cell density (OD₆₀₀): Must be positive, typically 0.001-10.0
-- CFU/mL: Must be positive, typically 10⁴-10¹² range
-- Growth time: Must be positive
-
-### 8.3 Metadata Completeness
-
-- All Level A (Essential) fields must be present
-- At least 50% of Level B (Recommended) fields for high-quality submissions
-- Cross-references must be valid (culture collection IDs, accessions)
-
-### 8.4 Ontology Term Validation
-
-- NCBI TaxID format: must be integer
-- ENVO terms: Must follow "ENVO:" prefix with 7-digit number
-- GO terms: Must follow "GO:" prefix with 7-digit number
-- All ontology terms should be current (not obsolete)
 
 ---
 
-## 9. Data Quality Tiers
+## 5. Data Quality Tiers
 
-### Tier 1: Gold Standard (Publication-Ready)
-- All Level A and B information complete
-- Genome sequenced with public accession
-- Deposited in international culture collection
-- 16S rRNA sequence verified (>99% match)
-- Comprehensive phenotypic characterization
-- Multiple independent biological replicates
-
-### Tier 2: Silver Standard (Research-Grade)
-- All Level A information complete
-- Most Level B information present
-- Identity confirmed by 16S rRNA or MALDI-TOF
-- Basic phenotypic characterization
-- Biological replicates (n≥2)
-
-### Tier 3: Bronze Standard (Preliminary)
-- All Level A essential information
-- Basic cultivation data
-- Identity presumed from morphology/biochemical tests
-- Suitable for screening studies
 
 ---
 
-## 10. Example Complete Record
 
-```yaml
-# MIX-MB(M) Compliant Microbial Record
-
-# Basic Identification
-organism_id: "ORG_001"
-scientific_name: "Bacteroides thetaiotaomicron"
-common_name: "B. theta"
-ncbi_taxid: 818
-strain_designation: "VPI-5482"
-
-# Taxonomy
-taxonomy:
-  domain: "Bacteria"
-  phylum: "Bacteroidota"
-  class: "Bacteroidia"
-  order: "Bacteroidales"
-  family: "Bacteroidaceae"
-  genus: "Bacteroides"
-  species: "Bacteroides thetaiotaomicron"
-
-# Strain Information
-strain_info:
-  type_strain: true
-  culture_collections:
-    - collection: "ATCC"
-      accession: "29148"
-      url: "https://www.atcc.org/products/29148"
-    - collection: "DSM"
-      accession: "2079"
-  isolation_source: "human fecal sample"
-  isolation_location: "USA"
-  host: "Homo sapiens"
-  isolation_year: 1972
-
-# Genomic Data
-genome:
-  sequenced: true
-  assembly_accession: "GCA_000011065.1"
-  refseq_accession: "NC_004663.1"
-  genome_size: "6.26 Mb"
-  gc_content: "42.8%"
-  chromosome_count: 1
-  plasmid_count: 0
-  annotation: "Complete genome, 4816 protein-coding genes"
-
-# Phenotype
-phenotype:
-  gram_stain: "negative"
-  cell_shape: "rod"
-  cell_size: "0.5-0.8 × 2-6 µm"
-  motility: "non-motile"
-  flagella: false
-  spore_formation: false
-  oxygen_requirement: "obligate anaerobe"
-  optimal_temperature: "37°C"
-  temperature_range: "30-42°C"
-  optimal_ph: "6.5-7.5"
-  
-# Environmental Context
-environment:
-  habitat: "ENVO:00002043 (gastrointestinal tract)"
-  host_association: "human gut microbiome"
-  abundance: "major constituent (>10% in some individuals)"
-  ecological_role: "polysaccharide degradation"
-
-# Cultivation
-cultivation:
-  recommended_medium: "BHI supplemented with hemin and vitamin K"
-  alternative_media:
-    - "YCFA (Yeast Casitone Fatty Acid) medium"
-    - "Anaerobe Basal Broth + supplements"
-  growth_conditions:
-    temperature: "37°C"
-    atmosphere: "anaerobic (85% N₂, 10% CO₂, 5% H₂)"
-    vessel: "serum bottle with butyl rubber stopper"
-    shaking: "static (no shaking)"
-  growth_characteristics:
-    doubling_time: "90-120 minutes"
-    max_od600: "2.5-3.0"
-    growth_curve_shape: "typical sigmoidal"
-
-# Experimental Conditions (for biotransformation study)
-experimental_setup:
-  culture_medium:
-    name: "BHI"
-    supplements:
-      - "hemin: 5 µg/mL"
-      - "vitamin K1: 1 µg/mL"
-      - "L-cysteine: 0.5 g/L"
-  inoculum:
-    source: "overnight culture"
-    initial_od600: "0.05"
-  growth_duration: "24 hours"
-  harvest_phase: "stationary phase"
-  harvest_od600: "2.2"
-  cell_concentration: "5.0 × 10⁹ CFU/mL"
-
-# Quality Control
-quality_control:
-  purity_check:
-    method: "colony morphology on blood agar"
-    result: "pure culture, no contamination"
-  identity_verification:
-    method: "16S rRNA gene sequencing (full length)"
-    result: "100% match to B. thetaiotaomicron VPI-5482"
-    accession: "NR_074376.1"
-  viability:
-    method: "serial dilution plating"
-    result: ">99% viable cells"
-  microscopy:
-    method: "Gram stain"
-    observation: "gram-negative rods, typical morphology"
-
-# Safety
-biosafety:
-  biosafety_level: "BSL-2"
-  risk_group: "2"
-  pathogenicity: "opportunistic pathogen"
-  special_precautions: "handle in anaerobic chamber"
-
-# Metabolic Capabilities
-metabolism:
-  key_pathways:
-    - "polysaccharide utilization loci (PULs)"
-    - "glycan degradation"
-    - "short-chain fatty acid production"
-  biotransformation_enzymes:
-    - enzyme: "azoreductase"
-      ec_number: "EC 1.7.1.17"
-      function: "azo bond reduction"
-    - enzyme: "nitroreductase"
-      ec_number: "EC 1.7.1.12"
-      function: "nitro group reduction"
-  known_substrates:
-    - "polysaccharides (diverse)"
-    - "xenobiotics (limited studies)"
-
-# Previous Studies
-references:
-  - study: "Genome analysis"
-    pmid: "14660578"
-    doi: "10.1126/science.1088727"
-  - study: "Polysaccharide utilization"
-    pmid: "16172379"
-    doi: "10.1073/pnas.0504002102"
-
-# Data Quality
-quality_tier: "Gold Standard"
-validation_status: "Passed"
-completeness_score: "98%"
-last_updated: "2026-02-05"
-```
+## 6. How to use the Template
 
 ---
 
-## 11. Integration with MIX-MB(X)
 
-### 11.1 Linking Microbes to Xenobiotics
-
-**Cross-Reference Structure:**
-```yaml
-biotransformation_experiment:
-  experiment_id: "EXP_001"
-  
-  # Xenobiotic (from MIX-MB(X))
-  substrate:
-    cidx: "C001"
-    compound_name: "Ibuprofen"
-    chembl_id: "CHEMBL1201246"
-  
-  # Microbe (from MIX-MB(M))
-  organism:
-    organism_id: "ORG_001"
-    scientific_name: "Bacteroides thetaiotaomicron"
-    ncbi_taxid: 818
-    strain: "VPI-5482"
-  
-  # Assay linking both
-  assay:
-    aidx: "A001_Btheta_VPI5482"
-    description: "Biotransformation of ibuprofen by B. theta VPI-5482"
-```
-
-### 11.2 Unified Submission
-
-For ChEMBL submission, combine information:
-- REFERENCE.tsv (publication info)
-- COMPOUND files (xenobiotic - MIX-MB(X))
-- ASSAY files (includes organism - MIX-MB(M))
-- ACTIVITY files (links compound + organism)
-
----
-
-## 12. Software Tools & Resources
-
-### 12.1 Taxonomic Identification
-
-- **16S rRNA Analysis:** EzBioCloud, SILVA, RDP Classifier
-- **MALDI-TOF:** Bruker MALDI Biotyper, bioMérieux VITEK MS
-- **Whole Genome:** ANI calculator, TYGS (Type Strain Genome Server)
-
-### 12.2 Database Resources
-
-- **NCBI Taxonomy:** https://www.ncbi.nlm.nih.gov/taxonomy
-- **LPSN (List of Prokaryotic names):** https://lpsn.dsmz.de/
-- **BacDive:** https://bacdive.dsmz.de/
-- **ATCC:** https://www.atcc.org/
-- **DSMZ:** https://www.dsmz.de/
-
-### 12.3 Ontology Tools
-
-- **OLS (Ontology Lookup Service):** https://www.ebi.ac.uk/ols/
-- **BioPortal:** https://bioportal.bioontology.org/
-- **ENVO Browser:** http://www.environmentontology.org/
-
-### 12.4 Metadata Management
-
-- **ISA Tools:** https://isa-tools.org/
-- **NCBI BioSample submission:** https://submit.ncbi.nlm.nih.gov/
-- **ENA (European Nucleotide Archive):** https://www.ebi.ac.uk/ena/
-
----
-
-## 13. Version History
+## 7. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
-| 0.1.0 | 2026-02-05 | Initial draft: Core microbial standards defined |
+| 0.1.0 | 2026-02-05 | Draft |
 
 ---
 
-## 14. References
+## 8. References
 
 1. NCBI Taxonomy Database: https://www.ncbi.nlm.nih.gov/taxonomy
 2. Genomic Standards Consortium (GSC): https://www.gensc.org/
@@ -974,7 +644,7 @@ For ChEMBL submission, combine information:
 
 ---
 
-## 15. Contact and Contributions
+## 9. Contact and Contributions
 
 For questions, suggestions, or contributions to this standard, please contact:
 - **Maintainer:** Mahnoor Zulfiqar
@@ -983,4 +653,3 @@ For questions, suggestions, or contributions to this standard, please contact:
 - **Repository:** [[GitHub repository URL](https://github.com/zmahnoor14/BioXend)]
 
 ---
-

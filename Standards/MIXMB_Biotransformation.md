@@ -3,8 +3,9 @@
 
 This document identifies Minimum Information (MI) required to report the biotransformation process between microorganisms and xenobiotic compounds. MIX-MB(B) bridges MIX-MB(X) (xenobiotics) and MIX-MB(M) (microbes) by defining standards for the experimental assays, measurements, and outcomes.
 
-**Version:** 0.1.0  
-**Release Date:** February 5, 2026 (Draft)  
+**Author:** Mahnoor Zulfiqar
+**Version:** 0.1.0
+**Release Date:** February 5, 2026 (Draft)
 **Status:** Draft Standard  
 **Part of:** MIX-MB Standard v0.1  
 **Replaces:** N/A  
@@ -14,6 +15,62 @@ This document identifies Minimum Information (MI) required to report the biotran
 
 **Breaking Changes:** N/A  
 **Alignment:** ChEMBL, BioAssay Ontology (BAO), STRENDA, MIAME, FAIR principles
+
+---
+
+## Table of Contents
+
+- [1. Overview](#1-overview)
+  - [1.1 How is this document organised?](#11-how-is-this-document-organised)
+  - [1.2 Which sections are important for contributors?](#12-which-sections-are-important-for-contributors)
+  - [1.3 Which sections are important for data submitters?](#13-which-sections-are-important-for-data-submitters)
+  - [1.4 Identifiers and Cross-Referencing](#14-identifiers-and-cross-referencing)
+- [2. Bioschemas](#2-bioschemas)
+  - [2.1 Study Profile](#21-study-profile)
+  - [2.2 LabProtocol Profile](#22-labprotocol-profile)
+  - [2.3 Dataset Profile](#23-dataset-profile)
+- [3. Ontologies](#3-ontologies)
+  - [3.1 BioAssay Ontology (BAO)](#31-bioassay-ontology-bao)
+  - [3.2 Gene Ontology (GO) — Biological Process](#32-gene-ontology-go---biological-process)
+  - [3.3 Chemical Methods Ontology (CHMO)](#33-chemical-methods-ontology-chmo)
+  - [3.4 Reaction Types Ontology](#34-reaction-types-ontology)
+- [4. Assay Design and Experimental Setup](#4-assay-design-and-experimental-setup)
+  - [4.1 Assay Type Classification](#41-assay-type-classification)
+  - [4.2 Required Assay Information](#42-required-assay-information)
+  - [4.3 Substrate Preparation](#43-substrate-preparation)
+  - [4.4 Cell/Enzyme Preparation](#44-cellenzyme-preparation)
+  - [4.5 Reaction Setup](#45-reaction-setup)
+  - [4.6 Sampling and Quenching](#46-sampling-and-quenching)
+- [5. Analytical Methods and Detection](#5-analytical-methods-and-detection)
+  - [5.1 LC-MS/MS Method](#51-lc-msms-method)
+  - [5.2 Data Processing](#52-data-processing)
+  - [5.3 Quality Control](#53-quality-control)
+- [6. Activity Measurements and Outcomes](#6-activity-measurements-and-outcomes)
+  - [6.1 Activity Types](#61-activity-types)
+  - [6.2 Quantitative Measurements](#62-quantitative-measurements)
+  - [6.3 Dose-Response Data](#63-dose-response-data)
+  - [6.4 Time-Course Data](#64-time-course-data)
+- [7. Product Characterization](#7-product-characterization)
+  - [7.1 Metabolite Identification](#71-metabolite-identification)
+  - [7.2 Structural Characterization](#72-structural-characterization)
+  - [7.3 Transformation Pathway](#73-transformation-pathway)
+- [8. Data Formats — ACTIVITY.tsv](#8-data-formats---activitytsv)
+  - [8.1 MIX-MB(B) Activity Template (Template.xlsx — Activity Sheet)](#81-mix-mbb-activity-template-templatexlsx--activity-sheet)
+  - [8.2 ChEMBL ACTIVITY.tsv Mapping](#82-chembl-activitytsv-mapping)
+  - [8.3 Controlled Vocabularies for Activity Fields](#83-controlled-vocabularies-for-activity-fields)
+  - [8.4 Example Template Rows](#84-example-template-rows)
+- [9. Controls and Validation](#9-controls-and-validation)
+  - [9.1 Required Controls](#91-required-controls)
+  - [9.2 Quality Assurance](#92-quality-assurance)
+- [10. Statistical Analysis](#10-statistical-analysis)
+  - [10.1 Required Statistical Information](#101-required-statistical-information)
+  - [10.2 Data Visualization Requirements](#102-data-visualization-requirements)
+- [11. Data Quality Tiers](#11-data-quality-tiers)
+- [12. Example Complete Record](#12-example-complete-record)
+- [13. Integration with Other Standards](#13-integration-with-other-standards)
+- [15. Version History](#15-version-history)
+- [16. References](#16-references)
+- [17. Contact and Contributions](#17-contact-and-contributions)
 
 ---
 
@@ -27,18 +84,7 @@ MIX-MB(B) establishes minimum information standards for documenting biotransform
 - **Traceability:** Links between substrates, organisms, and products
 - **Quality:** Validation and quality control measures
 
-### 1.1 Scope
-
-This standard covers:
-- In vitro biotransformation assays (whole cells, lysates, purified enzymes)
-- Ex vivo studies (tissue/organ preparations)
-- In situ measurements (community-level biotransformation)
-- Time-course experiments
-- Dose-response studies
-- Product identification and quantification
-- Type of Biotransformation
-
-### 1.2 Relationship to Other Standards
+This standard covers in vitro biotransformation assays (whole cells, lysates, purified enzymes), ex vivo studies, in situ community-level measurements, time-course experiments, dose-response studies, and product identification. It bridges MIX-MB(X) (xenobiotics) and MIX-MB(M) (microbes):
 
 ```
 MIX-MB(X)              MIX-MB(B)              MIX-MB(M)
@@ -47,116 +93,353 @@ MIX-MB(X)              MIX-MB(B)              MIX-MB(M)
    Product               Assay                  Enzyme
    Structure             Activity               Strain
 ```
+
 ### 1.1 How is this document organised?
+
+- **Section 1** — Introduction to MIX-MB(B): scope, relationship to MIX-MB(X) and MIX-MB(M), and how to use this document.
+- **Section 2** — Bioschemas profiles: structured metadata for the experimental study, assay protocol, and activity datasets.
+- **Section 3** — Ontologies: BAO for assay classification, GO for biological processes and molecular functions, CHMO for analytical techniques, and reaction type classification.
+- **Section 4** — Assay design and experimental setup: how to classify assay types, document substrate and cell/enzyme preparation, reaction conditions, and sampling strategy.
+- **Section 5** — Analytical methods and detection: which LC-MS/MS acquisition parameters and data processing steps to report.
+- **Section 6** — Activity measurements and outcomes: how to record substrate depletion, product formation, transformation rates, dose-response, and time-course data.
+- **Section 7** — Product characterization: MSI metabolite identification confidence levels, structural elucidation, and transformation pathway documentation.
+- **Section 8** — Data formats: how to populate ChEMBL `ACTIVITY.tsv` and `ASSAY.tsv` submission files.
+- **Section 9** — Controls and validation: required experimental controls and analytical quality assurance criteria.
+- **Section 10** — Statistical analysis: minimum statistical reporting requirements.
+- **Section 11** — Data quality tiers: Gold / Silver / Bronze compliance levels.
+- **Section 12** — Example complete record: a fully annotated MIX-MB(B)-compliant biotransformation study.
+- **Section 13** — Integration with MIX-MB(X) and MIX-MB(M): complete data package structure and cross-referencing strategy.
+- **Section 14** — Software tools and resources: data acquisition, processing, and deposition tools.
 
 ### 1.2 Which sections are important for contributors?
 
-### 1.3 Which sections are important for the data submitors?
+If you want to propose changes to the standard, focus on **Sections 2 and 3** (the Bioschemas metadata fields and ontologies), then follow the contribution process in [Versioning.md](Versioning.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Changes require a 7-day community review and 2 independent endorsements.
+
+### 1.3 Which sections are important for data submitters?
+
+If you are preparing data for submission, you need:
+- **Section 4** — how to classify your assay type and document the experimental setup
+- **Section 6** — how to quantify and record biotransformation activity results
+- **Section 8** — how to populate `ACTIVITY.tsv` and `ASSAY.tsv` for ChEMBL submission
+- **Section 9** — minimum controls required for a valid submission
+- **[Template.xlsx](Templates/Template.xlsx)** — colour-coded submission template (green = mandatory, blue = recommended, yellow = optional), specifically the **Activity** and **Assay** sheets.
+
+### 1.4 Identifiers and Cross-Referencing
+
+**This is the first practical step: establish the three-way identifier link (RIDX → CIDX → AIDX) before recording any activity.**
+
+#### The Three-Way Identifier System
+
+Every biotransformation event in MIX-MB is anchored by three identifiers that must be consistent across all submission files:
+
+| Identifier | Entity | Appears in | Format example |
+|-----------|--------|-----------|----------------|
+| **RIDX** | Reference (study / publication) | All files | `Zimmermann_GutBiotransformationAtlas` |
+| **CIDX** | Compound (substrate or product) | `COMPOUND_RECORD.tsv`, `ACTIVITY.tsv` | `CIDX0001` |
+| **AIDX** | Assay (organism × condition) | `ASSAY.tsv`, `ASSAY_PARAM.tsv`, `ACTIVITY.tsv` | `Zimmermann_Actinomyces_graevenitzii_biotransformation` |
+
+Every row in `ACTIVITY.tsv` must carry all three identifiers. They are the join keys that link compounds to assays to publications — if any one is missing or inconsistent, the record cannot be deposited or queried.
+
+#### Reference Index (RIDX)
+
+The RIDX is assigned once per study and used unchanged across every file in the submission.
+
+**Minting rules:**
+- Format: `[FirstAuthorLastName]_[DescriptiveLabel]`, e.g. `Zimmermann_GutBiotransformationAtlas`
+- Must be unique across all submissions to the target database
+- Use only ASCII letters, digits, underscores, and hyphens — no spaces or special characters
+- Set the RIDX at the outset of data preparation; do not change it after any file references it
+
+#### Activity Record Cross-Referencing
+
+Individual rows in `ACTIVITY.tsv` do not require their own unique identifier, but every row must carry a consistent `CIDX × AIDX × RIDX` triplet. Each such triplet represents one compound–assay interaction.
+
+**Rules:**
+- The same `CIDX × AIDX` pair may appear on multiple rows if multiple activity types are reported (e.g. both `Substrate` and `Product` for the same compound in the same assay)
+- Do not reuse the same `CIDX × AIDX × ACTION_TYPE` combination for separate measurements — add a distinguishing note in `ACTIVITY_COMMENT` instead
+- Every CIDX referenced in `ACTIVITY.tsv` must exist in `COMPOUND_RECORD.tsv`; every AIDX must exist in `ASSAY.tsv` — orphan references will fail ChEMBL validation
+
+#### Minting Scheme for Unconfirmed Biotransformation Events
+
+| Situation | `ACTION_TYPE` | CIDX to use | Notes |
+|-----------|--------------|------------|-------|
+| Substrate consumed (confirmed) | `Substrate` | Known `CIDX[nnnn]` | Quantitative `VALUE` recommended |
+| Product identified (MSI Level 1–2) | `Product` | Known `CIDX[nnnn]` | InChIKey required in `COMPOUND_RECORD.tsv` |
+| Product putatively characterised (MSI Level 3) | `Product` | `PUTATIVE_[RIDX]_[n]` | Add structural class and MSI level in `ACTIVITY_COMMENT` |
+| Product detected, unknown structure (MSI Level 4–5) | `Product` | `UNKNOWN_[RIDX]_[n]` | Add m/z, adduct type, and MSI level in `ACTIVITY_COMMENT` |
+| No biotransformation detected | `No Activity` | Substrate CIDX | Set `TEXT_VALUE` to `"No biotransformation detected"` |
+
+For time-course or dose-response experiments, group multiple measurements under the same `CIDX × AIDX` pair and distinguish individual rows using `ACTIVITY_COMMENT` (e.g. timepoint or concentration) rather than minting new identifiers.
+
+#### sameAs Cross-Referencing for Biotransformation Records
+
+`ACTIVITY.tsv` rows themselves are not linked externally via `sameAs`. Cross-database interoperability is achieved through the compound and assay entities that the activity references:
+- **Compound identity:** via InChIKey and `sameAs` URLs in the compound record — see [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md)
+- **Organism identity:** via NCBI TaxID and `sameAs` URLs in the assay record — see [MIX-MB(M) Section 1.4](MIXMB_Microbes.md)
+
+If the same biotransformation event is reported in a separate publication or database, cross-reference it using `ACTIVITY_COMMENT` with a DOI or database accession rather than a `sameAs` property.
+
 ---
 
 ## 2. Bioschemas
-Samples, study, 
 
-### 2.1 BioChemEntity Profile (Biotransformation Reaction)
+MIX-MB(B) uses Bioschemas profiles to provide structured, FAIR-compliant annotation of the experimental study, laboratory protocol, and results dataset. These profiles cross-link with the organism metadata in MIX-MB(M) (Taxon, Sample profiles) and the chemical metadata in MIX-MB(X) (MolecularEntity profile). Bioschemas fulfils the Findability and Interoperability aspects of FAIR.
 
-**Required Properties:**
-- `@type`: BioChemEntity
-- `identifier`: Reaction identifier
-- `name`: Biotransformation reaction name
-- `biochemicalInteraction`: Type of transformation
-- `isInvolvedInBiologicalProcess`: GO term for process
-- `hasBioChemEntityPart`: Substrate and product entities
+The following profiles are used:
+
+| Profile | Source | Version | Use in MIX-MB(B) |
+|---------|--------|---------|------------------|
+| [Study](https://bioschemas.org/profiles/Study/0.3-DRAFT) | Bioschemas | 0.3-DRAFT | Overall experiment design and metadata |
+| [LabProtocol](https://bioschemas.org/profiles/LabProtocol/0.7-DRAFT) | Bioschemas | 0.7-DRAFT | Biotransformation assay protocol |
+| [Dataset](https://bioschemas.org/profiles/Dataset/1.0-RELEASE) | Bioschemas | 1.0-RELEASE | Activity and measurement results |
+
+**_NOTE:_** Study and LabProtocol profiles map to `ASSAY.tsv` and `ASSAY_PARAM.tsv` for ChEMBL submission. Dataset covers activity data in `ACTIVITY.tsv` and supports deposition in MetaboLights or GNPS.
+
+---
+
+### 2.1 Study Profile
+
+Use [Bioschemas Study 0.3-DRAFT](https://bioschemas.org/profiles/Study/0.3-DRAFT) to describe the overall biotransformation experiment, linking the xenobiotic substrate, microbial organism, and assay conditions into a single structured record.
+
+**Minimum Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `@context` | URL | ONE | `"https://schema.org/"` |
+| `@type` | Text | ONE | `"Study"` |
+| `@id` | IRI | ONE | Globally unique IRI identifying this study |
+| `dct:conformsTo` | IRI | ONE | `"https://bioschemas.org/profiles/Study/0.3-DRAFT"` |
+| `identifier` | PropertyValue, Text, URL | ONE | Study identifier (e.g., RIDX, MetaboLights accession, DOI) |
+| `name` | Text | ONE | Study title |
+
+**Recommended Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `description` | Text | ONE | Free-text description of the biotransformation study |
+| `author` | Organization, Person | MANY | Principal investigator(s) and contributing authors |
+| `datePublished` | Date | ONE | Publication or submission date |
+| `url` | URL | ONE | Link to the study in a public repository (e.g., MetaboLights) |
+| `studyDomain` | Text | MANY | Research domains: `"microbiology"`, `"xenobiotic biotransformation"` |
+
+**Optional Properties (MIX-MB(B) relevant):**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `citation` | CreativeWork, URL | MANY | Related publications |
+| `keywords` | DefinedTerm, Text | MANY | Descriptive keywords (e.g., gut microbiome, drug metabolism) |
+| `measurementTechnique` | DefinedTerm, Text, URL | MANY | Analytical technique (e.g., LC-MS/MS, CHMO:0000470) |
+| `variableMeasured` | PropertyValue, Text | MANY | Primary outcome variable (e.g., substrate depletion %) |
+| `isPartOf` | CreativeWork, URL | MANY | Larger project or dataset collection this study belongs to |
 
 **Example:**
 ```json
 {
-  "@context": "https://schema.org",
-  "@type": "BioChemEntity",
-  "identifier": "BTRANS_001",
-  "name": "Reduction of ibuprofen to hydroxy-ibuprofen",
-  "biochemicalInteraction": "reduction",
-  "isInvolvedInBiologicalProcess": {
-    "@type": "DefinedTerm",
-    "identifier": "GO:0006805",
-    "name": "xenobiotic metabolic process",
-    "inDefinedTermSet": "Gene Ontology"
+  "@context": "https://schema.org/",
+  "@type": "Study",
+  "@id": "https://www.ebi.ac.uk/metabolights/MTBLS1234",
+  "http://purl.org/dc/terms/conformsTo": {
+    "@id": "https://bioschemas.org/profiles/Study/0.3-DRAFT",
+    "@type": "CreativeWork"
   },
-  "hasBioChemEntityPart": [
-    {
-      "@type": "MolecularEntity",
-      "identifier": "CHEMBL1201246",
-      "name": "Ibuprofen",
-      "roleInBiochemicalEntity": "substrate"
-    },
-    {
-      "@type": "MolecularEntity",
-      "identifier": "METABOLITE_001",
-      "name": "Hydroxy-ibuprofen",
-      "roleInBiochemicalEntity": "product"
-    }
-  ]
+  "identifier": "MTBLS1234",
+  "name": "Microbial biotransformation of NSAIDs by human gut bacteria under anaerobic conditions",
+  "description": "Whole-cell biotransformation screen of 12 NSAIDs against 25 human gut bacterial strains, measuring substrate depletion and product formation by LC-MS/MS over 24 hours",
+  "author": [
+    { "@type": "Person", "name": "Mahnoor Zulfiqar", "affiliation": "EMBL Heidelberg" }
+  ],
+  "datePublished": "2026-03-05",
+  "url": "https://www.ebi.ac.uk/metabolights/MTBLS1234",
+  "studyDomain": ["microbiology", "xenobiotic biotransformation"],
+  "measurementTechnique": {
+    "@type": "DefinedTerm",
+    "name": "liquid chromatography-mass spectrometry",
+    "termCode": "CHMO:0000470"
+  },
+  "variableMeasured": "substrate depletion percentage",
+  "keywords": ["gut microbiome", "drug biotransformation", "NSAID metabolism", "LC-MS/MS"]
 }
 ```
+
+**_NOTE:_** `identifier` from this profile maps to the `RIDX` field across all ChEMBL submission files (`REFERENCE.tsv`, `ASSAY.tsv`, `ACTIVITY.tsv`).
+
+---
 
 ### 2.2 LabProtocol Profile
 
-**Required Properties:**
-- `@type`: LabProtocol
-- `name`: Protocol name
-- `purpose`: Biotransformation assay
-- `protocolStep`: Sequential steps
-- `reagent`: List of reagents used
-- `instrument`: Equipment and instruments
+Use [Bioschemas LabProtocol 0.7-DRAFT](https://bioschemas.org/profiles/LabProtocol/0.7-DRAFT) to document the biotransformation assay protocol — covering inoculation, substrate exposure, incubation conditions, sampling, and analytical extraction.
+
+**Minimum Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `@context` | URL | ONE | `"https://schema.org/"` |
+| `@type` | Text | ONE | `"LabProtocol"` |
+| `@id` | IRI | ONE | Globally unique IRI (e.g., protocols.io DOI) |
+| `dct:conformsTo` | IRI | ONE | `"https://bioschemas.org/profiles/LabProtocol/0.7-DRAFT"` |
+| `purpose` | Text | ONE | Purpose of the protocol (e.g., `"Anaerobic whole-cell biotransformation assay"`) |
+| `url` | URL | ONE | Link to the protocol (protocols.io, supplementary material, etc.) |
+
+**Recommended Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `name` | Text | ONE | Protocol name |
+| `identifier` | PropertyValue, Text, URL | ONE | Protocol identifier (e.g., protocols.io accession) |
+| `description` | Text | ONE | Short description of the method |
+| `instrument` | Text, URL | MANY | Equipment used (e.g., anaerobic chamber, LC-MS system) |
+| `reagent` | BioChemEntity, ChemicalSubstance, MolecularEntity | MANY | Substrates, solvents, and reagents used |
+| `bioSampleUsed` | BioSample, Sample, URL | MANY | Microbial cultures (links to MIX-MB(M) Sample records) |
+| `labEquipment` | DefinedTerm, Text, URL | MANY | Specific equipment |
+
+**Optional Properties (MIX-MB(B) relevant):**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `duration` | Text, URL | ONE | Total protocol duration (e.g., `"24 hours"`) |
+| `step` | HowToSection, HowToStep, URL | MANY | Sequential protocol steps |
+| `computationalTool` | SoftwareApplication | MANY | Software used in the analysis pipeline |
+| `citation` | CreativeWork, URL | MANY | Literature supporting this protocol |
+| `isPartOf` | LabProtocol, URL | MANY | Parent protocol this is a sub-protocol of |
 
 **Example:**
 ```json
 {
-  "@context": "https://schema.org",
+  "@context": "https://schema.org/",
   "@type": "LabProtocol",
-  "identifier": "PROTO_BT_001",
-  "name": "Anaerobic bacterial biotransformation assay",
-  "purpose": "Measure xenobiotic biotransformation by gut bacteria",
-  "protocolStep": [
+  "@id": "https://dx.doi.org/10.17504/protocols.io.xyz123",
+  "http://purl.org/dc/terms/conformsTo": {
+    "@id": "https://bioschemas.org/profiles/LabProtocol/0.7-DRAFT",
+    "@type": "CreativeWork"
+  },
+  "name": "Anaerobic whole-cell biotransformation assay with gut bacteria",
+  "purpose": "Quantify xenobiotic biotransformation by gut bacterial strains under physiological anaerobic conditions",
+  "identifier": "protocols.io:xyz123",
+  "url": "https://dx.doi.org/10.17504/protocols.io.xyz123",
+  "description": "Stationary-phase cultures are washed, resuspended at OD₆₀₀ 1.0, and incubated with xenobiotic at 37°C under strict anaerobic conditions for 24 hours. Substrate depletion and product formation are quantified by LC-MS/MS.",
+  "instrument": [
+    "Anaerobic chamber (Coy Laboratory Products)",
+    "Agilent 1290 UHPLC",
+    "Thermo Q Exactive Plus Orbitrap MS"
+  ],
+  "reagent": [
+    { "@type": "ChemicalSubstance", "name": "Ibuprofen", "identifier": "CHEMBL1201246" },
+    { "@type": "ChemicalSubstance", "name": "DMSO (vehicle)", "identifier": "CHEBI:28262" },
+    { "@type": "ChemicalSubstance", "name": "BHI medium supplemented with hemin and vitamin K1" }
+  ],
+  "bioSampleUsed": {
+    "@type": "Sample",
+    "identifier": "biosample:SAMN02604091",
+    "name": "Escherichia coli K-12 MG1655 anaerobic culture"
+  },
+  "duration": "24 hours",
+  "step": [
+    { "@type": "HowToStep", "name": "Culture preparation", "text": "Grow bacteria to stationary phase in BHI medium under anaerobic conditions" },
+    { "@type": "HowToStep", "name": "Cell harvesting", "text": "Centrifuge at 5000 × g, 10 min, 4°C; wash twice with sterile PBS" },
+    { "@type": "HowToStep", "name": "Substrate addition", "text": "Add xenobiotic to final concentration of 100 µM (0.1% DMSO)" },
+    { "@type": "HowToStep", "name": "Incubation", "text": "Incubate at 37°C in anaerobic chamber for 24 h with sampling at 0, 3, 6, 12, 24 h" },
+    { "@type": "HowToStep", "name": "Sample quenching", "text": "Add equal volume ice-cold acetonitrile with 0.1% formic acid; centrifuge at 15,000 × g" },
+    { "@type": "HowToStep", "name": "LC-MS/MS analysis", "text": "Analyse supernatant by reversed-phase LC-MS/MS in negative ion mode" }
+  ]
+}
+```
+
+**_NOTE:_** This profile maps to `ASSAY.tsv` (`ASSAY_DESCRIPTION`, `ASSAY_TYPE`) and `ASSAY_PARAM.tsv` (incubation conditions, atmosphere, duration) for ChEMBL submission.
+
+---
+
+### 2.3 Dataset Profile
+
+Use [Bioschemas Dataset 1.0-RELEASE](https://bioschemas.org/profiles/Dataset/1.0-RELEASE) to describe the biotransformation activity data — making results findable and citable as a distinct, structured dataset linked to the study and compounds.
+
+**Minimum Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `@context` | URL | ONE | `"https://schema.org/"` |
+| `@type` | Text | ONE | `"Dataset"` |
+| `@id` | IRI | ONE | Globally unique IRI (e.g., MetaboLights URL, DOI) |
+| `dct:conformsTo` | IRI | ONE | `"https://bioschemas.org/profiles/Dataset/1.0-RELEASE"` |
+| `name` | Text | ONE | Dataset name |
+| `description` | Text | ONE | Description of the activity dataset contents |
+| `identifier` | PropertyValue, Text, URL | ONE | Dataset identifier (e.g., MetaboLights accession, DOI) |
+| `keywords` | DefinedTerm, Text | MANY | Keywords for discovery |
+| `license` | CreativeWork, URL | ONE | Dataset license (e.g., CC BY 4.0) |
+| `url` | URL | ONE | URL where the dataset can be accessed |
+
+**Recommended Properties:**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `creator` | Organization, Person | MANY | Dataset authors |
+| `citation` | CreativeWork, URL | MANY | Publication associated with the dataset |
+| `measurementTechnique` | DefinedTerm, Text, URL | MANY | Analytical method (e.g., LC-MS/MS) |
+| `variableMeasured` | PropertyValue, Text | MANY | Variables in the dataset (substrate depletion, product concentration) |
+| `version` | Text | ONE | Dataset version |
+| `distribution` | DataDownload | MANY | Download links for the data files |
+| `encodingFormat` | Text, URL | MANY | File format(s) (e.g., `"text/tab-separated-values"`) |
+
+**Optional Properties (MIX-MB(B) relevant):**
+
+| Property | Expected Type | Cardinality | Description |
+|----------|---------------|-------------|-------------|
+| `isBasedOn` | CreativeWork, URL | MANY | Raw data files or preceding datasets this is derived from |
+| `isPartOf` | CreativeWork, URL | MANY | Larger study or repository collection |
+| `hasPart` | CreativeWork, URL | MANY | Component datasets (e.g., raw mzML, processed TSVs) |
+| `temporalCoverage` | Text | ONE | Date range of experiments |
+| `sameAs` | URL | MANY | Same dataset in another repository |
+
+**Example:**
+```json
+{
+  "@context": "https://schema.org/",
+  "@type": "Dataset",
+  "@id": "https://www.ebi.ac.uk/metabolights/MTBLS1234",
+  "http://purl.org/dc/terms/conformsTo": {
+    "@id": "https://bioschemas.org/profiles/Dataset/1.0-RELEASE",
+    "@type": "CreativeWork"
+  },
+  "name": "Biotransformation activity data — NSAIDs × gut bacteria screen",
+  "description": "ChEMBL-formatted activity data (ACTIVITY.tsv, ASSAY.tsv) for the biotransformation of 12 NSAIDs by 25 human gut bacterial strains, quantified by LC-MS/MS substrate depletion and product formation.",
+  "identifier": "MTBLS1234",
+  "keywords": ["biotransformation", "gut microbiome", "NSAID", "LC-MS/MS", "substrate depletion"],
+  "license": "https://creativecommons.org/licenses/by/4.0/",
+  "url": "https://www.ebi.ac.uk/metabolights/MTBLS1234",
+  "creator": [
+    { "@type": "Person", "name": "Mahnoor Zulfiqar", "affiliation": "EMBL Heidelberg" }
+  ],
+  "citation": {
+    "@type": "CreativeWork",
+    "identifier": "https://doi.org/10.xxxx/example",
+    "name": "Systematic screen of gut microbial drug biotransformation"
+  },
+  "measurementTechnique": {
+    "@type": "DefinedTerm",
+    "name": "liquid chromatography-mass spectrometry",
+    "termCode": "CHMO:0000470"
+  },
+  "variableMeasured": [
+    { "@type": "PropertyValue", "name": "substrate_depletion", "unitText": "%" },
+    { "@type": "PropertyValue", "name": "product_concentration", "unitText": "µM" }
+  ],
+  "distribution": [
     {
-      "@type": "HowToStep",
-      "name": "Bacterial culture preparation",
-      "text": "Grow bacteria to stationary phase in BHI medium"
+      "@type": "DataDownload",
+      "name": "ACTIVITY.tsv",
+      "encodingFormat": "text/tab-separated-values",
+      "contentUrl": "https://www.ebi.ac.uk/metabolights/MTBLS1234/files/ACTIVITY.tsv"
     },
     {
-      "@type": "HowToStep",
-      "name": "Xenobiotic exposure",
-      "text": "Add xenobiotic to final concentration of 100 µM"
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Incubation",
-      "text": "Incubate anaerobically at 37°C for 24 hours"
-    },
-    {
-      "@type": "HowToStep",
-      "name": "Sample extraction",
-      "text": "Extract metabolites with acidified acetonitrile"
-    },
-    {
-      "@type": "HowToStep",
-      "name": "LC-MS analysis",
-      "text": "Analyze by LC-MS/MS in negative ion mode"
+      "@type": "DataDownload",
+      "name": "mzML raw files",
+      "encodingFormat": "application/mzML+xml",
+      "contentUrl": "https://www.ebi.ac.uk/metabolights/MTBLS1234/files/"
     }
   ]
 }
 ```
 
-### 2.3 Dataset Profile
-
-For biotransformation results:
-
-**Required Properties:**
-- `@type`: Dataset
-- `name`: Dataset title
-- `description`: Biotransformation data description
-- `about`: Links to substrates and organisms
-- `measurementTechnique`: Analytical method
-- `variableMeasured`: Parameters measured
+**_NOTE:_** This profile maps to `ACTIVITY.tsv` and supports data deposition in MetaboLights, GNPS, or other public repositories alongside the ChEMBL submission files.
 
 ---
 
@@ -811,58 +1094,140 @@ transformation_pathway:
 
 ## 8. Data Formats - ACTIVITY.tsv
 
-### 8.1 ChEMBL ACTIVITY.tsv Structure
+The MIX-MB(B) activity data lives in two formats: the **Template.xlsx Activity sheet** (the primary submitter input) and **ChEMBL ACTIVITY.tsv** (the pipeline output). The template is a superset of the ChEMBL format, adding metabolite detection, annotation, kinetic, and reaction-type columns as MIX-MB extensions.
 
-**Complete Column Definitions:**
+---
 
-| Column | Required | Type | Description | Example |
-|--------|----------|------|-------------|---------|
-| CIDX | Yes | String | Compound identifier | C001 |
-| CRIDX | No | String | Compound record index | CREC_001 |
-| SRC_ID_CIDX | No | String | Source database compound ID | CHEMBL1201246 |
-| AIDX | Yes | String | Assay identifier | A001_Ecoli_K12 |
-| SRC_ID_AIDX | No | String | Source assay ID | ASSAY_001 |
-| RIDX | Yes | String | Reference identifier | REF_001 |
-| TEXT_VALUE | No | String | Qualitative result | Compound metabolized |
-| RELATION | No | String | Relationship symbol | =, <, >, ~, <= |
-| VALUE | No | Numeric | Quantitative value | 85 |
-| UPPER_VALUE | No | Numeric | Upper range value | 90 |
-| UNITS | No | String | Unit of measurement | % |
-| SD_MINUS | No | Numeric | Standard deviation (lower) | 5.2 |
-| SD_PLUS | No | Numeric | Standard deviation (upper) | 5.2 |
-| ACTIVITY_COMMENT | No | Text | Additional notes | Anaerobic conditions |
-| CRIDX_CHEMBLID | No | String | ChEMBL compound ID | CHEMBL1201246 |
-| CRIDX_DOCID | No | String | Document identifier | DOC_001 |
-| ACT_ID | No | String | Activity record ID | ACT_001 |
-| TEOID | No | String | Target ontology ID | |
-| TYPE | Yes | String | Activity type | Biotransformation |
-| ACTION_TYPE | No | String | Action description | SUBSTRATE, PRODUCT |
+### 8.1 MIX-MB(B) Activity Template (Template.xlsx — Activity Sheet)
 
-### 8.2 Example ACTIVITY.tsv Entries
+This is the **primary submission format**. Submitters fill this sheet; the BioXend pipeline converts it to ChEMBL-ready files.
 
-**Substrate Depletion:**
-```tsv
-CIDX	AIDX	RIDX	TEXT_VALUE	RELATION	VALUE	UNITS	SD_MINUS	SD_PLUS	TYPE	ACTION_TYPE	ACTIVITY_COMMENT
-C001	A001_Ecoli_K12	REF_001	Compound metabolized	=	85	%	5.2	5.2	Biotransformation	SUBSTRATE	After 24h anaerobic incubation
-```
+| # | Column | Required | Type | Description |
+|---|--------|----------|------|-------------|
+| 1 | `Chemical_identifier` | Yes* | String | CIDX — auto-filled by pipeline. If filling manually, use the same identifier as in `COMPOUND_RECORD.tsv`. |
+| 2 | `Common_Name` | Yes | String | Common name of the xenobiotic (drug, pesticide, etc.) — must match the compound entry. |
+| 3 | `SMILES` | Yes | String | Canonical SMILES of the parent compound — must match `COMPOUND_RECORD.tsv`. |
+| 4 | `ASSAY_identifier` | Yes | String | AIDX — must match a valid record in `ASSAY.tsv`. Use the vocabulary defined in the Assay sheet. |
+| 5 | `TEXT_VALUE` | Cond. | String | Qualitative activity result from controlled vocabulary (see 8.3). Leave empty when reporting a `VALUE`. |
+| 6 | `VALUE` | Cond. | Numeric | Numerical measurement (e.g., % depletion, µM product). Leave empty when using `TEXT_VALUE`. |
+| 7 | `RELATION` | Cond. | String | Relationship operator for `VALUE`: `=`, `<`, `>`, `~`, `<=`, `>=`. Required when `VALUE` is provided. |
+| 8 | `UPPER_VALUE` | No | Numeric | Upper bound of a range; `VALUE` is then the lower bound. |
+| 9 | `UNITS` | Cond. | String | Unit of `VALUE` (e.g., `%`, `µM`, `µM/hour`, `h`). Required when `VALUE` is provided. |
+| 10 | `ACTIVITY_COMMENT` | **Yes** | Text | Free-text: thresholds, p-values, conditions, interpretation. **If left empty, BioXend will not annotate an activity value for this row.** |
+| 11 | `Metabolite_mz` | No | Numeric | Observed m/z of the detected biotransformation product (parent ion). |
+| 12 | `Metabolite_retention_time` | No | Text | Retention time of the metabolite with unit (e.g., `2.17 min`). |
+| 13 | `Metabolite_annotation` | No | String | Top annotation: SMILES, compound name, or ChemONT chemical class. Check a chemical database to determine the appropriate annotation level. |
+| 14 | `Metabolite_annotation_level` | No | Integer | MSI identification confidence: `1` (confirmed with authentic standard) to `5` (unknown). See Section 7 for full level definitions. |
+| 15 | `Kinetic_parameters` | No | Text | Kinetic data — biotransformation assays only (e.g., Km, Vmax, rate constant k, half-life t½). |
+| 16 | `Reaction_type` | No | String | Type of biotransformation reaction (controlled vocabulary in 8.3; EC numbers in Section 3.4). |
+| 17 | `Activity_type` | Yes | String | Always `Biotransformation` for all entries in this standard. |
+| 18 | `ACTION_TYPE` | Cond. | String | Effect classification (see 8.3). **Leave empty if no confirmed activity — do not guess.** |
 
-**Product Formation:**
-```tsv
-CIDX	AIDX	RIDX	TEXT_VALUE	RELATION	VALUE	UNITS	TYPE	ACTION_TYPE	ACTIVITY_COMMENT
-P001	A001_Ecoli_K12	REF_001	Product detected	=	72	µM	Biotransformation	PRODUCT	Hydroxy-ibuprofen formed
-```
+> \* `Chemical_identifier` is auto-filled by the BioXend pipeline; only supply manually when submitting without it.
 
-**Transformation Rate:**
-```tsv
-CIDX	AIDX	RIDX	RELATION	VALUE	UNITS	SD_MINUS	SD_PLUS	TYPE	ACTIVITY_COMMENT
-C001	A001_Ecoli_K12	REF_001	=	3.5	µM/hour	0.4	0.4	Biotransformation	Linear rate 0-24h, R²=0.98
-```
+---
 
-**No Activity:**
-```tsv
-CIDX	AIDX	RIDX	TEXT_VALUE	TYPE	ACTION_TYPE	ACTIVITY_COMMENT
-C002	A001_Ecoli_K12	REF_001	No biotransformation detected	Biotransformation	No Activity	No change after 48h
-```
+### 8.2 ChEMBL ACTIVITY.tsv Mapping
+
+The BioXend pipeline maps template columns to ChEMBL `ACTIVITY.tsv`. Columns 11–16 (metabolite, annotation, kinetics, reaction type) are MIX-MB extensions concatenated into `ACTIVITY_COMMENT`.
+
+| ChEMBL Column | Required | Template column | Notes |
+|---------------|----------|-----------------|-------|
+| `CIDX` | Yes | 1 `Chemical_identifier` | Auto-generated or manually provided |
+| `AIDX` | Yes | 4 `ASSAY_identifier` | Must match a row in `ASSAY.tsv` |
+| `RIDX` | Yes | Study-level | Same across all activity rows in one study |
+| `TEXT_VALUE` | Cond. | 5 `TEXT_VALUE` | Controlled vocabulary (see 8.3) |
+| `RELATION` | Cond. | 7 `RELATION` | Required with `VALUE` |
+| `VALUE` | Cond. | 6 `VALUE` | Numerical measurement |
+| `UPPER_VALUE` | No | 8 `UPPER_VALUE` | For range measurements |
+| `UNITS` | Cond. | 9 `UNITS` | Required with `VALUE` |
+| `ACTIVITY_COMMENT` | **Yes** | 10 + cols 11–16 | Pipeline concatenates ACTIVITY_COMMENT with metabolite and kinetic fields |
+| `TYPE` | Yes | 17 `Activity_type` | Always `Biotransformation` |
+| `ACTION_TYPE` | Cond. | 18 `ACTION_TYPE` | Null if no confirmed activity |
+
+---
+
+### 8.3 Controlled Vocabularies for Activity Fields
+
+**`TEXT_VALUE` — use one of these exact strings:**
+
+| TEXT_VALUE | Meaning |
+|------------|---------|
+| `Compound metabolized` | Parent compound consumed/depleted |
+| `Compound NOT metabolized` | No measurable transformation detected |
+| `Product detected` | Biotransformation product observed |
+| `Partial transformation` | Incomplete conversion (< 95%) |
+| `Complete transformation` | Full conversion (≥ 95%) |
+
+**`ACTION_TYPE` — effect classification:**
+
+| ACTION_TYPE | Use when |
+|-------------|----------|
+| `SUBSTRATE` | The compound is consumed as a substrate |
+| `PRODUCT` | The compound is a detected biotransformation product |
+| `No Activity` | No transformation detected; leave `VALUE` empty |
+| `INHIBITION` | The compound inhibits a microbial enzyme or process |
+| `STIMULATION` | The compound stimulates a microbial process |
+
+**`Reaction_type` — controlled vocabulary (see Section 3.4 for EC numbers):**
+
+`hydroxylation` | `reduction` | `oxidation` | `hydrolysis` | `decarboxylation` | `deamination` | `N-reduction` | `azo_reduction` | `demethylation` | `dehalogenation` | `conjugation` | `acetylation` | `glucuronidation` | `sulfation`
+
+---
+
+### 8.4 Example Template Rows
+
+**No biotransformation detected:**
+
+| Col | Value |
+|-----|-------|
+| Chemical_identifier | HMM0089 |
+| Common_Name | Diazepam |
+| SMILES | C15H13ClN2O |
+| ASSAY_identifier | assay1 |
+| TEXT_VALUE | Compound NOT metabolized |
+| ACTIVITY_COMMENT | No biotransformation of Diazepam after 24h anaerobic incubation; background <2% |
+| Activity_type | Biotransformation |
+| ACTION_TYPE | No Activity |
+
+**Compound metabolised with putative metabolite (MSI Level 4):**
+
+| Col | Value |
+|-----|-------|
+| Chemical_identifier | HMM0085 |
+| Common_Name | Diazepam |
+| ASSAY_identifier | assay3 |
+| TEXT_VALUE | Compound metabolized |
+| ACTIVITY_COMMENT | Diazepam biotransformed to desmethyldiazepam; 85% conversion after 24h; n=3 |
+| Metabolite_mz | 372.151 |
+| Metabolite_retention_time | 2.573 min |
+| Metabolite_annotation | Desmethyldiazepam |
+| Metabolite_annotation_level | 4 |
+| Reaction_type | hydrolysis |
+| Activity_type | Biotransformation |
+| ACTION_TYPE | SUBSTRATE |
+
+**Quantitative depletion with kinetics and confirmed product (MSI Level 2):**
+
+| Col | Value |
+|-----|-------|
+| Chemical_identifier | HMM0001 |
+| Common_Name | Ibuprofen |
+| SMILES | CC(C)Cc1ccc(cc1)C(C)C(=O)O |
+| ASSAY_identifier | assay2 |
+| TEXT_VALUE | Compound metabolized |
+| VALUE | 85 |
+| RELATION | = |
+| UNITS | % |
+| ACTIVITY_COMMENT | 85% substrate depletion after 24h; SD ±5.2%; p<0.01 one-way ANOVA n=3; 37°C anaerobic |
+| Metabolite_mz | 222.126 |
+| Metabolite_retention_time | 4.85 min |
+| Metabolite_annotation | CC(C)Cc1ccc(cc1)C(C)(O)C(=O)O |
+| Metabolite_annotation_level | 2 |
+| Kinetic_parameters | t½=9.5h; k=0.073 h⁻¹ |
+| Reaction_type | hydroxylation |
+| Activity_type | Biotransformation |
+| ACTION_TYPE | SUBSTRATE |
 
 ---
 
@@ -1003,7 +1368,34 @@ statistical_analysis:
 
 ---
 
+## 11. Data Quality Tiers
 
+### Tier 1: Gold Standard (Publication-Ready)
+
+- All Level A and B information complete
+- Quantitative activity data with statistical analysis (n ≥ 3 biological replicates)
+- Metabolite products identified at MSI Level 1 or 2
+- Raw LC-MS data deposited in a public repository (MetaboLights, GNPS)
+- Transformation pathway documented with proposed mechanism
+- All required controls passed (negative, positive, internal standard)
+- Mass accuracy ≤ 5 ppm; internal standard recovery 70–130%
+
+### Tier 2: Silver Standard (Research-Grade)
+
+- All Level A information complete
+- Quantitative or semi-quantitative activity data (n ≥ 2 biological replicates)
+- Metabolite products identified at MSI Level 2 or 3
+- Negative and internal standard controls included
+- Basic analytical quality control documented
+
+### Tier 3: Bronze Standard (Preliminary)
+
+- All Level A essential information (CIDX, AIDX, RIDX, TEXT_VALUE, ACTION_TYPE)
+- Qualitative activity (substrate consumed / product detected / no activity)
+- Single measurement acceptable for initial screening
+- Suitable for large-scale screening studies where quantification is impractical
+
+---
 
 ## 12. Example Complete Record
 
@@ -1222,49 +1614,6 @@ cross_references:
     file: "ACTIVITY.tsv"
 ```
 
----
-
-## 14. Software and Tools
-
-### 14.1 Recommended Software
-
-**Data Acquisition:**
-- **LC-MS:** Xcalibur, MassLynx, Analyst
-- **GC-MS:** ChemStation, GCMSsolution
-- **NMR:** TopSpin, VnmrJ
-
-**Data Processing:**
-- **Peak detection:** MZmine, XCMS, MS-DIAL
-- **Structure elucidation:** MassBank, SIRIUS, MetFrag
-- **Statistics:** R, Python (scipy, statsmodels)
-- **Visualization:** GraphPad Prism, ggplot2, matplotlib
-
-**Data Management:**
-- **ISA-Tools:** Metadata management
-- **GNPS:** Molecular networking
-- **MetaboLights:** Data deposition
-- **ChEMBL Loader:** Submission validation
-
-### 14.2 Computational Tools
-
-**Pathway Prediction:**
-- BioTransformer
-- GLORYx
-- MetaPrint2D-React
-- SyGMa
-
-**Data Analysis Pipelines:**
-```bash
-# Example R workflow
-library(xcms)
-library(CAMERA)
-library(MetaboAnalystR)
-
-# Process LC-MS data
-xdata <- readMSData("data.mzML", mode="onDisk")
-peaks <- findChromPeaks(xdata, param=CentWaveParam())
-results <- groupChromPeaks(peaks, param=PeakDensityParam())
-```
 
 ---
 
@@ -1302,32 +1651,4 @@ For questions, suggestions, or contributions to this standard, please contact:
 This standard bridges MIX-MB(X) and MIX-MB(M) to provide comprehensive documentation of microbial xenobiotic biotransformation processes. It is a living document that will be updated based on community feedback and evolving best practices.
 
 ---
-
-## Appendix: Quick Start Guide
-
-### For Experimentalists
-
-**Before Starting:**
-1. ✓ Read MIX-MB(X) for substrate preparation
-2. ✓ Read MIX-MB(M) for organism cultivation
-3. ✓ Design assay with all required controls
-4. ✓ Plan sampling strategy and timepoints
-
-**During Experiment:**
-5. ✓ Record all parameters in real-time
-6. ✓ Include internal standards
-7. ✓ Run all controls
-8. ✓ Document deviations
-
-**After Experiment:**
-9. ✓ Process data according to Section 5
-10. ✓ Complete all Level A checklist items
-11. ✓ Validate against QC criteria
-12. ✓ Prepare submission files
-
-**Minimum for Publication:**
-- All Level A (Essential) items complete
-- Gold or Silver quality tier
-- Raw data deposited in public repository
-- Statistical analysis included
 

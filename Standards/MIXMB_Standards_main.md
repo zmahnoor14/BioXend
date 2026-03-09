@@ -1,14 +1,37 @@
 # Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)
 
-**MIX-MB Standard Version:** 0.1  
-**Release Date:** February 5, 2026 (Draft)  
+**Author:** Mahnoor Zulfiqar
+**Version:** 0.1.0  
+**Release Date:** March 5, 2026 (Draft)  
 **Status:** Draft Standard  
 **DOI:** XXXXXXX (to be assigned upon stable release)
+
+
+---
+
+## Table of Contents
+
+- [Abstract](#abstract)
+- [Scope and Applicability](#scope-and-applicability)
+  - [In Scope](#in-scope)
+  - [Out of Scope](#out-of-scope)
+  - [Applicability Note](#applicability-note)
+- [How to Use This Document](#how-to-use-this-document)
+- [Component Standards](#component-standards)
+- [Identifiers and Cross-Referencing](#identifiers-and-cross-referencing)
+  - [Naming Your Compounds Properly](#naming-your-compounds-properly)
+  - [Naming Your Organisms Properly](#naming-your-organisms-properly)
+  - [Minting Scheme for Unknowns](#minting-scheme-for-unknowns)
+  - [sameAs Linking Policy](#sameas-linking-policy)
+- [ChEMBL Submission Files](#chembl-submission-files)
+  - [Study Metadata Files](#study-metadata-files)
+  - [Xenobiotics Metadata Files](#xenobiotics-metadata-files)
+  - [Microbe / Assay Metadata Files](#microbe-assay-metadata-files)
+  - [Biotransformation Metadata Files](#biotransformation-metadata-files)
 
 ---
 
 ## Abstract
-
 Microbial biotransformation of xenobiotics — the enzymatic conversion of drugs, environmental contaminants, and dietary compounds by microorganisms — is a research area of growing importance for human health, toxicology, and drug development. Despite increasing scientific output, data from these studies are rarely reported in a standardised or FAIR-compliant manner, limiting their reuse and integration across laboratories and databases.
 
 The **Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)** standard defines the minimum metadata and data elements required to describe, share, and deposit xenobiotic biotransformation experiments. MIX-MB covers three interconnected aspects of every study: the chemical substrate (MIX-MB(X)), the microbial organism or community (MIX-MB(M)), and the biotransformation assay and its outcomes (MIX-MB(B)). Together, these components ensure that study results are reproducible, comparable across research groups, and directly depositable into community databases such as [ChEMBL](https://www.ebi.ac.uk/chembl/).
@@ -70,6 +93,65 @@ This standard comprises three interconnected sub-standards:
 | **MIX-MB(M)** - Microbes | Minimum metadata required to describe the microbial organism or community used in the experiment, including taxonomy, strain, and culture conditions. | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
 | **MIX-MB(B)** - Biotransformation | Minimum metadata required to describe the biotransformation assay design, experimental conditions, and quantitative or qualitative activity outcomes. | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
 
+
+---
+
+
+## Identifiers and Cross-Referencing
+
+**This is the first practical step before entering any data: assign identifiers to every entity in your study.**
+
+MIX-MB uses a three-layer identifier system. Every biotransformation event is a record that links all three layers:
+
+| Identifier | Abbreviation | Entity | Format | Defined in |
+|-----------|-------------|--------|--------|-----------|
+| Reference Index | **RIDX** | Study / publication | `[Author]_[Label]` | `REFERENCE.tsv` |
+| Compound Index | **CIDX** | Chemical compound | `CIDX[nnnn]` | `COMPOUND_RECORD.tsv` |
+| Assay Index | **AIDX** | Organism × condition | `[Author]_[Organism]_[Condition]` | `ASSAY.tsv` |
+
+All three identifiers must appear together in every row of `ACTIVITY.tsv` to create an unambiguous, linkable record of a biotransformation event.
+
+### Naming Your Compounds Properly
+
+Use the **InChIKey** as the canonical chemical identifier for all known compounds — it is structure-based, database-independent, and collision-resistant. Alongside it, record the highest-priority external database identifier available:
+
+1. ChEMBL ID (preferred — this is the target submission database)
+2. PubChem CID
+3. ChEBI ID
+4. CAS Registry Number (fallback only)
+
+See [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md) for full CIDX minting rules and identifier priority.
+
+### Naming Your Organisms Properly
+
+Use the **NCBI TaxID** as the mandatory organism identifier for all assay entries (`ASSAY_TAX_ID`). Pair it with the full binomial scientific name (`ASSAY_ORGANISM`). For strains, add the culture collection identifier (e.g. ATCC, DSMZ) as an additional property.
+
+See [MIX-MB(M) Section 1.4](MIXMB_Microbes.md) for full AIDX minting rules and organism identifier guidance.
+
+### Minting Scheme for Unknowns
+
+Not all entities will have established external identifiers at the time of submission. Use study-local identifiers with the following prefixes:
+
+| Entity type | Prefix | Example |
+|------------|--------|---------|
+| Unknown compound (no structure, MSI Level 4–5) | `UNKNOWN_[RIDX]_[n]` | `UNKNOWN_GutMeta_M3` |
+| Putatively characterised compound (MSI Level 3) | `PUTATIVE_[RIDX]_[n]` | `PUTATIVE_GutMeta_P1` |
+| Novel microbial isolate (no TaxID registered) | Report at nearest known rank | Use species-level TaxID + note in `ACTIVITY_COMMENT` |
+
+Once an unknown entity is formally identified and registered in an external database, update its identifier across all affected files before resubmission.
+
+### sameAs Linking Policy
+
+Use the `sameAs` property (schema.org / Bioschemas) to declare equivalence between an entity in your submission and the same entity in an external database. This is what makes MIX-MB data interoperable with ChEMBL, PubChem, NCBI, and other resources.
+
+**Rules that apply across all component standards:**
+
+1. **Compounds:** Link to ChEMBL, PubChem, and/or ChEBI using canonical compound page URLs. Required for Gold tier; strongly recommended for Silver. See [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md).
+2. **Organisms:** Link to the NCBI Taxonomy URL (mandatory) and LPSN (recommended for prokaryotes). See [MIX-MB(M) Section 1.4](MIXMB_Microbes.md).
+3. **Unknowns:** Do not add `sameAs` until the entity has a confirmed, registered external record. Speculative `sameAs` links are not permitted.
+4. **Deprecated identifiers:** If a linked database entry is merged or retired, update `sameAs` to the new canonical URL.
+
+Activity records in `ACTIVITY.tsv` are not linked via `sameAs` directly — interoperability at the activity level is achieved through the consistent use of InChIKey (compounds) and NCBI TaxID (organisms). See [MIX-MB(B) Section 1.4](MIXMB_Biotransformation.md) for cross-referencing rules specific to activity records.
 
 ---
 

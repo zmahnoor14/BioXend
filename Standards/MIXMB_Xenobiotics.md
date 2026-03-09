@@ -1,11 +1,12 @@
 # Minimum Information about Xenobiotics-Microbiome Biotransformation -- MIX-MB(X)
-## Xenobiotics Component Standard
 
-This document identifies Minimum Information (MI) required to report xenobiotics involved in "Microbial Biotransformation of Xenobiotics", ensuring comprehensive documentation of xenobiotics used in biotransformation studies and information on the relevant assay information.
+## Xenobiotics Component Standard (X)
+
+This document identifies the Minimum Information (MI) required to report xenobiotics involved in microbial biotransformation studies, ensuring comprehensive documentation of chemical substrates and their transformation products.
 
 **Author:** Mahnoor Zulfiqar
 **Version:** 0.1.0  
-**Release Date:** February 5, 2026 (Draft)  
+**Release Date:** March 5, 2026 (Draft)  
 **Status:** Draft Standard  
 **Part of:** MIX-MB Standard v0.1  
 **Replaces:** N/A  
@@ -13,8 +14,34 @@ This document identifies Minimum Information (MI) required to report xenobiotics
 - MIX-MB(M) v0.1.0
 - MIX-MB(B) v0.1.0
 
-**Breaking Changes:** N/A
-**Alignment:** ChEMBL, ChEBI, ChemONT, MSI Standards, FAIR principles
+**Alignment:** BioSchemas, ChEMBL, ChEBI, ChemONT, MSI Standards, FAIR principles
+
+---
+
+## Table of Contents
+
+- [1. Overview](#1-overview)
+  - [1.1 How is this document organised?](#11-how-is-this-document-organised)
+  - [1.2 Which sections are important for contributors?](#12-which-sections-are-important-for-contributors)
+  - [1.3 Which sections are important for data submitters?](#13-which-sections-are-important-for-data-submitters)
+  - [1.4 Identifiers and Cross-Referencing](#14-identifiers-and-cross-referencing)
+- [2. Bioschemas](#2-bioschemas)
+  - [2.1 Xenobiotics — ChemicalSubstance Profile with Concentration](#21-xenobiotics----chemicalsubstance-profile-with-concentration)
+  - [2.2 Products and Metabolites with MSI Levels](#22-products-and-metabolites-with-msi-levels)
+  - [2.3 Concentration Documentation](#23-concentration-documentation)
+- [3. Ontologies](#3-ontologies)
+  - [3.1 ChEBI (Chemical Entities of Biological Interest)](#31-chebi-chemical-entities-of-biological-interest)
+  - [3.2 ChemOnt (Chemical Ontology)](#32-chemont-chemical-ontology)
+  - [3.3 Unit Ontology (UO)](#33-unit-ontology-uo)
+  - [3.4 Gene Ontology (GO) — Biotransformation Processes](#34-gene-ontology-go---biotransformation-processes)
+  - [3.5 MIX-MB Controlled Vocabularies](#35-mix-mb-controlled-vocabularies)
+- [4. Data Validation Rules](#4-data-validation-rules)
+- [5. Data Quality Tiers](#5-data-quality-tiers)
+- [6. How to use the Template](#6-how-to-use-the-template)
+- [7. Version History](#7-version-history)
+- [8. References](#8-references)
+- [9. Contact and Contributions](#9-contact-and-contributions)
+
 ---
 
 ## 1. Overview
@@ -23,114 +50,156 @@ MIX-MB(X) establishes minimum information standards for reporting microbial biot
 - **Findable:** Properly annotated with identifiers and metadata
 - **Accessible:** Standardized formats for submission to public repositories
 - **Interoperable:** Uses community ontologies and controlled vocabularies
-- **Reusable:** Complete provenance and methodology information
+- **Reusable:** Provenance and methodology information
 
 ### 1.1 How is this document organised?
+- **Section 1** — Introduction to MIX-MB(X) for Xenobiotics and how to use it.
+- **Section 2** — Bioschemas profiles: what metadata fields to use for substrates and metabolites, with JSON examples.
+- **Section 3** — Ontologies: which controlled vocabularies and identifiers to use (ChEBI, ChemOnt, GO, Unit Ontology).
+- **Section 4** — Validation rules
+- **Section 5** — Data quality tiers
+- **Section 6** — How to use template
+- 
 
 ### 1.2 Which sections are important for contributors?
 
-### 1.3 Which sections are important for the data submitors?
+If you want to propose changes to the standard, focus on **Sections 2 and 3** (the metadata fields and ontologies), then follow the contribution process in [Versioning.md](Versioning.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Changes require a 7-day community review and 2 independent endorsements.
 
+### 1.3 Which sections are important for data submitters?
+
+If you are preparing data for submission, you need:
+- **Section 2.1** — required fields for xenobiotic substrates
+- **Section 2.3** — how to report concentrations
+- **Section 4.1** — what analytical information to include
+- **Section 5** — validation checklist before you submit
+- **[Template.xlsx](Templates/Template.xlsx)** — colour-coded submission template (green = mandatory, blue = recommended, yellow = optional) specifically the Compounds sheet.
+
+### 1.4 Identifiers and Cross-Referencing
+
+**This is the first practical step: name your compounds properly before filling in any other field.**
+
+#### Compound Index (CIDX)
+
+Each compound in a MIX-MB submission must be assigned a **CIDX** — a study-local identifier that ties together `COMPOUND_RECORD.tsv`, `COMPOUND_CTAB.sdf`, and `ACTIVITY.tsv`.
+
+**Minting rules:**
+- Format: `CIDX` followed by a zero-padded integer, e.g. `CIDX0001`, `CIDX0002`
+- Assign sequentially within a study; CIDXs do not need to be globally unique
+- Assign one CIDX per distinct chemical structure (identical canonical SMILES = same CIDX)
+- For biotransformation products that are detected but not fully characterised, use the `UNKNOWN_` or `PUTATIVE_` prefix scheme (see below)
+
+#### External Identifier Priority Order
+
+When referencing a compound in an external database, use the following priority order:
+
+| Priority | Identifier | Field | Example |
+|----------|-----------|-------|---------|
+| 1 | **InChIKey** | `inChIKey` | `HEFNNWSXXWATRW-UHFFFAOYSA-N` |
+| 2 | **ChEMBL ID** | `identifier` | `CHEMBL1201246` |
+| 3 | **PubChem CID** | `identifier` | `CID:4583` |
+| 4 | **ChEBI ID** | `identifier` | `CHEBI:3686` |
+| 5 | **CAS Number** | `additionalProperty` → `cas_number` | `42399-41-7` |
+
+The **InChIKey** is the canonical structure identifier in MIX-MB and is **mandatory** for all known compounds. It identifies the chemical structure independently of naming conventions or database-specific numbering.
+
+#### Minting Scheme for Unknown Compounds
+
+For biotransformation products that cannot be fully identified at the time of submission, use the following naming convention:
+
+| Situation | CIDX format | MSI Level | Example |
+|-----------|------------|-----------|---------|
+| Confirmed structure | `CIDX[nnnn]` | Level 1–2 | `CIDX0003` |
+| Putatively characterised (structural class known) | `PUTATIVE_[RIDX]_[n]` | Level 3 | `PUTATIVE_GutMeta_P1` |
+| Unknown (mass only, no formula or structure) | `UNKNOWN_[RIDX]_[n]` | Level 4–5 | `UNKNOWN_GutMeta_M3` |
+
+- `[RIDX]` is the reference index for the study (e.g. `GutMeta`)
+- `[n]` is a sequential integer within the study
+- Once an unknown compound is formally identified, replace its `UNKNOWN_` CIDX with a standard CIDX and update all linked `ACTIVITY.tsv` rows accordingly
+
+#### sameAs Linking Policy
+
+Use the `sameAs` property to assert equivalence between a compound in your submission and the same compound in an external database. This is **required** for Gold-tier submissions and **strongly recommended** for Silver.
+
+| Database | URL pattern | Example |
+|----------|-----------|---------|
+| ChEMBL | `https://www.ebi.ac.uk/chembl/compound_report_card/{ID}/` | `https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1201246/` |
+| PubChem | `https://pubchem.ncbi.nlm.nih.gov/compound/{CID}` | `https://pubchem.ncbi.nlm.nih.gov/compound/4583` |
+| ChEBI | `https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:{n}` | `https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:3686` |
+| Wikidata | `https://www.wikidata.org/wiki/{QID}` | `https://www.wikidata.org/wiki/Q412690` |
+
+**Rules:**
+- Include at least one `sameAs` URL for every known compound
+- For unknowns (`UNKNOWN_` / `PUTATIVE_` CIDXs), omit `sameAs` — do not add speculative links
+- When a compound exists in multiple databases, list all confirmed `sameAs` URLs
+- If a database entry is merged or deprecated, update `sameAs` to the canonical replacement URL
 
 ---
 
-
 ## 2. Bioschemas
-MIX-MB(X) integrates already established standards such as BioSchema profile [Bioschemas MolecularEntity](https://bioschemas.org/types/MolecularEntity/). BioSchemas fulfils Findability aspect of FAIR. Note that MolecularEntity is not inclusive of all fields present in the Bioschemas MolecularEntity Profile, some are specific to this use case.
+MIX-MB(X) integrates already established standards such as BioSchema profile [Bioschemas ChemicalSubstance](https://bioschemas.org/types/ChemicalSubstance/) and [Bioschemas MolecularEntity](https://bioschemas.org/profiles/MolecularEntity/). BioSchemas fulfils Findability aspect of FAIR. 
 
-### 2.1 Xenobiotics -- MolecularEntity Profile with Concentration
+**_NOTE:_** ChemicalSubstance is not inclusive of all fields present in the Bioschemas ChemicalSubstance Profile, some are specific to this use case.
 
-The parent compound or xenobiotic used within the research follows [Bioschemas MolecularEntity](https://bioschemas.org/types/MolecularEntity/) with concentration and sample information captured as properties:
+### 2.1 Xenobiotics -- ChemicalSubstance Profile with Concentration
+
+The parent compound or xenobiotic used within the research follows [Bioschemas ChemicalSubstance](https://bioschemas.org/types/ChemicalSubstance/) with concentration and sample information captured as properties:
 
 **Required Properties:**
 - `@context`: https://schema.org/
-- `@type`: MolecularEntity
+- `@type`: ChemicalSubstance
+- `@id`: Globally unique IRI identifying the compound (e.g., canonical database URL such as `https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1201246/`)
+- `dct:conformsTo`: https://bioschemas.org/profiles/ChemicalSubstance/0.4-RELEASE
+- `identifier`: Compound identifier as Text, PropertyValue, or URL (e.g., ChEMBL ID, PubChem CID, InChI Key)
+- `name`: Chemical name of the compound (Text)
+- `url`: URL of the compound's entry in a reference database (e.g., ChEMBL, PubChem, ChEBI)
 - `inChIKey`: Standard InChI Key
 - `identifier`: Compound identifier (ChEMBL ID, PubChem CID, InChI Key)
-- `smiles`: Canonical SMILES string
-- `molecularFormula`: Chemical formula
-- `molecularWeight`: Molecular weight with unit [Units should be included in the form ‘ ‘, for example ‘12 amu’ or as ‘.]
+- `smiles`: Canonical SMILES string *(MIX-MB extension)*
+- `chemicalComposition`: Chemical formula (e.g: Molecular formula in this context)
+- `molecularWeight`: Molecular weight with unit [Units should be included in the form ‘ ‘, for example ‘12 amu’.]
 
 **Recommended Properties:**
-- `url`: Link to compound in databases (ChEMBL, PubChem, ChEBI)
-- `iupacName`: IUPAC systematic name
-- `alternateName`: preferred compound name
-- `monoisotopicMolecularWeight`: Exact mass
-- `chemicalRole`: Role classification from ChEBI (xenobiotic, drug, metabolite)
-- `associatedDisease`: a disease can be a MedicalCondition or a URL
-- `bioChemInteraction`:
-- `bioChemSimilarity`:
-- `biologicalRole`:
-- `description`:
-- `image`:
-- `isInvolvedInBiologicalProcess`
+- `alternateName`: An alias for the item (Text, MANY) — e.g., trade names, synonyms, preferred compound name
+- `iupacName`: IUPAC systematic name *(from MolecularEntity profile, not ChemicalSubstance)*
+- `monoisotopicMolecularWeight`: Exact monoisotopic mass *(from MolecularEntity profile, not ChemicalSubstance)*
+- `chemicalRole`: A role played by the molecular entity within a chemical context (DefinedTerm, MANY) — use ChEBI terms e.g., xenobiotic, drug, metabolite
+- `associatedDisease`: A disease associated with this BioChemEntity (MedicalCondition or URL, MANY)
+- `bioChemInteraction`: A BioChemEntity this compound interacts with (BioChemEntity, MANY) — e.g., drug targets, enzymes, receptors
+- `bioChemSimilarity`: A similar BioChemEntity, e.g., obtained by fingerprint similarity algorithms (BioChemEntity, MANY)
+- `biologicalRole`: A role played by the BioChemEntity within a biological context (DefinedTerm, MANY) — use ChEBI terms e.g., enzyme inhibitor, antimicrobial agent
+- `description`: A free-text description of the item (Text, ONE)
+- `disambiguatingDescription`: A short description used to disambiguate from other similar items (Text, ONE)
+- `image`: A structural image of the compound (ImageObject or URL, MANY) — e.g., 2D/3D depiction
+- `potentialUse`: Intended use of the BioChemEntity by humans (DefinedTerm, MANY) — e.g., pharmaceutical, pesticide, food additive
+- `sameAs`: URL of a reference web page that unambiguously indicates the item's identity in another database (URL, MANY)
 
-**Sample Properties (using `additionalProperty`) not available in the MolecularEntity Profile:**
-- `purity`: Purity percentage and measurement method
-- `manufacturer`: Source/vendor information
-- `stock_concentration`: Initial concentration with unit
-- `storage_conditions`: Storage conditions and stability notes
+**Sample Properties (using `additionalProperty`) not available in the ChemicalSubstance Profile:**
+- `cas_number`: CAS Registry Number of the compound
+- `vendor`: Supplier/vendor who provided the compound (e.g., Sigma-Aldrich, TCI)
+- `purity`: Purity percentage and measurement method (e.g., ≥98%, HPLC)
+- `solubility`: Solubility information (solvent, concentration limit)
+- `stock_concentration`: Stock solution concentration with unit and solvent
+- `stock_solvent`: Solvent used to prepare the stock solution (e.g., DMSO, ethanol, water)
+- `storage_conditions`: Storage conditions and stability notes (e.g., -20°C, protect from light)
+- `local_synonym`: Local study-specific synonym or identifier used in the manuscript (e.g., compound 23)
 
-**Example - Xenobiotic Substrate:**
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "MolecularEntity",
-  "identifier": "CHEMBL1201246",
-  "inChIKey": "HEFNNWSXXWATRW-UHFFFAOYSA-N",
-  "iupacName": "2-(4-isobutylphenyl)propionic acid",
-  "alternateName": ["Advil", "Brufen", "Nurofen"],
-  "smiles": "CC(C)Cc1ccc(cc1)C(C)C(=O)O",
-  "molecularFormula": "C13H18O2",
-  "molecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "206.28",
-    "unitCode": "GM"
-  },
-  "monoisotopicMolecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "206.1307",
-    "unitCode": "DA"
-  },
-  "chemicalRole": ["xenobiotic", "non-steroidal anti-inflammatory drug"],
-  "biologicalRole": [
-    "http://purl.obolibrary.org/obo/CHEBI_50906",
-    "http://purl.obolibrary.org/obo/CHEBI_35480"
-  ],
-  "url": "https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1201246/",
-  "description": "Ibuprofen is a nonsteroidal anti-inflammatory drug (NSAID) used to treat pain, fever, and inflammation. It is widely used as a model compound for studying xenobiotic biotransformation by gut microbiota.",
-  "additionalProperty": [
-    {
-      "@type": "PropertyValue",
-      "name": "Purity",
-      "value": "≥98%",
-      "measurementTechnique": "High-Performance Liquid Chromatography"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Vendor",
-      "value": "Sigma-Aldrich"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Stock Concentration",
-      "value": "100",
-      "unitCode": "MMO"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Storage Conditions",
-      "value": "Room temperature, dry conditions"
-    }
-  ]
-}
-```
+**Analytical Detection Properties (using `additionalProperty`):**
+- `mz`: Measured m/z value of the compound or eluted form
+- `column_separation`: Separation technique used (e.g., LC, GC)
+- `retention_time`: Retention time recorded during separation
+- `retention_time_unit`: Unit for retention time (sec, min, hr)
+- `eluted_compound`: Whether the eluted compound differs from the original (e.g., yes for salts where MS detects the active form)
+- `eluted_compound_smiles`: SMILES of the eluted compound if different from the original
+
+**_NOTE:_** This profile goes to the `COMPOUNDS_RECORD.tsv`, `COMPOUNDS_CTAB.sdf`, `ASSAY.tsv` and `ASSAY_PARAM.tsv` files for ChEMBL submission.
 
 ### 2.2 Products and Metabolites with MSI Levels
 
-For biotransformation products characterised with mass spectrometry (MS), use the same **MolecularEntity profile** with **MSI identification confidence levels** to indicate the degree of characterization. This profile is optional and is only important in case of a xenobiotics product is measured and detected. 
+For biotransformation products characterised with mass spectrometry (MS), use the same **MolecularEntity profile** with **MSI identification confidence levels** to indicate the degree of characterization. This profile is optional and is only important in case if a xenobiotics product is measured and detected. 
 
 **MSI Level Guidelines:**
+
+Levels 1–5 follow the updated standard [Metabolomics Standards Initiative (MSI)](https://metabolomicssociety.org/resources/metabolomics-standards-initiative) scheme.
 
 | Level | Description | Confidence | Required Information | Example |
 |-------|-------------|------------|----------------------|---------|
@@ -144,498 +213,90 @@ For biotransformation products characterised with mass spectrometry (MS), use th
 **Required Properties (for all levels):**
 - `@context`: https://schema.org/
 - `@type`: MolecularEntity
-- `molecularWeight`: Molecular weight with unit [Units should be included in the form ‘ ‘, for example ‘12 amu’ or as ‘.]
-- `identifier`: Product identifier (or "UNKNOWN_" prefix if unknown)
-- `isPartOfBioChemEntity`: Reference to parent xenobiotic
-- `chemicalRole`: Must include "metabolite" and/or "biotransformation product"
-- `additionalProperty`: Must include MSI identification level
+- `@id`: Globally unique IRI identifying the product (e.g., canonical database URL, or a study-local URI for unknowns such as `#UNKNOWN_M3`)
+- `dct:conformsTo`: https://bioschemas.org/profiles/MolecularEntity/0.7-DRAFT
+- `molecularWeight`: Molecular weight with unit (QuantitativeValue or Text, ONE) — use UO unit codes (see Section 3.3); *Recommended in profile, Required for MIX-MB*
+- `identifier`: Product identifier as DefinedTerm, PropertyValue, Text, or URL (use `UNKNOWN_` prefix for unknowns)
+- `isPartOfBioChemEntity`: Reference to the parent xenobiotic (BioChemEntity, MANY)
+- `chemicalRole`: Must include "metabolite" and/or "biotransformation product" (DefinedTerm, MANY) — use ChEBI terms
+- `additionalProperty`: Must include MSI identification level (PropertyValue)
 
 **Recommended Properties (if known):**
-- `inChIKey`: Standard InChI Key
-- `alternateName`: Product name or systematic designation
-- `smiles`: Canonical SMILES string
-- `molecularFormula`: Chemical formula
-- `inChIKey`: Standard InChI Key
-- `smiles`: Canonical SMILES string
-- `monoisotopicMolecularWeight`: Exact mass
-- `chemicalRole`: Role classification from ChEBI (xenobiotic, drug, metabolite)
-- `associatedDisease`: a disease can be a MedicalCondition or a URL
-- `bioChemInteraction`:
-- `bioChemSimilarity`:
-- `biologicalRole`:
-- `description`:
-- `image`:
-- `isInvolvedInBiologicalProcess`:
+- `inChIKey`: Hashed InChI identifier (Text, ONE) — *Recommended in profile*
+- `iupacName`: IUPAC systematic name (Text, ONE) — *Recommended in profile*
+- `molecularFormula`: Molecular formula (Text, ONE) — *Recommended in profile*
+- `molecularWeight`: Molecular weight with unit (QuantitativeValue or Text, ONE) — *Recommended in profile, Required for MIX-MB*
+- `sameAs`: Reference URLs unambiguously indicating the product’s identity in other databases (URL, MANY) — *Recommended in profile*
+- `alternateName`: Product name or systematic designation (Text, MANY)
+- `associatedDisease`: A disease associated with this entity (MedicalCondition, PropertyValue, or URL, MANY)
+- `bioChemInteraction`: A BioChemEntity this product interacts with (BioChemEntity, MANY)
+- `bioChemSimilarity`: A similar molecular entity, e.g., obtained by fingerprint similarity algorithms (BioChemEntity, MANY)
+- `biologicalRole`: A role played by the entity in a biological context (DefinedTerm, MANY) — use ChEBI terms
+- `chemicalRole`: A role played by the molecular entity within a chemical context (DefinedTerm, MANY) — *Optional in profile, Required for MIX-MB*
+- `description`: A free-text description of the product (Text, ONE)
+- `disambiguatingDescription`: A short description to distinguish from similar items (Text, ONE)
+- `hasBioChemEntityPart`: A BioChemEntity that (in some sense) has this entity as a part (BioChemEntity, MANY)
+- `hasMolecularFunction`: Molecular function performed by this entity (DefinedTerm, PropertyValue, Text, or URL, MANY) — use GO terms
+- `hasRepresentation`: A common representation of this entity such as a chemical structure or structural classification (DefinedTerm, PropertyValue, Text, or URL, MANY) — e.g., SMILES, InChI, or ChemOnt/ClassyFire class (see Section 3.2)
+- `image`: A structural image of the compound (ImageObject or URL, MANY)
+- `isEncodedByBioChemEntity`: A gene or BioChemEntity encoding this entity (Gene, MANY)
+- `isInvolvedInBiologicalProcess`: Biological process this entity is involved in (DefinedTerm, PropertyValue, Text, or URL, MANY) — use GO terms (see Section 3.4)
+- `isLocatedInSubcellularLocation`: Subcellular location where this entity is located (DefinedTerm, PropertyValue, Text, or URL, MANY)
+- `isPartOfBioChemEntity`: The parent BioChemEntity this entity is a part of (BioChemEntity, MANY) — *Optional in profile, Required for MIX-MB*
+- `monoisotopicMolecularWeight`: Exact monoisotopic mass (QuantitativeValue or Text, ONE)
+- `potentialUse`: Intended use of the entity by humans (DefinedTerm, MANY)
+- `subjectOf`: A CreativeWork or Event about this entity (CreativeWork or Event, MANY) — e.g., publication, dataset
+- `taxonomicRange`: Taxonomic grouping of the organism that expresses or relates to this entity (DefinedTerm, Taxon, Text, or URL, MANY)
 
+**Analytical Detection Properties (using `additionalProperty`):**
 
-**Level 1 Example - Identified Product (Confirmed with Standard):**
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "MolecularEntity",
-  "identifier": "HMDB0001923",
-  "alternateName": "2-Hydroxyibuprofen",
-  "inChIKey": "ZISAWCKPVBGBBM-UHFFFAOYSA-N",
-  "smiles": "CC(C)Cc1ccc(cc1)C(C)(O)C(=O)O",
-  "molecularFormula": "C13H18O3",
-  "molecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "222.28",
-    "unitCode": "GM"
-  },
-  "monoisotopicMolecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "222.1256",
-    "unitCode": "DA"
-  },
-  "chemicalRole": [
-    "metabolite",
-    "biotransformation product",
-    "hydroxylated derivative"
-  ],
-  "biologicalRole": [
-    "http://purl.obolibrary.org/obo/CHEBI_25212"
-  ],
-  "isPartOfBioChemEntity": {
-    "@type": "MolecularEntity",
-    "identifier": "CHEMBL1201246",
-    "alternateName": "Ibuprofen"
-  },
-  "description": "Phase I metabolite of Ibuprofen formed via hydroxylation. Detected with authentic reference standard.",
-  "url": "https://www.hmdb.ca/metabolites/HMDB0001923",
-  "additionalProperty": [
-    {
-      "@type": "PropertyValue",
-      "name": "MSI Identification Level",
-      "value": "Level 1",
-      "description": "Identified - Confirmed with authentic reference standard"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Retention Time",
-      "value": "4.32",
-      "unitCode": "MIN"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Retention Time Match",
-      "value": "0.01 min difference from standard",
-      "description": "Reference standard: 4.33 min"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "MS/MS Similarity Score",
-      "value": "0.99",
-      "description": "Match to standard MS/MS spectrum"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Reference Standard",
-      "value": "Sigma-Aldrich, Catalog #H7629",
-      "description": "Authentic 2-Hydroxyibuprofen standard used for confirmation"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Transformation Type",
-      "value": "hydroxylation",
-      "valueReference": "http://purl.obolibrary.org/obo/GO_0018126"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Quantitation",
-      "value": "45.2",
-      "unitCode": "UMO",
-      "description": "µM after 24 hours incubation"
-    }
-  ]
-}
-```
+*Required for all MSI levels:*
+- `MSI_level`: MSI identification confidence level assigned to this product (Level 1–5; see MSI Level Guidelines above)
+- `mz`: Measured m/z value of the detected ion
+- `adduct_type`: Ion adduct form detected (e.g., [M+H]+, [M-H]-, [M+Na]+, [M+NH4]+)
+- `ionization_mode`: Ionization mode used (e.g., ESI positive, ESI negative, APCI)
+- `mass_accuracy_ppm`: Mass measurement accuracy relative to theoretical mass (parts per million)
+- `retention_time`: Retention time recorded during chromatographic separation
+- `retention_time_unit`: Unit for retention time (sec, min, hr)
+- `signal_to_noise`: Signal-to-noise ratio of the detected peak
+- `detection_frequency`: Number of replicates in which the compound was detected (e.g., 3/3)
+- `transformation_type`: Type of biotransformation from the parent compound (use controlled vocabulary from Section 3.5)
+- `mass_difference_from_parent`: Exact mass difference from the parent xenobiotic (e.g., +15.9949 Da for hydroxylation)
 
-**Level 2 Example - Putatively Annotated (Library Match):**
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "MolecularEntity",
-  "identifier": "M1_PUTATIVE",
-  "alternateName": "Ibuprofen metabolite M1 (putative)",
-  "molecularFormula": "C13H18O3",
-  "molecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "222.28",
-    "unitCode": "GM"
-  },
-  "monoisotopicMolecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "222.1256",
-    "unitCode": "DA"
-  },
-  "chemicalRole": [
-    "metabolite",
-    "biotransformation product",
-    "putative structure"
-  ],
-  "isPartOfBioChemEntity": {
-    "@type": "MolecularEntity",
-    "identifier": "CHEMBL1201246",
-    "alternateName": "Ibuprofen"
-  },
-  "description": "Putative Ibuprofen metabolite identified via MS/MS spectral library matching with high confidence.",
-  "additionalProperty": [
-    {
-      "@type": "PropertyValue",
-      "name": "MSI Identification Level",
-      "value": "Level 2",
-      "description": "Putatively annotated via MS/MS spectral library match"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "MS/MS Similarity Score",
-      "value": "0.82",
-      "description": "GNPS library match (normalized dot product)"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Library Match",
-      "value": "MassBank (MB009246)",
-      "description": "Best hit: 2-Hydroxyibuprofen with cosine similarity 0.82"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Retention Time",
-      "value": "4.35",
-      "unitCode": "MIN"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Retention Index Match",
-      "value": "Agreement within 5 RI units",
-      "description": "Experimental RI: 1245, Literature RI: 1248"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Exact Mass",
-      "value": "222.1256",
-      "unitCode": "DA"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Structural Hypothesis",
-      "value": "hydroxylation",
-      "description": "Most probable based on MS/MS fragmentation pattern"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Confidence",
-      "value": "High",
-      "description": "Strong MS/MS and retention time agreement"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Quantitation",
-      "value": "38.5",
-      "unitCode": "UMO",
-      "description": "µM after 24 hours (semi-quantitative)"
-    }
-  ]
-}
-```
+*Level 1 (Identified) — additional required:*
+- `reference_standard`: Authentic reference standard used for confirmation (supplier, catalog number)
+- `retention_time_match`: Retention time difference compared to the authentic reference standard (with unit)
+- `ms2_similarity_score`: MS/MS spectral similarity score vs the reference standard spectrum (0–1)
 
-**Level 3 Example - Putatively Characterized (Chemical Class Known):**
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "MolecularEntity",
-  "identifier": "M2_PUTATIVE",
-  "alternateName": "Ibuprofen dihydroxy metabolite (putative)",
-  "molecularFormula": "C13H18O4",
-  "molecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "238.28",
-    "unitCode": "GM"
-  },
-  "monoisotopicMolecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "238.1205",
-    "unitCode": "DA"
-  },
-  "chemicalRole": [
-    "metabolite",
-    "biotransformation product",
-    "polyhydroxylated derivative"
-  ],
-  "isPartOfBioChemEntity": {
-    "@type": "MolecularEntity",
-    "identifier": "CHEMBL1201246",
-    "alternateName": "Ibuprofen"
-  },
-  "description": "Putatively characterized Ibuprofen metabolite with confirmed molecular formula and functional group assignment based on MS/MS fragmentation.",
-  "additionalProperty": [
-    {
-      "@type": "PropertyValue",
-      "name": "MSI Identification Level",
-      "value": "Level 3",
-      "description": "Putatively characterized - Chemical class identified"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Molecular Formula",
-      "value": "C13H18O4",
-      "description": "Confirmed via accurate mass measurement"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Mass Difference from Parent",
-      "value": "+32 Da",
-      "description": "Indicates double hydroxylation from parent (M+32)"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Chemical Class",
-      "value": "Dihydroxylated phenylpropionic acid",
-      "description": "Functional group assignment based on MS/MS fragmentation"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Fragment Pattern",
-      "value": "Consistent with dihydroxy-ibuprofen",
-      "description": "Key fragments at m/z 177, 159, 137 match expected fragmentation"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Degree of Unsaturation",
-      "value": "5",
-      "description": "Benzene ring (4) + carboxylic acid (1)"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Retention Time",
-      "value": "3.87",
-      "unitCode": "MIN"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Exact Mass",
-      "value": "238.1205",
-      "unitCode": "DA"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Structural Hypothesis",
-      "value": "Double hydroxylation at aliphatic side chains",
-      "description": "Most consistent with oxidative metabolism"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Confidence",
-      "value": "Medium-High",
-      "description": "Chemical class confirmed but exact hydroxylation sites unknown"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Quantitation",
-      "value": "12.3",
-      "unitCode": "UMO",
-      "description": "µM after 24 hours (semi-quantitative)"
-    }
-  ]
-}
-```
+*Level 2 (Putatively annotated) — additional required:*
+- `ms2_similarity_score`: MS/MS spectral similarity score vs matched library spectrum (e.g., cosine similarity ≥ 0.7)
+- `spectral_library`: Spectral library used for matching (e.g., GNPS, MassBank, HMDB, mzCloud)
+- `library_match_id`: Identifier of the matched library spectrum (e.g., GNPS accession, MassBank ID)
+- `retention_index_match`: Agreement between experimental and literature retention index (if applicable)
 
-**Level 4 Example - Unknown Compound (Minimal Information):**
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "MolecularEntity",
-  "identifier": "UNKNOWN_M3",
-  "alternateName": "Unknown biotransformation product M3",
-  "chemicalRole": [
-    "metabolite",
-    "biotransformation product",
-    "unknown structure"
-  ],
-  "isPartOfBioChemEntity": {
-    "@type": "MolecularEntity",
-    "identifier": "CHEMBL1201246",
-    "alternateName": "Ibuprofen"
-  },
-  "description": "Unknown Ibuprofen metabolite detected with minimal structural information available. Only exact mass measurement performed.",
-  "additionalProperty": [
-    {
-      "@type": "PropertyValue",
-      "name": "MSI Identification Level",
-      "value": "Level 4",
-      "description": "Unknown compound - Minimal structural information available"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Detected Mass",
-      "value": "254.1154",
-      "unitCode": "DA"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Retention Time",
-      "value": "2.45",
-      "unitCode": "MIN"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "MS/MS Available",
-      "value": "No",
-      "description": "Insufficient intensity for MS/MS acquisition"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Possible Molecular Formula",
-      "value": "C13H18O5",
-      "description": "Calculated from exact mass (m/z ± 5 ppm)"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Signal-to-Noise Ratio",
-      "value": "25"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Detection Consistency",
-      "value": "2 out of 3 replicates"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Confidence in Detection",
-      "value": "Medium",
-      "description": "Reproducible but low intensity signal"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Quantitation",
-      "value": "5.7",
-      "unitCode": "UMO",
-      "description": "µM after 24 hours (detection only, approximate)"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Recommendations for Further Study",
-      "value": "Increase sample enrichment, high-resolution MS fragmentation, NMR characterization, isolation and purification"
-    }
-  ]
-}
-```
-**Level 5 Example - Unidentified Compound (Spectral Data Only):**
-```json
-{
-  "@context": "https://schema.org",
-  "@type": "MolecularEntity",
-  "identifier": "UNIDENTIFIED_M1",
-  "alternateName": "Unknown biotransformation product M1",
-  "chemicalRole": [
-    "metabolite",
-    "biotransformation product",
-    "unidentified"
-  ],
-  "isPartOfBioChemEntity": {
-    "@type": "MolecularEntity",
-    "identifier": "CHEMBL1201246",
-    "alternateName": "Ibuprofen"
-  },
-  "additionalProperty": [
-    {
-      "@type": "PropertyValue",
-      "name": "MSI Identification Level",
-      "value": "Level 5",
-      "description": "Unidentified - Spectral data only, no structural hypothesis"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Detected Mass",
-      "value": "254.1154",
-      "unitCode": "DA"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Retention Time",
-      "value": "2.12",
-      "unitCode": "MIN"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Signal-to-Noise Ratio",
-      "value": "45"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Detection Frequency",
-      "value": "All replicates (n=3)",
-      "description": "Consistent detection across biological replicates"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Quantitation",
-      "value": "2.1",
-      "unitCode": "UMO",
-      "description": "µM after 24 hours (detection only)"
-    },
-    {
-      "@type": "PropertyValue",
-      "name": "Recommendations for Further Study",
-      "value": "High-resolution accurate mass measurement, MS/MS fragmentation, NMR characterization"
-    }
-  ]
-}
-```
+*Level 3 (Putatively characterized) — additional required:*
+- `structural_hypothesis`: Proposed structural class or transformation type (e.g., double hydroxylation at aliphatic chain)
+- `fragment_pattern`: Key fragment ions supporting the structural assignment (e.g., m/z 177, 159, 137)
+- `chemont_class`: ClassyFire/ChemOnt structural classification of the putative compound (use in `hasRepresentation`; maps to template `Metabolite_annotation` column) — e.g., "Phenylpropanoic acids", "Dihydroxylated phenylpropionic acid"; see Section 3.2
+
+*Level 4/5 (Unknown/Unidentified) — additional required:*
+- `ms2_available`: Whether an MS/MS spectrum was acquired for this signal (yes/no)
+- `possible_molecular_formula`: Proposed molecular formula derived from accurate mass measurement (± ppm tolerance)
+- `detection_consistency`: Number of replicates with a confirmed signal (e.g., 2 out of 3)
+
+**_NOTE:_** This profile goes to the `ASSAY.tsv` and `ACTIVITY.tsv` files for ChEMBL submission.
 
 ### 2.3 Concentration Documentation
 
-**Concentration is documented in `additionalProperty` for both substrates and products:**
+Concentration is documented using `additionalProperty` (PropertyValue) for both substrates (Section 2.1) and biotransformation products (Section 2.2). All five properties below apply to both, though `initial_concentration` and `stock_concentration` are most relevant to substrates, while `final_concentration` and `concentration_change` are most relevant to products.
 
-| Parameter | Type | Unit | Example |
-|-----------|------|------|---------|
-| **stock_concentration** | Initial compound concentration | mmol/L, mg/mL, µg/µL | 100 mmol/L |
-| **initial_concentration** | Starting concentration in assay | mmol/L, µM, µg/mL | 50 µM |
-| **final_concentration** | Measured concentration at timepoint | mmol/L, µM, µg/mL | 2.5 µM (at 24h) |
-| **concentration_change** | Absolute or relative change | mmol/L, %, fold-change | 95% degradation |
-| **detection_limit** | Lower limit of quantitation | nmol/L, µg/mL, ppm | 10 nM |
-
-**Example - Quantitation Fields:**
-```json
-"additionalProperty": [
-  {
-    "@type": "PropertyValue",
-    "name": "Initial Substrate Concentration",
-    "value": "100",
-    "unitCode": "UMO",
-    "description": "µM Ibuprofen at time 0"
-  },
-  {
-    "@type": "PropertyValue",
-    "name": "Final Substrate Concentration",
-    "value": "5",
-    "unitCode": "UMO",
-    "description": "µM Ibuprofen after 24 hours"
-  },
-  {
-    "@type": "PropertyValue",
-    "name": "Substrate Degradation",
-    "value": "95",
-    "unitCode": "%",
-    "description": "Percentage of parent compound consumed"
-  },
-  {
-    "@type": "PropertyValue",
-    "name": "Product Formation",
-    "value": "45.2",
-    "unitCode": "UMO",
-    "description": "µM 2-Hydroxyibuprofen formed"
-  },
-  {
-    "@type": "PropertyValue",
-    "name": "Mass Balance",
-    "value": "85",
-    "unitCode": "%",
-    "description": "Percentage of initial substrate recovered as products"
-  }
-]
-```
+| Property | Description | Recommended Units | Example |
+|---|---|---|---|
+| `stock_concentration` | Concentration of the compound in the prepared stock solution, before dilution into the assay medium | mmol/L, mg/mL, µg/µL | 100 mmol/L in DMSO |
+| `initial_concentration` | Starting concentration of the compound in the assay at time zero (t=0), after dilution from stock | µM, µg/mL, mmol/L | 50 µM |
+| `final_concentration` | Measured concentration of the compound (substrate remaining or product formed) at the experimental endpoint or a defined timepoint | µM, µg/mL, nmol/L | 2.5 µM at 24 h |
+| `concentration_change` | Absolute or relative change in concentration compared to the initial value — use to report substrate degradation or product formation | µM, %, fold-change | 95% degradation; +45.2 µM product |
+| `detection_limit` | Lower limit of quantitation (LLOQ) for the analytical method used; signals below this value should not be reported as quantified | nmol/L, µg/mL, ppm | 10 nM |
 
 ---
 
@@ -644,17 +305,20 @@ For biotransformation products characterised with mass spectrometry (MS), use th
 ### 3.1 ChEBI (Chemical Entities of Biological Interest)
 
 **Required ChEBI Classifications:**
-- **Chemical Class:** Parent chemical class (e.g., CHEBI:50906 'xenobiotic')
-- **Role:** Biochemical role (e.g., CHEBI:35610 'drug', CHEBI:49295 'pharmaceutical')
-- **Application:** Intended use (e.g., CHEBI:35842 'analgesic', CHEBI:33281 'antimicrobial')
+- **Chemical Role** (`chemicalRole`): Intrinsic chemical role of the compound (e.g., CHEBI:50906 'xenobiotic', CHEBI:25212 'metabolite') — for biotransformation products (§2.2), must include CHEBI:25212 'metabolite'
+- **Biological Role** (`biologicalRole`): How the compound functions in a biological context (e.g., CHEBI:38439 'calcium channel blocker', CHEBI:33281 'antimicrobial agent', CHEBI:35222 'inhibitor')
+- **Application** (`potentialUse`): Intended therapeutic or practical use (e.g., CHEBI:35610 'drug', CHEBI:49295 'pharmaceutical', CHEBI:35842 'analgesic')
 
 **Example Annotations:**
 ```
-Ibuprofen:
-  - CHEBI:5855 (ibuprofen)
-  - CHEBI:35842 (analgesic)
-  - CHEBI:35480 (anti-inflammatory agent)
-  - CHEBI:50906 (xenobiotic)
+Diltiazem (substrate):
+  Chemical Role:   CHEBI:3686 (diltiazem), CHEBI:50906 (xenobiotic)
+  Biological Role: CHEBI:38439 (calcium channel blocker)
+  Application:     CHEBI:35474 (antihypertensive agent), CHEBI:35498 (antiarrhythmic drug)
+
+N-desmethyldiltiazem (biotransformation product):
+  Chemical Role:   CHEBI:25212 (metabolite)
+  Biological Role: CHEBI:38439 (calcium channel blocker)
 ```
 
 ### 3.2 ChemOnt (Chemical Ontology)
@@ -669,12 +333,12 @@ Use [ClassyFire Chemical Ontology](http://classyfire.wishartlab.com/) for struct
 
 **Example:**
 ```
-Ibuprofen:
+Diltiazem:
   Kingdom: Organic compounds
-  Superclass: Benzenoids
-  Class: Benzene and substituted derivatives
-  Subclass: Phenylpropanoic acids
-  Direct Parent: Phenylpropanoic acids
+  Superclass: Organoheterocyclic compounds
+  Class: Benzothiazepines
+  Subclass: 1,5-Benzothiazepines
+  Direct Parent: 1,5-Benzothiazepines
 ```
 
 ### 3.3 Unit Ontology (UO)
@@ -685,7 +349,7 @@ Use [Unit Ontology](https://bioportal.bioontology.org/ontologies/UO) for standar
 - **Mass:** `GM` (gram), `DA` (dalton), `MGM` (milligram), `UGM` (microgram)
 - **Volume:** `ML` (milliliter), `UL` (microliter), `NL` (nanoliter)
 - **Concentration:** `MMO` (millimolar), `UMO` (micromolar), `NMO` (nanomolar), `PMO` (picomolar)
-- **Time:** `MIN` (minute), `HOUR` (hour), `DAY (day), `SEC` (second)
+- **Time:** `MIN` (minute), `HOUR` (hour), `DAY` (day), `SEC` (second)
 - **Temperature:** `CEL` (degree Celsius), `DEK` (kelvin)
 - **pH:** Dimensionless (no unit code)
 - **Percentage:** `%` (percent)
@@ -724,21 +388,6 @@ concentrations:
     description: "percent"
 ```
 
-**Implementation in JSON:**
-```json
-{
-  "molecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "206.28",
-    "unitCode": "GM"
-  },
-  "monoisotopicMolecularWeight": {
-    "@type": "QuantitativeValue",
-    "value": "206.1307",
-    "unitCode": "DA"
-  }
-}
-```
 
 ### 3.4 Gene Ontology (GO) - Biotransformation Processes
 
@@ -758,33 +407,6 @@ Phase II refers to the further modification of the xenobiotics metabolite from p
 - GO:0016620 (transferase activity, transferring alkyl or aryl groups)
 - GO:0008146 (sulfotransferase activity)
 
-**Example - Biotransformation Annotation:**
-```json
-{
-  "@type": "PropertyValue",
-  "name": "Biotransformation Type",
-  "value": "hydroxylation",
-  "valueReference": "http://purl.obolibrary.org/obo/GO_0018126",
-  "description": "Addition of hydroxyl group (-OH) catalyzed by cytochrome P450 monooxygenase"
-}
-```
-
-**Multi-step Biotransformation Example:**
-```yaml
-biotransformation_pathway:
-  - step_1:
-      process: "Phase I - Hydroxylation"
-      go_term: "GO:0018126"
-      enzyme: "CYP2E1"
-      product: "2-Hydroxyibuprofen"
-  
-  - step_2:
-      process: "Phase II - Glucuronidation"
-      go_term: "GO:0008194"
-      enzyme: "UDP-glucuronosyltransferase"
-      product: "2-Hydroxyibuprofen glucuronide"
-```
-
 **Common Biotransformation GO Terms Reference:**
 
 | Transformation | GO Term | GO ID |
@@ -800,188 +422,58 @@ biotransformation_pathway:
 | Conjugation | Transferase activity | GO:0016757 |
 | Methylation | Methyltransferase activity | GO:0008168 |
 
----
+### 3.5 MIX-MB Controlled Vocabularies
 
-## 4. MSI Metabolomics Standards
+These terms must be used exactly as written to ensure consistency across submissions.
 
-MSI metabolite annotation levels of confidence are already mentioned in the BioSchemas section. [Metabolomics Standards Initiative (MSI)](https://metabolomicssociety.org/resources/metabolomics-standards-initiative) are minimum standards developed to report metabolomics data and studies:
+**Transformation types** (use in `additionalProperty` → `transformation_type`, and in template `Reaction_type` column):
 
-### 4.1 Chemical Analysis
+These terms map directly to GO terms (see Section 3.4). Use the MIX-MB term as the `value` and the GO URI as `valueReference` when expressing in JSON-LD.
 
-**Required Information:**
-- **Xenobiotic Substrate:**
-  - Chemical identifier (ChEMBL ID, PubChem CID, InChI Key)
-  - Concentration with units
-  - Purity (%)
-  - Source/vendor
-  
-- **Detection Method:**
-  - Analytical platform (LC-MS, GC-MS, NMR, UV-Vis)
-  - Instrument model
-  - Column/separation method (if applicable)
-  - Detection mode (e.g., positive/negative ionization)
+| MIX-MB Term | Description | GO ID | GO URI |
+|---|---|---|---|
+| `hydroxylation` | Addition of -OH group | GO:0018126 | http://purl.obolibrary.org/obo/GO_0018126 |
+| `oxidation` | Oxidation reaction | GO:0055114 | http://purl.obolibrary.org/obo/GO_0055114 |
+| `reduction` | Reduction reaction | GO:0055114 | http://purl.obolibrary.org/obo/GO_0055114 |
+| `hydrolysis` | Hydrolytic cleavage | GO:0016787 | http://purl.obolibrary.org/obo/GO_0016787 |
+| `decarboxylation` | Loss of CO₂ | GO:0017001 | http://purl.obolibrary.org/obo/GO_0017001 |
+| `deamination` | Loss of amino group | GO:0018133 | http://purl.obolibrary.org/obo/GO_0018133 |
+| `conjugation` | Addition of a larger molecular group | GO:0016757 | http://purl.obolibrary.org/obo/GO_0016757 |
+| `demethylation` | Loss of methyl group | GO:0032259 | http://purl.obolibrary.org/obo/GO_0032259 |
+| `acetylation` | Addition of acetyl group | GO:0016408 | http://purl.obolibrary.org/obo/GO_0016408 |
+| `glucuronidation` | Addition of glucuronic acid | GO:0008194 | http://purl.obolibrary.org/obo/GO_0008194 |
+| `sulfation` | Addition of sulfate group | GO:0008146 | http://purl.obolibrary.org/obo/GO_0008146 |
 
-**Example:**
-```yaml
-substrate:
-  compound: "Ibuprofen"
-  chembl_id: "CHEMBL1201246"
-  inchi_key: "HEFNNWSXXWATRW-UHFFFAOYSA-N"
-  concentration: "100 µM"
-  purity: "≥98%"
-  vendor: "Sigma-Aldrich"
-  catalog_number: "I4883"
+**Activity ACTION_TYPE** (use in ACTIVITY.tsv):
 
-analytical_method:
-  platform: "LC-MS"
-  instrument: "Thermo Q Exactive Plus Orbitrap"
-  column: "Waters Acquity UPLC BEH C18 (2.1 x 100 mm, 1.7 µm)"
-  ionization: "ESI negative mode"
-  mass_range: "50-1000 m/z"
-  resolution: "70,000 FWHM"
-```
+| Term | Meaning |
+|------|---------|
+| `Biotransformation` | General transformation event |
+| `Substrate` | Compound consumed in the reaction |
+| `Product` | Compound produced by the reaction |
+| `No Activity` | No biotransformation detected |
 
-### 4.2 Data Processing
-
-**Required Information:**
-- **Quantification method:**
-  - Standard curve vs. semi-quantitative
-  - Internal standards used
-  - Calibration range
-  
-- **Quality control:**
-  - Blank controls
-  - Positive/negative controls
-  - Replication (biological and technical)
-  
-- **Data processing:**
-  - Software used
-  - Peak detection parameters
-  - Normalization method
-
-**Example:**
-```yaml
-quantification:
-  method: "external standard curve"
-  standard_range: "1-500 µM"
-  internal_standard: "13C6-Ibuprofen"
-  linearity_r2: 0.998
-
-quality_control:
-  blank_controls: "media without bacteria"
-  positive_control: "E. coli with xenobiotic"
-  negative_control: "E. coli without xenobiotic"
-  biological_replicates: 3
-  technical_replicates: 2
-
-data_processing:
-  software: "Xcalibur v4.1, MZmine 2.53"
-  peak_detection: "mass tolerance 5 ppm"
-  normalization: "cell density (OD600)"
-```
-
-### 4.4 Metabolite Identification
-
-Use MSI identification confidence levels:
-
-- **Level 1:** Identified compounds (match to authentic standard)
-- **Level 2:** Putatively annotated (MS² or library match)
-- **Level 3:** Putatively characterized (chemical class)
-- **Level 4:** Unknown compounds
-
-**Required for Each Metabolite:**
-```yaml
-metabolite_id: "M1"
-identification_level: "Level 2"
-compound_name: "Hydroxy-ibuprofen"
-exact_mass: 222.1256
-retention_time: "4.32 min"
-ms2_similarity: 0.85
-reference_database: "MassBank, HMDB"
-confidence_score: "High"
-```
+<to be updated>
 
 ---
 
-## 5. Data Validation Rules
 
-### 5.1 Chemical Structure Validation
+## 4. Data Validation Rules
 
-- SMILES must be valid and canonical
-- InChI Key must match SMILES structure
-- Molecular formula must be calculable from structure
-- Molecular weight must be within 0.1 Da of calculated value
-
-### 5.2 Quantitative Data Validation
-
-- Concentrations must be positive values
-- Units must be from Unit Ontology (UO)
-- Standard deviation cannot exceed mean value
-- Replicates required (n≥3 for statistical analysis)
-
-### 5.3 Cross-referencing Validation
-
-- All CIDX in ACTIVITY.tsv must exist in COMPOUND_RECORD.tsv
-- All AIDX in ACTIVITY.tsv must exist in ASSAY.tsv
-- All RIDX must exist in REFERENCE.tsv
-- ChEMBL IDs must be valid (if provided)
-
----
-# ChEMBL data format: 
-Important Links: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/drug-and-compound-questions
-
-## 6. Data Quality Tiers
-
-### Tier 1: Gold Standard (Publication-Ready)
-- All Level A and B information complete
-- Level 1 MSI metabolite identification
-- Raw data deposited in public repository
-- Quality control passed (blanks, standards, replicates)
-- Peer-reviewed or preprint available
-
-### Tier 2: Silver Standard (Research-Grade)
-- All Level A information complete
-- Level 2 MSI metabolite identification
-- Technical replicates (n≥2)
-- Method validation documented
-
-### Tier 3: Bronze Standard (Preliminary)
-- All Level A essential information
-- Single experimental replicate
-- Basic quality control
-- Suitable for initial screening data
 
 ---
 
-## 7. Implementation Guidelines
+## 5. Data Quality Tiers
 
-### 7.1 Data Collection Workflow
-
-1. **Pre-experiment:** Define experimental design, ensure all metadata fields can be captured
-2. **During experiment:** Record all parameters in real-time using electronic lab notebooks
-3. **Post-experiment:** Process data according to MSI standards
-4. **Validation:** Check all required fields before submission
-5. **Deposition:** Submit to appropriate repositories (ChEMBL, MetaboLights, etc.)
-
-### 7.2 Software Tools
-
-**Recommended Tools:**
-- **Chemical structure handling:** RDKit, OpenBabel, ChemDraw
-- **Ontology annotation:** Zooma, OLS (Ontology Lookup Service)
-- **Data validation:** ISA tools, ChEMBL loader validation
-- **MS data processing:** MZmine, XCMS, MS-DIAL
-
-### 7.3 Repository Submission
-
-**Primary Repositories:**
-- **ChEMBL:** Bioactivity data submission portal (required)
-- **MetaboLights:** Metabolomics experiments and derived data (required)
-- **GNPS:** Mass spectrometry data and molecular networking (optional)
-- **Zenodo:** General scientific data with DOI assignment (optional)
 
 ---
 
-## 8. Version History
+
+## 6. How to use the Template
+
+
+
+## 7. Version History
 
 | Version | Date | Changes |
 |---------|------|---------|
@@ -989,18 +481,20 @@ Important Links: https://chembl.gitbook.io/chembl-interface-documentation/freque
 
 ---
 
-## 9. References
+## 8. References
 1. ChEMBL Database Guidelines: https://www.ebi.ac.uk/chembl/
 2. Metabolomics Standards Initiative: https://metabolomicssociety.org/resources/metabolomics-standards-initiative
 3. Bioschemas Specifications: https://bioschemas.org/
 4. ChEBI Ontology: https://www.ebi.ac.uk/chebi/
 5. ClassyFire Chemical Taxonomy: http://classyfire.wishartlab.com/
+6. Gene Ontology: http://geneontology.org/
 7. FAIR Principles: https://www.go-fair.org/fair-principles/
 8. Unit Ontology: https://bioportal.bioontology.org/ontologies/UO
 
 ---
 
-## 10. Contact and Contributions
+
+## 9. Contact and Contributions
 
 For questions, suggestions, or contributions to this standard, please contact:
 - **Maintainer:** Mahnoor Zulfiqar
