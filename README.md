@@ -12,40 +12,15 @@ BioXend defines community-driven minimum reporting standards for xenobiotic micr
 
 ## Overview
 
-The MIX-MB framework specifies what metadata should accompany biotransformation data across five categories:
+### Community Standards
 
-| Table | Covers |
-|-------|--------|
-| **Reference** | Publication, DOI, authors, data license |
-| **Chemicals** | Xenobiotic identity (SMILES, InChI), vendor, analytical measurements |
-| **Microbes** | Organism identity, strain, sequencing accessions, protein targets |
-| **Experiment** | Culture conditions, controls, incubation, sample preparation |
-| **Biotransformation** | Activity values, metabolite identification, reaction type |
-
-Each field is classified as **Mandatory**, **Recommended**, or **Optional** based on community consensus and survey feedback from 23 respondents.
-
-## Repository Structure
-
-```
-BioXend/
-├── Standards/              # MIX-MB standards documents (one per table)
-├── Standards/Templates/Template.xlsx           # Data submission template
-├── versions/               # Component version tracking
-├── pipeline/               # Data processing pipeline (future)
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md
-├── VERSION.md
-└── README.md
-```
-
-## Getting Started
-
-## Community Standards
-
-This project will be built on community consensus. The standards are informed by already existing standards, ChEMBL submission guidelines, an [open survey](https://forms.gle/towuMVYYuqDi7pEJ7) and ongoing feedback from researchers in xenobiotic microbial biotransformation (via collaboration and this GitHub repository).
+This project will be built on community consensus. The standards are informed by already existing standards, ChEMBL submission guidelines, an [open survey](https://forms.gle/towuMVYYuqDi7pEJ7). Please view the current results from the survey in [MIX-MB_Survey_Analysis.ipynb](https://github.com/zmahnoor14/BioXend/Standards/MIX-MB_Survey_Analysis.ipynb) notebook.
 
 All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 
+## Repository Structure
+
+<to update later>
 
 ### For contributors
 
@@ -74,7 +49,7 @@ This project is licensed under the [MIT License](LICENSE).
 
 ## Contact
 
-- **Maintainer**: Mahnoor Zulfiqar — [ORCID](https://orcid.org/0000-0002-8330-4071), Eleonora Mastrorilli - [ORCID](https://orcid.org/0000-0003-2127-4150)
+- **Maintainers**: Mahnoor Zulfiqar — [ORCID](https://orcid.org/0000-0002-8330-4071), Eleonora Mastrorilli - [ORCID](https://orcid.org/0000-0003-2127-4150)
 - **Institution**: EMBL, Molecular Systems Biology (MSB) Unit
 
 ## Funding
