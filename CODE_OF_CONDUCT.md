@@ -18,7 +18,7 @@ This applies to all community spaces: GitHub issues, pull requests, discussions,
 
 ## Enforcement
 
-Report violations to the project maintainers at **[Mahnoor Zulfiqar](mailto:mahnoor.zulfiqar@embl.de)**. All reports will be handled confidentially. 
+Report violations to the project maintainers at **[mahnoor.zulfiqar@embl.de](mailto:mahnoor.zulfiqar@embl.de)**. All reports will be handled confidentially. 
 
 ## Attribution
 
