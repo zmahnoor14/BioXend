@@ -1,0 +1,280 @@
+# Auto-versioning and release workflow for BioXend / MIX-MB
+#
+# Triggers on every push to main (i.e. when a PR is merged).
+# Detects which components changed, bumps their version files in versions/,
+# bumps the framework version, commits the changes, and creates a GitHub Release.
+#
+# Version bump level is controlled by PR labels:
+#   bump:major  →  MAJOR bump (breaking changes)
+#   bump:minor  →  MINOR bump (new backward-compatible additions)
+#   bump:patch  →  PATCH bump (fixes/clarifications) — DEFAULT if no label
+#
+# Components tracked:
+#   Standards/MIXMB_Xenobiotics.md         → versions/standards-xenobiotics.txt
+#   Standards/MIXMB_Microbes.md            → versions/standards-microbes.txt
+#   Standards/MIXMB_Biotransformation.md   → versions/standards-biotransformation.txt
+#   Standards/MIXMB_Standards_main.md      → (triggers framework bump only)
+#   Standards/Templates/**                 → versions/template.txt
+#   main.nf / nextflow.config / bin/ / modules/  → versions/workflow.txt
+#   versions/framework.txt                 → bumped whenever any component is bumped
+
+name: Auto Versioning and Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  version-and-release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: read
+
+    steps:
+      # ------------------------------------------------------------------ #
+      # 1. Checkout with full history so we can compare commits             #
+      # ------------------------------------------------------------------ #
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      # ------------------------------------------------------------------ #
+      # 2. Identify the merged PR and its bump label                        #
+      # ------------------------------------------------------------------ #
+      - name: Detect bump type from PR labels
+        id: pr_info
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Search the most-recently-updated closed PRs for the one whose
+            // merge_commit_sha matches the current push SHA.
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo:  context.repo.repo,
+              state: 'closed',
+              sort:  'updated',
+              direction: 'desc',
+              per_page: 20
+            });
+
+            const mergedPR = prs.find(pr => pr.merge_commit_sha === context.sha);
+
+            let bumpType = 'patch';
+            let prNumber = '';
+            let prTitle  = context.payload.head_commit?.message ?? 'Direct push to main';
+
+            if (mergedPR) {
+              const labels = mergedPR.labels.map(l => l.name);
+              prNumber = String(mergedPR.number);
+              prTitle  = mergedPR.title;
+              if      (labels.includes('bump:major')) bumpType = 'major';
+              else if (labels.includes('bump:minor')) bumpType = 'minor';
+              // else: default 'patch'
+            }
+
+            core.setOutput('bump_type', bumpType);
+            core.setOutput('pr_number', prNumber);
+            core.setOutput('pr_title',  prTitle);
+            core.info(`Bump type: ${bumpType} | PR: ${prNumber || 'n/a'}`);
+
+      # ------------------------------------------------------------------ #
+      # 3. Detect which components have changed in this push                #
+      # ------------------------------------------------------------------ #
+      - name: Detect changed components
+        id: components
+        uses: actions/github-script@v7
+        with:
+          script: |
+            let changedFiles = [];
+            try {
+              const { data: comparison } = await github.rest.repos.compareCommits({
+                owner: context.repo.owner,
+                repo:  context.repo.repo,
+                base:  context.payload.before,
+                head:  context.payload.after
+              });
+              changedFiles = comparison.files.map(f => f.filename);
+            } catch (e) {
+              core.warning(`Could not compare commits: ${e.message}`);
+            }
+
+            core.info(`Changed files:\n${changedFiles.join('\n')}`);
+
+            const match = (patterns) =>
+              changedFiles.some(f => patterns.some(p => f.match(p)));
+
+            const changed = {
+              xenobiotics:      match([/^Standards\/MIXMB_Xenobiotics/]),
+              microbes:         match([/^Standards\/MIXMB_Microbes/]),
+              biotransformation:match([/^Standards\/MIXMB_Biotransformation/]),
+              standards_main:   match([/^Standards\/MIXMB_Standards_main/]),
+              template:         match([/^Standards\/Templates\//]),
+              workflow:         match([/^main\.nf$/, /^nextflow\.config$/, /^bin\//, /^modules\//])
+            };
+
+            // standards_main affects framework version but has no own version file
+            const anyVersionable = changed.xenobiotics || changed.microbes ||
+              changed.biotransformation || changed.template || changed.workflow;
+            const any = anyVersionable || changed.standards_main;
+
+            for (const [k, v] of Object.entries(changed)) {
+              core.setOutput(k, String(v));
+            }
+            core.setOutput('any_versionable', String(anyVersionable));
+            core.setOutput('any', String(any));
+
+      # ------------------------------------------------------------------ #
+      # 4. Bump version files (only runs if something changed)              #
+      # ------------------------------------------------------------------ #
+      - name: Bump component versions
+        if: steps.components.outputs.any == 'true'
+        id: bump
+        shell: bash
+        env:
+          BUMP: ${{ steps.pr_info.outputs.bump_type }}
+          XENOBIOTICS:       ${{ steps.components.outputs.xenobiotics }}
+          MICROBES:          ${{ steps.components.outputs.microbes }}
+          BIOTRANSFORMATION: ${{ steps.components.outputs.biotransformation }}
+          STANDARDS_MAIN:    ${{ steps.components.outputs.standards_main }}
+          TEMPLATE:          ${{ steps.components.outputs.template }}
+          WORKFLOW:          ${{ steps.components.outputs.workflow }}
+        run: |
+          # ---- helper: bump a MAJOR.MINOR.PATCH version string ----
+          bump_semver() {
+            local version="$1" level="$2"
+            local major minor patch
+            IFS='.' read -r major minor patch <<< "$version"
+            case "$level" in
+              major) echo "$((major + 1)).0.0" ;;
+              minor) echo "${major}.$((minor + 1)).0" ;;
+              *)     echo "${major}.${minor}.$((patch + 1))" ;;
+            esac
+          }
+
+          # ---- helper: escalate MAX_BUMP ----
+          MAX_BUMP="patch"
+          promote() {
+            local level="$1"
+            if   [[ "$level" == "major" ]]; then
+              MAX_BUMP="major"
+            elif [[ "$level" == "minor" && "$MAX_BUMP" == "patch" ]]; then
+              MAX_BUMP="minor"
+            fi
+          }
+
+          CHANGELOG=""
+
+          # ---- bump one component ----
+          bump_component() {
+            local file="$1" label="$2"
+            local old new
+            old=$(tr -d '[:space:]' < "$file")
+            new=$(bump_semver "$old" "$BUMP")
+            printf '%s\n' "$new" > "$file"
+            CHANGELOG+=$'\n'"- **${label}**: \`${old}\` → \`${new}\`"
+            promote "$BUMP"
+            echo "  Bumped ${label}: ${old} → ${new}"
+          }
+
+          # ---- per-component logic ----
+          [[ "$XENOBIOTICS"       == "true" ]] && bump_component \
+            versions/standards-xenobiotics.txt    "MIX-MB(X) Xenobiotics Standard"
+
+          [[ "$MICROBES"          == "true" ]] && bump_component \
+            versions/standards-microbes.txt       "MIX-MB(M) Microbes Standard"
+
+          [[ "$BIOTRANSFORMATION" == "true" ]] && bump_component \
+            versions/standards-biotransformation.txt "MIX-MB(B) Biotransformation Standard"
+
+          [[ "$TEMPLATE"          == "true" ]] && bump_component \
+            versions/template.txt                 "Submission Template"
+
+          [[ "$WORKFLOW"          == "true" ]] && bump_component \
+            versions/workflow.txt                 "Nextflow Workflow"
+
+          # Standards main affects framework bump level even without its own file
+          [[ "$STANDARDS_MAIN"    == "true" ]] && promote "$BUMP"
+
+          # ---- bump framework ----
+          OLD_FW=$(tr -d '[:space:]' < versions/framework.txt)
+          NEW_FW=$(bump_semver "$OLD_FW" "$MAX_BUMP")
+          printf '%s\n' "$NEW_FW" > versions/framework.txt
+          echo "  Bumped framework: ${OLD_FW} → ${NEW_FW} (via ${MAX_BUMP})"
+
+          # ---- write outputs (multiline-safe) ----
+          {
+            echo "framework_old=${OLD_FW}"
+            echo "framework_new=${NEW_FW}"
+            echo "changelog<<EOF"
+            printf '%s\n' "$CHANGELOG"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+
+      # ------------------------------------------------------------------ #
+      # 5. Commit the bumped version files back to main                     #
+      # ------------------------------------------------------------------ #
+      - name: Commit version bumps
+        if: steps.components.outputs.any == 'true'
+        run: |
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add versions/
+          git commit -m "chore: release v${{ steps.bump.outputs.framework_new }} [skip ci]"
+          git push
+
+      # ------------------------------------------------------------------ #
+      # 6. Create a GitHub Release with auto-generated release notes        #
+      # ------------------------------------------------------------------ #
+      - name: Create GitHub Release
+        if: steps.components.outputs.any == 'true'
+        uses: actions/github-script@v7
+        env:
+          FRAMEWORK_NEW: ${{ steps.bump.outputs.framework_new }}
+          FRAMEWORK_OLD: ${{ steps.bump.outputs.framework_old }}
+          CHANGELOG:     ${{ steps.bump.outputs.changelog }}
+          BUMP_TYPE:     ${{ steps.pr_info.outputs.bump_type }}
+          PR_NUMBER:     ${{ steps.pr_info.outputs.pr_number }}
+          PR_TITLE:      ${{ steps.pr_info.outputs.pr_title }}
+        with:
+          script: |
+            const { FRAMEWORK_NEW, FRAMEWORK_OLD, CHANGELOG,
+                    BUMP_TYPE, PR_NUMBER, PR_TITLE } = process.env;
+
+            const prRef = PR_NUMBER
+              ? `[#${PR_NUMBER}](https://github.com/${context.repo.owner}/${context.repo.repo}/pull/${PR_NUMBER}) — ${PR_TITLE}`
+              : PR_TITLE;
+
+            const body = [
+              `## BioXend / MIX-MB Framework v${FRAMEWORK_NEW}`,
+              '',
+              `| | |`,
+              `|---|---|`,
+              `| **Release type** | \`${BUMP_TYPE}\` |`,
+              `| **Source** | ${prRef} |`,
+              `| **Previous version** | \`v${FRAMEWORK_OLD}\` |`,
+              '',
+              '## Component Version Changes',
+              CHANGELOG || '_No component version files changed._',
+              '',
+              '---',
+              '> See [Standards/Versioning.md](Standards/Versioning.md) for the full',
+              '> compatibility matrix and versioning policy.'
+            ].join('\n');
+
+            const isPrerelease = FRAMEWORK_NEW.startsWith('0.');
+
+            await github.rest.repos.createRelease({
+              owner:      context.repo.owner,
+              repo:       context.repo.repo,
+              tag_name:   `v${FRAMEWORK_NEW}`,
+              name:       `BioXend v${FRAMEWORK_NEW}`,
+              body,
+              draft:      false,
+              prerelease: isPrerelease
+            });
+
+            core.info(`Created release v${FRAMEWORK_NEW}`);

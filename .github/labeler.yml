@@ -1,0 +1,45 @@
+# .github/labeler.yml
+# Maps changed file paths to PR labels.
+# Used by .github/workflows/label-pr.yml (actions/labeler@v5).
+
+standards:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'Standards/MIXMB_Standards_main*'
+
+standards-xenobiotics:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'Standards/MIXMB_Xenobiotics*'
+
+standards-microbes:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'Standards/MIXMB_Microbes*'
+
+standards-biotransformation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'Standards/MIXMB_Biotransformation*'
+
+template:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'Standards/Templates/**'
+
+workflow:
+  - changed-files:
+    - any-glob-to-any-file:
+      - 'main.nf'
+      - 'nextflow.config'
+      - 'bin/**'
+      - 'modules/**'
+      - 'envs/**'
+
+documentation:
+  - changed-files:
+    - any-glob-to-any-file:
+      - '*.md'
+      - 'docs/**'
+    - all-globs-to-all-files:
+      - '!Standards/MIXMB_*.md'

@@ -1,0 +1,29 @@
+# Auto-labeler workflow for BioXend / MIX-MB
+#
+# Automatically applies component labels to PRs targeting devel based on
+# which files are changed. Labels are defined in .github/labeler.yml.
+#
+# Contributors: labels are applied automatically — no manual labelling needed.
+# Maintainers: add bump:major or bump:minor labels manually when required;
+#              the default is bump:patch (applied by auto-version.yml at merge time).
+
+name: Label PR
+
+on:
+  pull_request:
+    branches:
+      - devel
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+
+    steps:
+      - uses: actions/labeler@v5
+        with:
+          repo-token: ${{ secrets.GITHUB_TOKEN }}
+          configuration-path: .github/labeler.yml
+          sync-labels: false   # only add labels, never remove existing ones
