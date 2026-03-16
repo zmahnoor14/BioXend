@@ -1,6 +1,25 @@
 # Contributing to BioXend / MIX-MB
 
-Thank you for your interest in contributing to the Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB) standards! This is a community-driven project, and we welcome contributions from researchers, bioinformaticians, data curators, and anyone working in xenobiotic microbial biotransformation. 
+Thank you for your interest in contributing to the Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB) standards! This is a community-driven project, and we welcome contributions from researchers, bioinformaticians, data curators, and anyone working in xenobiotic microbial biotransformation.
+
+## Table of Contents
+
+- [How to Contribute](#how-to-contribute)
+  - [1. No GitHub Account — Contribute Without GitHub](#1-no-github-account---contribute-without-github)
+  - [2. With GitHub Account](#2-with-github-account)
+    - [2.1. Suggest Changes via Issues](#21-suggest-changes-via-issues-no-git-knowledge-needed)
+    - [2.2. Submit a Pull Request](#22-submit-a-pull-request-for-git-users)
+    - [2.3. Endorse or Comment on Existing Proposals](#23-endorse-or-comment-on-existing-proposals)
+    - [2.4. Discuss and Propose via GitHub Discussions](#24-discuss-and-propose-via-github-discussions)
+    - [2.5. Review and Endorsement Process](#25-review-and-endorsement-process)
+- [Branching and Versioning](#branching-and-versioning)
+  - [How to add the version-bump labels](#how-to-add-the-version-bump-labels)
+- [What Makes a Good Standards Proposal?](#what-makes-a-good-standards-proposal)
+- [Code of Conduct](#code-of-conduct)
+- [Citing This Work](#citing-this-work)
+- [Questions?](#questions)
+
+---
 
 **First time here?** 
 - Here is the link to the current project board: [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6) to get oriented.
