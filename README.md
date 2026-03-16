@@ -79,7 +79,7 @@ We welcome contributions to the standards, template, and nf workflow for submiss
 ### For future data submitters
 
 1. Download the latest [`Template.xlsx`](/Standards/Templates/Template.xlsx)
-2. Read the `Template_Description` sheet for instructions
+2. Read the `Template_Description` sheet for instructions. This template defines mandatory, recommended and optional fields based on ChEMBL submission guidelines and also the current version of MIX-MB.
 3. Fill in your data — green columns are mandatory, blue are recommended, purple are optional
 4. Submit feedback on ease of use via [issues](https://github.com/zmahnoor14/BioXend/issues/new/choose) or [discussion](https://github.com/zmahnoor14/BioXend/discussions) -- This template will be used as input to generate ready to submit ChEMBL files.
 
