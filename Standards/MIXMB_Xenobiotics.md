@@ -460,16 +460,121 @@ These terms map directly to GO terms (see Section 3.4). Use the MIX-MB term as t
 
 ## 4. Data Validation Rules
 
+Before submitting data, verify that all compound records pass the following checks. The pipeline (`generate_compound_files.py`) performs these checks automatically; they also apply to manually prepared submissions.
+
+### 4.1 Structural Identifiers
+
+| Rule | Check |
+|------|-------|
+| SMILES is present | Every compound must have a non-empty canonical SMILES string |
+| SMILES is valid | SMILES must parse without errors (use RDKit or OpenBabel to verify) |
+| InChIKey is present | Mandatory for all known compounds (MSI Level 1–2) |
+| InChIKey format | Must match the pattern `[A-Z]{14}-[A-Z]{10}-[A-Z]` (27 characters) |
+| SMILES–InChIKey consistency | InChIKey must be derivable from the provided SMILES (no manual mismatches) |
+
+### 4.2 Compound Index (CIDX)
+
+| Rule | Check |
+|------|-------|
+| CIDX is present | Every row in `COMPOUND_RECORD.tsv` must have a CIDX |
+| CIDX format | Must follow `CIDX` + zero-padded integer, e.g. `CIDX0001` |
+| CIDX uniqueness | Each CIDX must be unique within the study |
+| Unknown prefix | Uncharacterised compounds must use `UNKNOWN_[RIDX]_[n]` or `PUTATIVE_[RIDX]_[n]` — never a bare CIDX |
+
+### 4.3 Required Fields
+
+The following fields must be non-empty in `COMPOUND_RECORD.tsv` for every compound:
+
+- `CIDX`, `RIDX`, `COMPOUND_NAME`
+
+The following fields must be non-empty in `COMPOUND_CTAB.sdf` for every compound:
+
+- Canonical SMILES, InChI, InChIKey, CIDX (as SDF property tag)
+
+### 4.4 Concentration and Units
+
+| Rule | Check |
+|------|-------|
+| Unit codes are standardised | All concentration values must use UO unit codes (see Section 3.3): `MMO`, `UMO`, `NMO`, etc. |
+| Numeric values are positive | Concentration, molecular weight, and retention time values must be > 0 |
+| Detection limit is provided | If quantitative data are reported, `detection_limit` should be included |
+
+### 4.5 MSI Level Consistency
+
+| MSI Level | Required fields |
+|-----------|----------------|
+| Level 1 | InChIKey, `reference_standard`, `ms2_similarity_score`, `retention_time_match` |
+| Level 2 | InChIKey, `ms2_similarity_score`, `spectral_library`, `library_match_id` |
+| Level 3 | `structural_hypothesis`, `fragment_pattern`, `chemont_class` |
+| Level 4/5 | `mz`, `ms2_available`, `detection_consistency` |
 
 ---
 
 ## 5. Data Quality Tiers
 
+MIX-MB(X) defines three compliance tiers for xenobiotic compound data. Higher tiers enable broader reuse, database cross-linking, and publication in FAIR-compliant repositories.
+
+### Tier 1 — Gold (Publication-Ready)
+
+Meets all mandatory and recommended fields. Suitable for ChEMBL submission and FAIR data publications.
+
+- InChIKey present and verified against SMILES
+- At least one external database ID (ChEMBL, PubChem, or ChEBI)
+- `sameAs` links provided for all known compounds
+- Full Bioschemas ChemicalSubstance JSON-LD record (Section 2.1)
+- Purity, vendor, and stock concentration documented
+- Concentration data complete: initial, final, and detection limit
+- For detected products: MSI Level 1 or 2 with full analytical evidence
+
+### Tier 2 — Silver (Research-Grade)
+
+Meets all mandatory fields with partial recommended fields. Suitable for internal data sharing and preprint deposition.
+
+- InChIKey present
+- At least one external database ID
+- `COMPOUND_NAME`, `SMILES`, `CIDX`, `RIDX` all present
+- Initial substrate concentration documented
+- For detected products: MSI Level 2 or 3 acceptable
+
+### Tier 3 — Bronze (Preliminary / Screening)
+
+Meets only mandatory fields. Suitable for large-scale screening data where full characterisation is not yet possible.
+
+- Valid SMILES and `COMPOUND_NAME` present
+- `CIDX` and `RIDX` assigned
+- Qualitative activity reported (substrate consumed / product detected / no activity)
+- Single measurement acceptable; full replication not required at this tier
 
 ---
 
 
 ## 6. How to use the Template
+
+The MIX-MB submission template is provided as [Templates/Template.xlsx](Templates/Template.xlsx). The **Compounds** sheet covers the MIX-MB(X) standard.
+
+### Colour coding
+
+| Colour | Meaning |
+|--------|---------|
+| Green | Mandatory — must be filled for a valid submission |
+| Blue | Recommended — strongly encouraged; required for Tier 1 (Gold) |
+| Yellow | Optional — fill if available |
+
+### Step-by-step
+
+1. **Open** `Template.xlsx` and go to the **Compounds** sheet.
+2. **Add one row per compound.** If the same compound appears in multiple assays, it still gets only one row here — the link to assays is made in the Activity sheet.
+3. **Fill in the CIDX** — assign sequentially (`CIDX0001`, `CIDX0002`, …). Use `UNKNOWN_` or `PUTATIVE_` prefixes for uncharacterised compounds (see Section 1.4).
+4. **Fill in the SMILES.** Use canonical SMILES. If you have a structure drawn in ChemDraw or Marvin, export as canonical SMILES.
+5. **Generate the InChIKey** from the SMILES using any of the following:
+   - Python/RDKit: `Chem.MolToInchi(mol)` → `inchi.InchiToInchiKey(inchi)`
+   - Online: [https://www.cheminfo.org/Chemistry/Cheminformatics/FormatConverter/index.html](https://www.cheminfo.org/Chemistry/Cheminformatics/FormatConverter/index.html)
+6. **Look up external database IDs** using the InChIKey:
+   - ChEMBL: search by InChIKey at [ebi.ac.uk/chembl](https://www.ebi.ac.uk/chembl/)
+   - PubChem: search at [pubchem.ncbi.nlm.nih.gov](https://pubchem.ncbi.nlm.nih.gov/)
+7. **Fill in concentration fields** (stock, initial, units) using UO unit codes (Section 3.3).
+8. **For biotransformation products,** go to the **Metabolites** sub-section and assign an MSI level before filling in the analytical detection fields.
+9. **Validate** your completed sheet against the rules in Section 4 before running the pipeline or submitting.
 
 
 

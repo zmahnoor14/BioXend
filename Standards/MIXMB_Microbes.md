@@ -608,16 +608,114 @@ Standard terms:
 
 ## 4. Data Validation Rules
 
+Before submitting data, verify that all assay records pass the following checks. The pipeline (`generate_assay.R`) performs these checks automatically; they also apply to manually prepared submissions.
+
+### 4.1 Organism Identifiers
+
+| Rule | Check |
+|------|-------|
+| NCBI TaxID is present | Every assay row must have a non-empty `ASSAY_TAX_ID` |
+| NCBI TaxID is numeric | Must be a positive integer (e.g. `1351`, not `"Enterococcus"`) |
+| Scientific name is present | `ASSAY_ORGANISM` must contain the full binomial name (Genus species) |
+| Name–TaxID consistency | The scientific name must match the registered name for that TaxID in NCBI Taxonomy |
+| Novel isolates | If no strain-level TaxID exists, use the species-level TaxID and add a note in `ACTIVITY_COMMENT` |
+
+### 4.2 Assay Index (AIDX)
+
+| Rule | Check |
+|------|-------|
+| AIDX is present | Every row in `ASSAY.tsv` must have an AIDX |
+| AIDX format | Must follow `[Author]_[Genus]_[species]_[Condition]`, using only ASCII letters, digits, underscores, and hyphens |
+| AIDX uniqueness | Each AIDX must be unique within the study |
+| No spaces | Spaces are not permitted in AIDX values |
+
+### 4.3 Required Fields
+
+The following fields must be non-empty in `ASSAY.tsv` for every assay record:
+
+- `AIDX`, `RIDX`, `ASSAY_DESCRIPTION`, `ASSAY_TYPE`, `ASSAY_ORGANISM`, `ASSAY_TAX_ID`
+
+### 4.4 Controlled Vocabulary Terms
+
+| Field | Allowed values |
+|-------|---------------|
+| `ASSAY_TYPE` | `bacteria`, `enzyme`, `community` |
+| `oxygen_requirement` | `obligate aerobe`, `facultative anaerobe`, `obligate anaerobe`, `microaerophile`, `aerotolerant anaerobe` (Section 7.1) |
+| `sample_type` | `pure culture`, `enrichment culture`, `mixed culture`, `community`, `cell-free lysate`, `membrane fraction`, `cytoplasmic fraction` (Section 7.3) |
+| `harvest_phase` | `lag phase`, `exponential phase`, `stationary phase`, `death phase`, `early exponential`, `mid exponential`, `late stationary` (Section 7.4) |
+
+### 4.5 `sameAs` Linking
+
+| Rule | Check |
+|------|-------|
+| NCBI Taxonomy URL | Required for all organisms with a registered TaxID (Gold tier) |
+| No speculative links | Do not add `sameAs` for novel isolates without a registered external record |
 
 ---
 
 ## 5. Data Quality Tiers
 
+MIX-MB(M) defines three compliance tiers for microbial organism data. Higher tiers enable broader reuse and interoperability with genomic and phenotypic databases.
+
+### Tier 1 — Gold (Publication-Ready)
+
+Meets all mandatory and recommended fields. Suitable for ChEMBL submission and FAIR data publications.
+
+- NCBI TaxID present and verified
+- Full binomial scientific name matching the TaxID
+- Strain designation provided (e.g. ATCC, DSMZ, or culture collection number)
+- Genome assembly accession available (`GCA_` or `GCF_` accession)
+- `sameAs` link to NCBI Taxonomy URL provided; LPSN link included for prokaryotes
+- All growth conditions documented: medium, temperature, oxygen requirement, harvest phase
+- Full Bioschemas Taxon + Sample JSON-LD records (Sections 2.1 and 2.3)
+
+### Tier 2 — Silver (Research-Grade)
+
+Meets all mandatory fields with partial recommended fields. Suitable for internal data sharing and preprint deposition.
+
+- NCBI TaxID present and verified
+- Full binomial scientific name
+- Strain designation provided
+- `sameAs` link to NCBI Taxonomy URL
+- Basic growth conditions: at minimum, medium and temperature
+
+### Tier 3 — Bronze (Preliminary / Screening)
+
+Meets only mandatory fields. Suitable for large-scale screening data where full strain characterisation is not yet available.
+
+- NCBI TaxID present
+- Scientific name present
+- `AIDX` and `RIDX` assigned
+- `ASSAY_TYPE` specified
+- Minimal cultivation information; quantitative growth conditions not required
 
 ---
 
 
 ## 6. How to use the Template
+
+The MIX-MB submission template is provided as [Templates/Template.xlsx](Templates/Template.xlsx). The **Assay** sheet covers the MIX-MB(M) standard.
+
+### Colour coding
+
+| Colour | Meaning |
+|--------|---------|
+| Green | Mandatory — must be filled for a valid submission |
+| Blue | Recommended — strongly encouraged; required for Tier 1 (Gold) |
+| Yellow | Optional — fill if available |
+
+### Step-by-step
+
+1. **Open** `Template.xlsx` and go to the **Assay** sheet.
+2. **Add one row per organism × condition combination.** If the same organism is used under two different oxygen conditions or media, it gets two rows with distinct AIDXs.
+3. **Look up the NCBI TaxID** for each organism:
+   - Go to [https://www.ncbi.nlm.nih.gov/taxonomy](https://www.ncbi.nlm.nih.gov/taxonomy)
+   - Search by scientific name; copy the TaxID number into `ASSAY_TAX_ID`
+4. **Assign the AIDX** using the format `[FirstAuthorLastName]_[Genus]_[species]_[Condition]`, e.g. `Zimmermann_Actinomyces_graevenitzii_biotransformation`.
+5. **Fill in cultivation conditions** (medium, temperature, oxygen requirement) using the controlled vocabulary terms from Section 7.
+6. **For community assays,** set `ASSAY_ORGANISM` to `mixed microbial community`, `ASSAY_TAX_ID` to `1` (root), and describe the community source in `ASSAY_DESCRIPTION`.
+7. **Fill in `ASSAY_PARAM.tsv`** for quantitative experimental parameters (temperature, incubation time, pH, cell density, substrate concentration). Each parameter gets its own row linked by AIDX.
+8. **Validate** your completed sheet against the rules in Section 4 before running the pipeline or submitting.
 
 ---
 
