@@ -127,17 +127,6 @@ Community consensus matters — proposals with broader endorsement will be prior
 
 Discussions that reach consensus can be converted into issues and enter the review process.
 
-#### 2.5. Review and Endorsement Process
-
-1. A proposal is submitted as an Issue or Pull Request.
-2. The community discusses and can endorse with 👍 reactions independently.
-3. After a **minimum review period of 14 days**, the maintainer evaluates community feedback.
-4. If endorsed by at least **1-2 independent contributors** (besides the proposer), the change proceeds.
-5. The maintainer incorporates the change, updates the relevant version, and merges to `devel`.
-6. Periodically, `devel` is merged to `main` as a new release.
-
-For urgent fixes i.e `bump:patch` versioning updates (typos, broken links, clear errors), no review period is necessary.
-
 ## Branching and Versioning
 
 This project uses a structured versioning system. Please see `VERSION.md` at the root of the repository for full details. In brief:
@@ -162,6 +151,18 @@ When making changes, **do not manually update version numbers** — this is hand
 1. Open your Pull Request on GitHub.
 2. In the right-hand sidebar, click **Labels**.
 3. Search for and select the appropriate label: `bump:patch`, `bump:minor`, or `bump:major`.
+
+## Review and Endorsement Process
+
+1. A proposal is submitted as an Issue or Pull Request.
+2. The community discusses and can endorse with 👍 reactions independently.
+3. After a **minimum review period of 14 days**, the maintainer evaluates community feedback.
+4. If endorsed by at least **1-2 independent contributors** (besides the proposer), the change proceeds.
+5. The maintainer incorporates the change, updates the relevant version, and merges to `devel`.
+6. Periodically, `devel` is merged to `main` as a new release.
+
+For urgent fixes i.e `bump:patch` versioning updates (typos, broken links, clear errors), no review period is necessary.
+
 
 ## What Makes a Good Standards Proposal?
 
