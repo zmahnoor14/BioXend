@@ -13,10 +13,12 @@
 #   Standards/MIXMB_Xenobiotics.md         → versions/standards-xenobiotics.txt
 #   Standards/MIXMB_Microbes.md            → versions/standards-microbes.txt
 #   Standards/MIXMB_Biotransformation.md   → versions/standards-biotransformation.txt
-#   Standards/MIXMB_Standards_main.md      → (triggers framework bump only)
+#   Standards/MIXMB_Standards_main.md      → versions/standards-main.txt
 #   Standards/Templates/**                 → versions/template.txt
 #   main.nf / nextflow.config / bin/ / modules/  → versions/workflow.txt
-#   versions/framework.txt                 → bumped whenever any component is bumped
+#   versions/framework.txt                 → umbrella version for the whole package
+#                                            (standards + templates + workflow);
+#                                            bumped whenever any component is bumped
 
 name: Auto Versioning and Release
 
@@ -116,10 +118,11 @@ jobs:
               workflow:         match([/^main\.nf$/, /^nextflow\.config$/, /^bin\//, /^modules\//])
             };
 
-            // standards_main affects framework version but has no own version file
+            // standards_main now has its own version file like other components
             const anyVersionable = changed.xenobiotics || changed.microbes ||
-              changed.biotransformation || changed.template || changed.workflow;
-            const any = anyVersionable || changed.standards_main;
+              changed.biotransformation || changed.standards_main ||
+              changed.template || changed.workflow;
+            const any = anyVersionable;
 
             for (const [k, v] of Object.entries(changed)) {
               core.setOutput(k, String(v));
@@ -190,14 +193,14 @@ jobs:
           [[ "$BIOTRANSFORMATION" == "true" ]] && bump_component \
             versions/standards-biotransformation.txt "MIX-MB(B) Biotransformation Standard"
 
+          [[ "$STANDARDS_MAIN"    == "true" ]] && bump_component \
+            versions/standards-main.txt           "MIX-MB Standards Overview"
+
           [[ "$TEMPLATE"          == "true" ]] && bump_component \
             versions/template.txt                 "Submission Template"
 
           [[ "$WORKFLOW"          == "true" ]] && bump_component \
             versions/workflow.txt                 "Nextflow Workflow"
-
-          # Standards main affects framework bump level even without its own file
-          [[ "$STANDARDS_MAIN"    == "true" ]] && promote "$BUMP"
 
           # ---- bump framework ----
           OLD_FW=$(tr -d '[:space:]' < versions/framework.txt)
