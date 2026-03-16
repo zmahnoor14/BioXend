@@ -9,9 +9,16 @@ Thank you for your interest in contributing to the Minimum Information about Xen
 
 ## How to Contribute
 
-There are several ways to participate, depending on your comfort level with GitHub:
+There are several ways to participate, depending on your comfort level with(/out) GitHub:
 
-### 1. Suggest Changes via Issues (No Git Knowledge Needed)
+### No GitHub account - Contribute Without GitHub
+
+You don't need a GitHub account to help shape MIX-MB. The current Non-github contributions are integrated via the [MIX-MB Survey](https://forms.gle/towuMVYYuqDi7pEJ7). Feedback collected through the survey will be triaged by a maintainer and converted into GitHub Issues so it enters the formal review process. Current results from the survey can be viewed with the notebook: [Standards/MIX-MB_Survey_Analysis.ipynb](Standards
+/MIX-MB_Survey_Analysis.ipynb).
+
+### With GitHub account
+
+#### 1. Suggest Changes via Issues (No Git Knowledge Needed)
 
 If you have feedback on the standards documentation and template, but aren't familiar with Git:
 
@@ -26,7 +33,7 @@ If you have feedback on the standards documentation and template, but aren't fam
 
 ### 2. Submit a Pull Request (For Git Users)
 
-For direct contributions to the standards documents, templates, or code, all external contributors must work from a **fork**. Only maintainers added to the project can push branches directly to this repository.
+For direct contributions to the standards documents, templates, or nf workflow, all external contributors must work from a **fork**. Only maintainers added to the project can push branches directly to this repository.
 
 #### Step-by-step for external contributors
 
@@ -64,7 +71,7 @@ For direct contributions to the standards documents, templates, or code, all ext
    Examples:
    [standards] Add recommendation for pH reporting in Experiment table
    [template] Add new column for enzyme commission number in Biotransformation
-   [pipeline] Fix SMILES validation step
+   [workflow] Fix SMILES validation step
    ```
 
 8. **Push to your fork**:
@@ -74,7 +81,7 @@ For direct contributions to the standards documents, templates, or code, all ext
 
 9. **Open a Pull Request** from your fork's branch to `zmahnoor14/BioXend:devel`. GitHub will usually suggest the upstream repo as the target automatically — confirm the base repository is `zmahnoor14/BioXend` and the base branch is `devel`, not `main`.
 
-10. **Reference the originating issue** in your PR description using `Closes #XX` or `Relates to #XX`. Every change should trace back to a tracked issue.
+10. **Reference the originating issue (if you were working on an issue)** in your PR description using `Closes #XX` or `Relates to #XX`. For best practices, generally there should be an open issue to which this PR is related to. If the issue doesnt exist, you can enter the issue and then after adding your contribution, mnetion that issue. This way changes are tracked properly.
 
 11. **Apply a version-bump label** to your PR (see [Branching and Versioning](#branching-and-versioning) below): `bump:patch`, `bump:minor`, or `bump:major`.
 
@@ -90,14 +97,6 @@ Browse [open issues](https://github.com/zmahnoor14/BioXend/issues) and [pull req
 
 Community consensus matters — proposals with broader endorsement will be prioritized.
 
-### 4. Contribute Without GitHub
-
-You don't need a GitHub account to help shape MIX-MB. Non-code contributions are just as valuable:
-
-- **Google Form** *(coming soon)* — Submit structured feedback on field classifications and controlled vocabularies without any account required. Link will be posted in the README once available.
-- **Google Docs open consultation** — Comment-enabled drafts of proposed standards revisions will be shared periodically for community input. Watch the [Announcements discussion category](https://github.com/zmahnoor14/BioXend/discussions/categories/announcements) for links.
-
-Feedback collected through these channels will be triaged by a maintainer and converted into GitHub Issues so it enters the formal review process.
 
 ### 5. Discuss and Propose via GitHub Discussions
 
@@ -115,7 +114,7 @@ This project uses a structured versioning system. Please see `VERSION.md` at the
 
 - **`main`** branch contains only stable, endorsed releases
 - **`devel`** branch is the active working branch for all contributions
-- Each document (standards docs, template) and the pipeline carry independent version numbers
+- Each document (standards docs, template) and the workflow carry independent version numbers
 - The overall framework version increments when any component has a new release
 
 When making changes, **do not manually update version numbers** — this is handled automatically by GitHub Actions when changes are merged to `main`.
@@ -128,15 +127,11 @@ When making changes, **do not manually update version numbers** — this is hand
 | `bump:minor` | New optional/recommended fields, backward-compatible additions |
 | `bump:major` | Breaking changes: new mandatory fields, removed fields, renamed columns |
 
-## What Makes a Good Standards Proposal?
+### How to add the version-bump labels:
 
-When proposing changes to the MIX-MB minimum information checklists, please include the following, (sections are already present in the issue templates):
-
-- **Rationale**: Why is this field/change necessary? Reference survey data or literature if possible.
-- **Classification**: Should the field be Mandatory, Recommended, or Optional?
-- **Affected table(s)**: Which template sheet(s) would be impacted (Reference, Chemicals, Microbes, Experiment, Biotransformation)?
-- **Controlled vocabulary**: If the field requires controlled terms, propose them or reference an existing ontology.
-- **Backward compatibility**: Will this change break existing submitted data?
+1. Open your Pull Request on GitHub.
+2. In the right-hand sidebar, click **Labels**.
+3. Search for and select the appropriate label: `bump:patch`, `bump:minor`, or `bump:major`.
 
 ## Review and Endorsement Process
 
@@ -149,6 +144,16 @@ When proposing changes to the MIX-MB minimum information checklists, please incl
 
 For urgent fixes i.e `bump:patch` versioning updates (typos, broken links, clear errors), no review period is necessary.
 
+## What Makes a Good Standards Proposal?
+
+When proposing changes to the MIX-MB minimum information checklists, please include the following, (sections are already present in the issue templates):
+
+- **Rationale**: Why is this field/change necessary? Reference survey data or literature if possible.
+- **Classification**: Should the field be Mandatory, Recommended, or Optional?
+- **Affected table(s)**: Which template sheet(s) would be impacted (Reference, Chemicals, Microbes, Experiment, Biotransformation)?
+- **Controlled vocabulary**: If the field requires controlled terms, propose them or reference an existing ontology.
+- **Backward compatibility**: Will this change break existing submitted data?
+
 ## Code of Conduct
 
 All contributors are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before participating.
@@ -160,3 +165,5 @@ Releases of BioXend / MIX-MB will be soon archived on [Zenodo](https://zenodo.or
 ## Questions?
 
 If you're unsure where to start or how to contribute, open a [Discussion](https://github.com/zmahnoor14/BioXend/discussions) or reach out to the main maintainer at **mahnoor.zulfiqar@embl.de**. We're happy to help!
+
+
