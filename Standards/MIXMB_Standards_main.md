@@ -2,7 +2,7 @@
 
 **Author:** Mahnoor Zulfiqar
 **Version:** 0.1.0  
-**Release Date:** March 5, 2026 (Draft)  
+**Release Date:** March 16, 2026 (Draft)  
 **Status:** Draft Standard  
 **DOI:** XXXXXXX (to be assigned upon stable release)
 
