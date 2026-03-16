@@ -59,18 +59,21 @@ BioXend/
 
 ### How to participate:
 
-All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
+All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md). Also check thelink to the current project board: [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6)
 
-### For contributors
+#### For contributors
 
-We welcome contributions to the standards, template, and nf workflow for submission! See our [Contributing Guide](CONTRIBUTING.md) for details. You can:
+We welcome contributions to the standards, template, and nf workflow for submission! See our [Contributing Guide](CONTRIBUTING.md) for details. There are different ways to contribute, either via an issue, via dicussions, via Pull Requests (PR) or via endorsement of the already submitted changes that you can easily view in the [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6).
+<br>
 
+**Easy:**
 - **Propose changes** by opening an [issue](https://github.com/zmahnoor14/BioXend/issues/new/choose)
-- **Submit a pull request** targeting the `devel` branch
-- **Endorse proposals** by adding 👍 to issues and PRs you support
 - **Discuss ideas** in [GitHub Discussions](https://github.com/zmahnoor14/BioXend/discussions)
+- **Endorse proposals** by adding 👍 to issues and PRs you support
+<br>
 
-Also link to the current project board: [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6)
+**Requires git knowledge:**
+- **Submit a pull request (PR)** targeting the `devel` branch
 
 ### For future data submitters
 
