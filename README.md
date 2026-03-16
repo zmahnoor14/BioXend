@@ -31,6 +31,8 @@ We welcome contributions to the standards, template, and pipeline! See our [Cont
 - **Endorse proposals** by adding 👍 to issues and PRs you support
 - **Discuss ideas** in [GitHub Discussions](https://github.com/zmahnoor14/BioXend/discussions)
 
+Also link to the currnt project board: https://github.com/users/zmahnoor14/projects/6
+
 ### For future data submitters
 
 1. Download the latest [`Template.xlsx`](Template.xlsx)

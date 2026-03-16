@@ -1,6 +1,6 @@
 # Contributing to BioXend / MIX-MB
 
-Thank you for your interest in contributing to the Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB) standards! This is a community-driven project, and we welcome contributions from researchers, bioinformaticians, data curators, and anyone working in xenobiotic microbial biotransformation.
+Thank you for your interest in contributing to the Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB) standards! This is a community-driven project, and we welcome contributions from researchers, bioinformaticians, data curators, and anyone working in xenobiotic microbial biotransformation. here is the link to the current project board: Also link to the currnt project board: https://github.com/users/zmahnoor14/projects/6.
 
 **First time here?** Look for issues labeled [`good-first-issue`](https://github.com/zmahnoor14/BioXend/issues/2) or browse the [Discussions board](https://github.com/zmahnoor14/BioXend/discussions) to get oriented before diving in.
 
