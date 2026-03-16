@@ -1,5 +1,5 @@
 ![GitHub tag](https://img.shields.io/github/v/tag/zmahnoor14/BioXend?style=flat&label=version)
-[![License: MIT](https://img.shields.io/badge/License-MIT-pink.svg)](LICENSE)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Issues](https://img.shields.io/github/issues/zmahnoor14/BioXend)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
