@@ -2,6 +2,9 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 ![Issues](https://img.shields.io/github/issues/zmahnoor14/BioXend)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
+[![Bioschemas](https://img.shields.io/badge/Bioschemas-aligned-e87722)](https://bioschemas.org/)
+[![ChEMBL](https://img.shields.io/badge/ChEMBL-submission--ready-e8003d)](https://www.ebi.ac.uk/chembl/)
+![Contributors](https://img.shields.io/github/contributors/zmahnoor14/BioXend)
 
 # BioXend 
 BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. 
