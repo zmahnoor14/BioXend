@@ -31,11 +31,11 @@ If you have feedback on the standards documentation and template, but aren't fam
   - **Blank issue** - if it's a general issue you would like to report
 - Fill out the template and submit. A maintainer will review, and the community can discuss and endorse.
 
-### 2.2. Submit a Pull Request (For Git Users)
+#### 2.2. Submit a Pull Request (For Git Users)
 
 For direct contributions to the standards documents, templates, or nf workflow, all external contributors must work from a **fork**. Only maintainers added to the project can push branches directly to this repository.
 
-#### Step-by-step for external contributors
+##### Step-by-step for external contributors
 
 1. **Fork** the repository by clicking the **Fork** button on the [BioXend GitHub page](https://github.com/zmahnoor14/BioXend). This creates a copy of the repo under your own GitHub account.
 
@@ -87,7 +87,7 @@ For direct contributions to the standards documents, templates, or nf workflow, 
 
 12. Your PR will be reviewed by at least one maintainer. Community endorsement (thumbs-up reactions or comments) is encouraged.
 
-### 2.3. Endorse or Comment on Existing Proposals
+#### 2.3. Endorse or Comment on Existing Proposals
 
 Browse [open issues](https://github.com/zmahnoor14/BioXend/issues) and [pull requests](https://github.com/zmahnoor14/BioXend/pulls). You can:
 
@@ -98,7 +98,7 @@ Browse [open issues](https://github.com/zmahnoor14/BioXend/issues) and [pull req
 Community consensus matters — proposals with broader endorsement will be prioritized.
 
 
-### 2.4. Discuss and Propose via GitHub Discussions
+#### 2.4. Discuss and Propose via GitHub Discussions
 
 [GitHub Discussions](https://github.com/zmahnoor14/BioXend/discussions) is a first-class contribution channel for open-ended conversation that doesn't yet belong in an issue:
 
