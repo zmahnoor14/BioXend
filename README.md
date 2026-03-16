@@ -1,9 +1,17 @@
 # BioXend 
 BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. 
+- WP1: is to develop minimum reporting standards based on community consensus
+- WP2: is to automate the metadata collection
+- WP3: is to develop a submission workflow to [ChEMBL](https://www.ebi.ac.uk/chembl/)
+- WP4: is to release this framework as part of NFDI4Micropbiota workflow
+<br>
+
 <p align="center">
   <img src="WP_BioXend.png" />
 </p>
 
+<br>
+We welcome community participation especially for developing the minimum standards called Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB).
 
 ## MIX-MB Standards
 
