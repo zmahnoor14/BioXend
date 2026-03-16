@@ -88,11 +88,11 @@ Different readers will need different parts of this standard. Use the table belo
 
 This standard comprises three interconnected sub-standards:
 
-| Component | Description | Version | Status | Last Updated (YYYY-MM-DD) | Document |
-|-----------|-------------|---------|--------|--------------------------|----------|
-| **MIX-MB(X)** - Xenobiotics | Minimum metadata required to describe the chemical substrate, including structural identity, physicochemical properties, and source information. | 0.1.1 | Draft | 2026-03-16 | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
-| **MIX-MB(M)** - Microbes | Minimum metadata required to describe the microbial organism or community used in the experiment, including taxonomy, strain, and culture conditions. | 0.1.1 | Draft | 2026-03-16 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
-| **MIX-MB(B)** - Biotransformation | Minimum metadata required to describe the biotransformation assay design, experimental conditions, and quantitative or qualitative activity outcomes. | 0.1.1 | Draft | 2026-03-16 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
+| Component | Description | Version | Last Updated (YYYY-MM-DD) | Document |
+|-----------|-------------|---------|--------------------------|----------|
+| **MIX-MB(X)** - Xenobiotics | Minimum metadata required to describe the chemical substrate, including structural identity, physicochemical properties, and source information. | 0.1.1 | 2026-03-16 | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
+| **MIX-MB(M)** - Microbes | Minimum metadata required to describe the microbial organism or community used in the experiment, including taxonomy, strain, and culture conditions. | 0.1.1 | 2026-03-16 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
+| **MIX-MB(B)** - Biotransformation | Minimum metadata required to describe the biotransformation assay design, experimental conditions, and quantitative or qualitative activity outcomes. | 0.1.1 | 2026-03-16 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
 
 Please check the individual standards document above to understand each component.
 
@@ -100,103 +100,43 @@ Please check the individual standards document above to understand each componen
 
 ## Template 
 
-The template is based on the above 3 components ([MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md), [MIXMB_Microbes.md](MIXMB_Microbes.md), [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md)) and the [ChEMBL submission guidelines](https://chembl.gitbook.io/chembl-data-deposition-guide). To understand the template, we first have to understand the ChEMBL submission file formats.
+The template is based on the above 3 components ([MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md), [MIXMB_Microbes.md](MIXMB_Microbes.md), [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md)) and the [ChEMBL submission guidelines](https://chembl.gitbook.io/chembl-data-deposition-guide). To understand the template, we first have to understand the ChEMBL submission file formats. [**ChEMBL** ](https://www.ebi.ac.uk/chembl/) is a database of bioactivity associated with small molecules, and is used within academia and industry as a highly curated repository. 
 
 <p align="center">
   <img src="chembl-files.jpg" />
 </p>
 
-
-## Identifiers and Cross-Referencing
-
-**This is the first practical step before entering any data: assign identifiers to every entity in your study.**
-
-MIX-MB uses a three-layer identifier system based on ChEMBL submission guidelines. Every biotransformation event is a record that links all three layers:
-
-| Identifier | Abbreviation | Entity | Defined in |
-|-----------|-------------|--------|-----------|
-| Reference Index | **RIDX** | Study / publication | `REFERENCE.tsv` |
-| Compound Index | **CIDX** | Chemical compound |`COMPOUND_RECORD.tsv` |
-| Assay Index | **AIDX** | Organism × condition | `ASSAY.tsv` |
-
-All three identifiers must appear together in every row of `ACTIVITY.tsv` to create an unambiguous, linkable record of a biotransformation event.
-
-### Naming Your Compounds Properly
-
-Use the **InChIKey** as the canonical chemical identifier for all known compounds — it is structure-based, database-independent, and collision-resistant. Alongside it, record the highest-priority external database identifier available:
-
-1. ChEMBL ID (preferred — this is the target submission database)
-2. PubChem CID
-3. ChEBI ID
-4. CAS Registry Number (fallback only)
-
-See [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md) for full CIDX minting rules and identifier priority.
-
-### Naming Your Organisms Properly
-
-Use the **NCBI TaxID** as the mandatory organism identifier for all assay entries (`ASSAY_TAX_ID`). Pair it with the full binomial scientific name (`ASSAY_ORGANISM`). For strains, add the culture collection identifier (e.g. ATCC, DSMZ) as an additional property.
-
-See [MIX-MB(M) Section 1.4](MIXMB_Microbes.md) for full AIDX minting rules and organism identifier guidance.
-
-### Minting Scheme for Unknowns
-
-Not all entities will have established external identifiers at the time of submission. Use study-local identifiers with the following prefixes:
-
-| Entity type | Prefix | Example |
-|------------|--------|---------|
-| Unknown compound (no structure, MSI Level 4–5) | `UNKNOWN_[RIDX]_[n]` | `UNKNOWN_GutMeta_M3` |
-| Putatively characterised compound (MSI Level 3) | `PUTATIVE_[RIDX]_[n]` | `PUTATIVE_GutMeta_P1` |
-| Novel microbial isolate (no TaxID registered) | Report at nearest known rank | Use species-level TaxID + note in `ACTIVITY_COMMENT` |
-
-Once an unknown entity is formally identified and registered in an external database, update its identifier across all affected files before resubmission.
-
-### sameAs Linking Policy
-
-Use the `sameAs` property (schema.org / Bioschemas) to declare equivalence between an entity in your submission and the same entity in an external database. This is what makes MIX-MB data interoperable with ChEMBL, PubChem, NCBI, and other resources.
-
-**Rules that apply across all component standards:**
-
-1. **Compounds:** Link to ChEMBL, PubChem, and/or ChEBI using canonical compound page URLs. Required for Gold tier; strongly recommended for Silver. See [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md).
-2. **Organisms:** Link to the NCBI Taxonomy URL (mandatory) and LPSN (recommended for prokaryotes). See [MIX-MB(M) Section 1.4](MIXMB_Microbes.md).
-3. **Unknowns:** Do not add `sameAs` until the entity has a confirmed, registered external record. Speculative `sameAs` links are not permitted.
-4. **Deprecated identifiers:** If a linked database entry is merged or retired, update `sameAs` to the new canonical URL.
-
-Activity records in `ACTIVITY.tsv` are not linked via `sameAs` directly — interoperability at the activity level is achieved through the consistent use of InChIKey (compounds) and NCBI TaxID (organisms). See [MIX-MB(B) Section 1.4](MIXMB_Biotransformation.md) for cross-referencing rules specific to activity records.
-
----
-
-
-## ChEMBL Submission Files
-MIX-MB standards provide guidelines on FAIR data and metadata associated with xenobiotics-microbiome biotransformation research, where the outcomes can be easily converted to ChEMBL database submission ready files. [ChEMBL](https://www.ebi.ac.uk/chembl/) is a database of bioactivity assocviated with small molecules, and is used within academia and industry as a highly curated repository. The standards are integrated into a [Template](Standards/Templates/Template.xlsx). Here are some details on different files required by ChEMBL.
-* Information on ChEMBL: https://chembl.gitbook.io/chembl-interface-documentation 
-* ChEMBL submission guidelines: https://chembl.gitbook.io/chembl-data-deposition-guide 
-
-**FAQs:**
-1. General Questions: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/general-questions
-2. Compounds: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/drug-and-compound-questions
-3. Assay and activities: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/chembl-data-questions
-4. Targets: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/target-questions
-
 ### Study metadata files
 
-#### REFERENCE.tsv
-Reference file provides provenance of the study, including the DOI/ PMID, title, abstract, authors, journal, or dataset (if unpublished). For details please refer to the tutorial provided by ChEMBL on how to generate the [REFERENCE.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/reference.tsv). 
+**1. REFERENCE.tsv:** <br>
+Reference file provides metadata regarding the study, including the DOI/ PMID, title, abstract, authors, journal, or dataset (if unpublished). For details please refer to the tutorial provided by ChEMBL on how to generate the [REFERENCE.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/reference.tsv). 
 
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| RIDX | Yes | String | Reference identifier |
-| DOI | Yes | String | Digital Object Identifier |
-| TITLE | Yes | String | Publication title |
-| AUTHORS | Yes | String | Author list |
-| ABSTRACT | Yes | String | Publication abstract |
-| YEAR | Yes | Integer | Publication year |
-| JOURNAL_NAME | No | String | Journal name |
-| VOLUME | No | String | Volume number |
-| REF_TYPE | Yes | String | Publication, Patent, Dataset, Book |
-| DATA_LICENCE | No | String | Data license (e.g., CC0, CC-BY) |
-
-#### INFO.txt
+**2. INFO.txt:** <br>
 Optional file with free text space to mention any additional information about the study. For details please refer to the tutorial provided by ChEMBL on how to generate the [INFO.txt file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/supplementary-data-files/info.txt).
+
+#### How are these files integrated into the Template.xlsx
+
+The **Reference** sheet in `Template.xlsx` maps directly to `REFERENCE.tsv` and one column for `INFO.txt`. Fill in one row per study. Columns marked **Mandatory** must be completed; all others are optional or even can be automatically extracted by the nf workflow.
+
+| Template Column | Maps to REFERENCE.tsv | Required | Description |
+|----------------|----------------------|----------|-------------|
+| `Reference_identifier` | `RIDX` | **Mandatory** | Meaningful unique identifier for each reference; if not provided, BioXend workflow will create one automatically |
+| `DOI` | `DOI` | **Mandatory** | Must be present; if no DOI exists, contact ChEMBL to provide one |
+| `PUBMED_ID` | `PUBMED_ID` | Mandatory only if no DOI | PubMed identifier; if DOI is present this field can be left empty |
+| `DATA_LICENCE` | `DATA_LICENCE` | **Mandatory** | Licence for the deposited data; use `CC0` for public domain |
+| `CONTACT` | — | Recommended | Contact person ORCID and/or email (e.g. `https://orcid.org/0000-0000-0000-0000`) |
+| `JOURNAL_NAME` | `JOURNAL_NAME` | Optional | If published: use the standard NIH NLM Catalog abbreviated journal name |
+| `YEAR` | `YEAR` | Recommended | Year of publication, dataset or submission |
+| `VOLUME` | `VOLUME` | Optional | Volume number of the publication |
+| `ISSUE` | `ISSUE` | Optional | Issue number of the publication |
+| `FIRST_PAGE` | `FIRST_PAGE` | Optional | First page of the article |
+| `LAST_PAGE` | `LAST_PAGE` | Optional | Last page of the article |
+| `REF_TYPE` | `REF_TYPE` | Recommended | Type of reference: `Publication`, `Patent`, `Dataset`, or `Book` |
+| `TITLE` | `TITLE` | Recommended | Title of the article or dataset description |
+| `PATENT_ID` | `PATENT_ID` | Optional | Patent identifier (only relevant for ChEMBL internal use) |
+| `ABSTRACT` | `ABSTRACT` | Recommended | Abstract of the article or dataset description |
+| `AUTHORS` | `AUTHORS` | Recommended | List of the authors |
+| `INFO` | — | Optional | Any additional context to include with the deposited data (ChEMBL internal usage only) |
 
 ### Xenobiotics metadata files
 
@@ -288,6 +228,70 @@ All biotransformation events occurring between `COMPOUND` and `ASSAY`, are menti
 `ACTIVITY_PROPERTIES.tsv` - Adding context to experimental results. <br>
 `ACTIVITY_SUPP.tsv` - Multiplex assays, supporting data, and complex results sets. <br>
 
+
+
+## Identifiers and Cross-Referencing
+
+**This is the first practical step before entering any data: assign identifiers to every entity in your study.**
+
+MIX-MB uses a three-layer identifier system based on ChEMBL submission guidelines. Every biotransformation event is a record that links all three layers:
+
+| Identifier | Abbreviation | Entity | Defined in |
+|-----------|-------------|--------|-----------|
+| Reference Index | **RIDX** | Study / publication | `REFERENCE.tsv` |
+| Compound Index | **CIDX** | Chemical compound |`COMPOUND_RECORD.tsv` |
+| Assay Index | **AIDX** | Organism × condition | `ASSAY.tsv` |
+
+All three identifiers must appear together in every row of `ACTIVITY.tsv` to create an unambiguous, linkable record of a biotransformation event.
+
+### Naming Your Compounds Properly
+
+Use the **InChIKey** as the canonical chemical identifier for all known compounds — it is structure-based, database-independent, and collision-resistant. Alongside it, record the highest-priority external database identifier available:
+
+1. ChEMBL ID (preferred — this is the target submission database)
+2. PubChem CID
+3. ChEBI ID
+4. CAS Registry Number (fallback only)
+
+See [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md) for full CIDX minting rules and identifier priority.
+
+### Naming Your Organisms Properly
+
+Use the **NCBI TaxID** as the mandatory organism identifier for all assay entries (`ASSAY_TAX_ID`). Pair it with the full binomial scientific name (`ASSAY_ORGANISM`). For strains, add the culture collection identifier (e.g. ATCC, DSMZ) as an additional property.
+
+See [MIX-MB(M) Section 1.4](MIXMB_Microbes.md) for full AIDX minting rules and organism identifier guidance.
+
+### Minting Scheme for Unknowns
+
+Not all entities will have established external identifiers at the time of submission. Use study-local identifiers with the following prefixes:
+
+| Entity type | Prefix | Example |
+|------------|--------|---------|
+| Unknown compound (no structure, MSI Level 4–5) | `UNKNOWN_[RIDX]_[n]` | `UNKNOWN_GutMeta_M3` |
+| Putatively characterised compound (MSI Level 3) | `PUTATIVE_[RIDX]_[n]` | `PUTATIVE_GutMeta_P1` |
+| Novel microbial isolate (no TaxID registered) | Report at nearest known rank | Use species-level TaxID + note in `ACTIVITY_COMMENT` |
+
+Once an unknown entity is formally identified and registered in an external database, update its identifier across all affected files before resubmission.
+
+### sameAs Linking Policy
+
+Use the `sameAs` property (schema.org / Bioschemas) to declare equivalence between an entity in your submission and the same entity in an external database. This is what makes MIX-MB data interoperable with ChEMBL, PubChem, NCBI, and other resources.
+
+**Rules that apply across all component standards:**
+
+1. **Compounds:** Link to ChEMBL, PubChem, and/or ChEBI using canonical compound page URLs. Required for Gold tier; strongly recommended for Silver. See [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md).
+2. **Organisms:** Link to the NCBI Taxonomy URL (mandatory) and LPSN (recommended for prokaryotes). See [MIX-MB(M) Section 1.4](MIXMB_Microbes.md).
+3. **Unknowns:** Do not add `sameAs` until the entity has a confirmed, registered external record. Speculative `sameAs` links are not permitted.
+4. **Deprecated identifiers:** If a linked database entry is merged or retired, update `sameAs` to the new canonical URL.
+
+Activity records in `ACTIVITY.tsv` are not linked via `sameAs` directly — interoperability at the activity level is achieved through the consistent use of InChIKey (compounds) and NCBI TaxID (organisms). See [MIX-MB(B) Section 1.4](MIXMB_Biotransformation.md) for cross-referencing rules specific to activity records.
+
+---
+
+
+
+
+
 ---
 <!--
 ## 7. Controlled Vocabularies not defined by any ontologies?
@@ -328,3 +332,14 @@ Use standardized terms:
 1. Vocabulary section?
 2.
 -->
+
+## ChEMBL links and FAQs
+Here are some details on different files required by ChEMBL.
+#### Links: 
+* Information on ChEMBL: https://chembl.gitbook.io/chembl-interface-documentation 
+* ChEMBL submission guidelines: https://chembl.gitbook.io/chembl-data-deposition-guide 
+#### FAQs: 
+1. General Questions: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/general-questions
+2. Compounds: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/drug-and-compound-questions
+3. Assay and activities: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/chembl-data-questions
+4. Targets: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/target-questions
