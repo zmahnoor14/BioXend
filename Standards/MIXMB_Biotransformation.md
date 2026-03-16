@@ -5,7 +5,7 @@ This document identifies Minimum Information (MI) required to report the biotran
 
 **Author:** Mahnoor Zulfiqar
 **Version:** 0.1.0
-**Release Date:** February 5, 2026 (Draft)
+**Release Date:** February 16, 2026 (Draft)
 **Status:** Draft Standard  
 **Part of:** MIX-MB Standard v0.1  
 **Replaces:** N/A  

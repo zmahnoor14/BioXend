@@ -6,7 +6,7 @@ This document identifies the Minimum Information (MI) required to report xenobio
 
 **Author:** Mahnoor Zulfiqar
 **Version:** 0.1.0  
-**Release Date:** March 5, 2026 (Draft)  
+**Release Date:** March 16, 2026 (Draft)  
 **Status:** Draft Standard  
 **Part of:** MIX-MB Standard v0.1  
 **Replaces:** N/A  
