@@ -1,5 +1,5 @@
-![GitHub release](https://img.shields.io/github/v/release/zmahnoor14/BioXend) -->
-![License](https://img.shields.io/github/license/zmahnoor14/BioXend)
+![GitHub release](https://img.shields.io/github/v/release/zmahnoor14/BioXend?style=flat)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Issues](https://img.shields.io/github/issues/zmahnoor14/BioXend)
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 
