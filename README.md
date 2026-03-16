@@ -1,4 +1,11 @@
-# BioXend — MIX-MB Standards
+# BioXend 
+BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. 
+<p align="center">
+  <img src="WP_BioXend.png" />
+</p>
+
+
+## MIX-MB Standards
 
 **Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)**
 
