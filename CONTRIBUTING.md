@@ -121,7 +121,7 @@ Community consensus matters — proposals with broader endorsement will be prior
 
 [GitHub Discussions](https://github.com/zmahnoor14/BioXend/discussions) is a first-class contribution channel for open-ended conversation that doesn't yet belong in an issue:
 
-- **Standards Proposals** — Float ideas for new fields or classification changes before writing a formal issue
+- **Standards Proposal** — Float ideas for new fields or classification changes before writing a formal issue
 - **Template Questions** — Ask about column meanings, controlled vocabularies, or submission format
 - **General** — Introduce yourself, share related work, or ask where to start
 
