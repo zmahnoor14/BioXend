@@ -1,7 +1,7 @@
 # Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)
 
 **Author:** Mahnoor Zulfiqar
-**Version:** 0.1.0  
+**Version:** 0.1.1  
 **Release Date:** March 16, 2026 (Draft)  
 **Status:** Draft Standard  
 **DOI:** XXXXXXX (to be assigned upon stable release)
@@ -34,7 +34,11 @@
 ## Abstract
 Microbial biotransformation of xenobiotics — the enzymatic conversion of drugs, environmental contaminants, and dietary compounds by microorganisms — is a research area of growing importance for human health, toxicology, and drug development. Despite increasing scientific output, data from these studies are rarely reported in a standardised or FAIR-compliant manner, limiting their reuse and integration across laboratories and databases.
 
-The **Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)** standard defines the minimum metadata and data elements required to describe, share, and deposit xenobiotic biotransformation experiments. MIX-MB covers three interconnected aspects of every study: the chemical substrate (MIX-MB(X)), the microbial organism or community (MIX-MB(M)), and the biotransformation assay and its outcomes (MIX-MB(B)). Together, these components ensure that study results are reproducible, comparable across research groups, and directly depositable into community databases such as [ChEMBL](https://www.ebi.ac.uk/chembl/).
+The **Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)** standard defines the minimum metadata and data elements required to describe, share, and deposit xenobiotic biotransformation experiments. MIX-MB covers three interconnected aspects of every study: 
+- the chemical substrate (MIX-MB(X)), 
+- the microbial organism or community (MIX-MB(M)), and 
+- the biotransformation assay and its outcomes (MIX-MB(B)). 
+Together, these components ensure that study results are reproducible, comparable across research groups, and directly depositable into community databases such as [ChEMBL](https://www.ebi.ac.uk/chembl/).
 
 This document is the top-level overview of the MIX-MB standard. It describes the component sub-standards, the ChEMBL submission file specifications, controlled vocabularies, and data quality tiers. It is intended for researchers generating biotransformation data, data curators, and software developers building tools that process or submit such data.
 
@@ -48,20 +52,19 @@ MIX-MB applies to experimental studies that measure the biotransformation of one
 - **In vitro assays** — single bacterial strain, and purified enzyme reactions
 - **Community-level assays** — mixed microbial communities (e.g. gut microbiota, soil communities)
 - **Time-course experiments** — measuring substrate depletion or product formation over time
-- **Dose-response experiments** — measuring activity across a range of substrate concentrations
+<!--- - **Dose-response experiments** — measuring activity across a range of substrate concentrations --->
+<!--- - **Ex vivo assays** — tissue or organ preparations with microbial activity --->
 - **Product identification studies** — structural characterisation of biotransformation products
 - **Non-xenobiotic substrates** — The standard focuses on Xenobiotics, however, the same fgramework can also be used for endogenous metabolites transformed by the bacteria
 - **In vivo animal or human studies** — metabolic data from whole organisms without isolated microbial components
-
-The standard applies to all microbial kingdoms: bacteria, archaea, and fungi.
+- **Microbial Kingdom** - The standard currently focuses on bacteria but can be applied to all microbial kingdoms: bacteria, archaea, and fungi.
 
 ### Out of scope
 
 MIX-MB does not currently cover:
 
 - **Purely computational predictions** of biotransformation (e.g. metabolite prediction tools with no experimental validation)
-- **Metabolomics, Genomics or transcriptomics data** describing biotransformation enzymes or metabolites — these should follow [MIxS](https://www.gensc.org/pages/standards-policies/checklists.html) or equivalent sequence standards. This standard is for reporting bioactivity. and not for the experimental omics data (which have already their own established standards)
-- **Ex vivo assays** — tissue or organ preparations with microbial activity
+- **Metabolomics, Genomics or transcriptomics data** describing biotransformation enzymes or metabolites or equivalent sequence standards. This standard is for reporting biotransformation (bioactivity), and not for the experimental omics data (which have already their own established standards)
 
 ### Applicability note
 
@@ -76,10 +79,8 @@ Different readers will need different parts of this standard. Use the table belo
 | I am a… | I want to… | Start here |
 |---------|-----------|-----------|
 | **Data submitter** (researcher depositing study data) | Understand what metadata and files to prepare | [ChEMBL Submission Files](#chembl-submission-files), [Controlled Vocabularies](#controlled-vocabularies) |
-| **Experimental scientist** (designing or reporting a study) | Know what to record during and after experiments | [MIX-MB(X)](MIXMB_Xenobiotics.md), [MIX-MB(M)](MIXMB_Microbes.md), [MIX-MB(B)](MIXMB_Biotransformation.md) |
-| **Tool / software developer** | Implement parsers, validators, or submission pipelines | [ChEMBL Submission Files](#chembl-submission-files) (column definitions), [Controlled Vocabularies](#controlled-vocabularies) |
-| **Reviewer / curator** | Assess whether a dataset is MIX-MB compliant | [Scope and Applicability](#scope-and-applicability), compliance tiers in each component sub-standard |
-| **Contributor** (proposing changes to the standard) | Understand the versioning policy and contribution process | [Versioning.md](Versioning.md), [CONTRIBUTING.md](../CONTRIBUTING.md) |
+| **Experimental scientist** (designing or reporting a study) | Know what to record during and after experiments | [Template](Templates/Template.xlsx), [Component Standards](#component-standards) |
+| **Contributor** (proposing changes to the standard) | Understand the versioning policy and contribution process and edit the standards | [Versioning.md](Versioning.md), [CONTRIBUTING.md](../CONTRIBUTING.md), [Component Standards](#component-standards) |
 
 ---
 
@@ -89,25 +90,34 @@ This standard comprises three interconnected sub-standards:
 
 | Component | Description | Version | Status | Last Updated (YYYY-MM-DD) | Document |
 |-----------|-------------|---------|--------|--------------------------|----------|
-| **MIX-MB(X)** - Xenobiotics | Minimum metadata required to describe the chemical substrate, including structural identity, physicochemical properties, and source information. | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
-| **MIX-MB(M)** - Microbes | Minimum metadata required to describe the microbial organism or community used in the experiment, including taxonomy, strain, and culture conditions. | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
-| **MIX-MB(B)** - Biotransformation | Minimum metadata required to describe the biotransformation assay design, experimental conditions, and quantitative or qualitative activity outcomes. | 0.1.0 | Draft | 2026-03-03 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
+| **MIX-MB(X)** - Xenobiotics | Minimum metadata required to describe the chemical substrate, including structural identity, physicochemical properties, and source information. | 0.1.1 | Draft | 2026-03-16 | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
+| **MIX-MB(M)** - Microbes | Minimum metadata required to describe the microbial organism or community used in the experiment, including taxonomy, strain, and culture conditions. | 0.1.1 | Draft | 2026-03-16 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
+| **MIX-MB(B)** - Biotransformation | Minimum metadata required to describe the biotransformation assay design, experimental conditions, and quantitative or qualitative activity outcomes. | 0.1.1 | Draft | 2026-03-16 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
 
+Please check the individual standards document above to understand each component.
 
 ---
+
+## Template 
+
+The template is based on the above 3 components ([MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md), [MIXMB_Microbes.md](MIXMB_Microbes.md), [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md)) and the [ChEMBL submission guidelines](https://chembl.gitbook.io/chembl-data-deposition-guide). To understand the template, we first have to understand the ChEMBL submission file formats.
+
+<p align="center">
+  <img src="chembl-files.jpg" />
+</p>
 
 
 ## Identifiers and Cross-Referencing
 
 **This is the first practical step before entering any data: assign identifiers to every entity in your study.**
 
-MIX-MB uses a three-layer identifier system. Every biotransformation event is a record that links all three layers:
+MIX-MB uses a three-layer identifier system based on ChEMBL submission guidelines. Every biotransformation event is a record that links all three layers:
 
-| Identifier | Abbreviation | Entity | Format | Defined in |
-|-----------|-------------|--------|--------|-----------|
-| Reference Index | **RIDX** | Study / publication | `[Author]_[Label]` | `REFERENCE.tsv` |
-| Compound Index | **CIDX** | Chemical compound | `CIDX[nnnn]` | `COMPOUND_RECORD.tsv` |
-| Assay Index | **AIDX** | Organism × condition | `[Author]_[Organism]_[Condition]` | `ASSAY.tsv` |
+| Identifier | Abbreviation | Entity | Defined in |
+|-----------|-------------|--------|-----------|
+| Reference Index | **RIDX** | Study / publication | `REFERENCE.tsv` |
+| Compound Index | **CIDX** | Chemical compound |`COMPOUND_RECORD.tsv` |
+| Assay Index | **AIDX** | Organism × condition | `ASSAY.tsv` |
 
 All three identifiers must appear together in every row of `ACTIVITY.tsv` to create an unambiguous, linkable record of a biotransformation event.
 
