@@ -67,6 +67,7 @@ We welcome contributions to the standards, template, and nf workflow for submiss
 <br>
 
 **Easy:**
+- **Fill out the open survey** using the [survery link](forms.gle/towuMVYYuqDi7pEJ7)
 - **Propose changes** by opening an [issue](https://github.com/zmahnoor14/BioXend/issues/new/choose)
 - **Discuss ideas** in [GitHub Discussions](https://github.com/zmahnoor14/BioXend/discussions)
 - **Endorse proposals** by adding 👍 to issues and PRs you support
@@ -80,7 +81,7 @@ We welcome contributions to the standards, template, and nf workflow for submiss
 1. Download the latest [`Template.xlsx`](Template.xlsx)
 2. Read the `Template_Description` sheet for instructions
 3. Fill in your data — green columns are mandatory, blue are recommended, purple are optional
-4. Submit feedback on ease of use -- This template will be used as input to generate ready to submit ChEMBL files
+4. Submit feedback on ease of use via [issues](https://github.com/zmahnoor14/BioXend/issues/new/choose) or [discussion](https://github.com/zmahnoor14/BioXend/discussions) -- This template will be used as input to generate ready to submit ChEMBL files.
 
 ## Versioning
 
