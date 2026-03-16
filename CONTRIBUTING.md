@@ -11,14 +11,14 @@ Thank you for your interest in contributing to the Minimum Information about Xen
 
 There are several ways to participate, depending on your comfort level with(/out) GitHub:
 
-### No GitHub account - Contribute Without GitHub
+### 1. No GitHub account - Contribute Without GitHub
 
 You don't need a GitHub account to help shape MIX-MB. The current Non-github contributions are integrated via the [MIX-MB Survey](https://forms.gle/towuMVYYuqDi7pEJ7). Feedback collected through the survey will be triaged by a maintainer and converted into GitHub Issues so it enters the formal review process. Current results from the survey can be viewed with the notebook: [Standards/MIX-MB_Survey_Analysis.ipynb](Standards
 /MIX-MB_Survey_Analysis.ipynb).
 
-### With GitHub account
+### 2. With GitHub account
 
-#### 1. Suggest Changes via Issues (No Git Knowledge Needed)
+#### 2.1. Suggest Changes via Issues (No Git Knowledge Needed)
 
 If you have feedback on the standards documentation and template, but aren't familiar with Git:
 
@@ -31,7 +31,7 @@ If you have feedback on the standards documentation and template, but aren't fam
   - **Blank issue** - if it's a general issue you would like to report
 - Fill out the template and submit. A maintainer will review, and the community can discuss and endorse.
 
-### 2. Submit a Pull Request (For Git Users)
+### 2.2. Submit a Pull Request (For Git Users)
 
 For direct contributions to the standards documents, templates, or nf workflow, all external contributors must work from a **fork**. Only maintainers added to the project can push branches directly to this repository.
 
@@ -62,7 +62,7 @@ For direct contributions to the standards documents, templates, or nf workflow, 
    git checkout -b your-branch-name
    ```
 
-6. **Make your changes**. Please follow the versioning and file conventions described below.
+6. **Make your changes**. Please follow the [versioning and file conventions](#branching-and-versioning) described below.
 
 7. **Commit** with a clear message following the convention:
    ```
@@ -87,7 +87,7 @@ For direct contributions to the standards documents, templates, or nf workflow, 
 
 12. Your PR will be reviewed by at least one maintainer. Community endorsement (thumbs-up reactions or comments) is encouraged.
 
-### 3. Endorse or Comment on Existing Proposals
+### 2.3. Endorse or Comment on Existing Proposals
 
 Browse [open issues](https://github.com/zmahnoor14/BioXend/issues) and [pull requests](https://github.com/zmahnoor14/BioXend/pulls). You can:
 
@@ -98,7 +98,7 @@ Browse [open issues](https://github.com/zmahnoor14/BioXend/issues) and [pull req
 Community consensus matters — proposals with broader endorsement will be prioritized.
 
 
-### 5. Discuss and Propose via GitHub Discussions
+### 2.4. Discuss and Propose via GitHub Discussions
 
 [GitHub Discussions](https://github.com/zmahnoor14/BioXend/discussions) is a first-class contribution channel for open-ended conversation that doesn't yet belong in an issue:
 
@@ -107,6 +107,17 @@ Community consensus matters — proposals with broader endorsement will be prior
 - **General** — Introduce yourself, share related work, or ask where to start
 
 Discussions that reach consensus can be converted into issues and enter the review process.
+
+#### 2.5. Review and Endorsement Process
+
+1. A proposal is submitted as an Issue or Pull Request.
+2. The community discusses and can endorse with 👍 reactions independently.
+3. After a **minimum review period of 14 days**, the maintainer evaluates community feedback.
+4. If endorsed by at least **1-2 independent contributors** (besides the proposer), the change proceeds.
+5. The maintainer incorporates the change, updates the relevant version, and merges to `devel`.
+6. Periodically, `devel` is merged to `main` as a new release.
+
+For urgent fixes i.e `bump:patch` versioning updates (typos, broken links, clear errors), no review period is necessary.
 
 ## Branching and Versioning
 
@@ -132,17 +143,6 @@ When making changes, **do not manually update version numbers** — this is hand
 1. Open your Pull Request on GitHub.
 2. In the right-hand sidebar, click **Labels**.
 3. Search for and select the appropriate label: `bump:patch`, `bump:minor`, or `bump:major`.
-
-## Review and Endorsement Process
-
-1. A proposal is submitted as an Issue or Pull Request.
-2. The community discusses and can endorse with 👍 reactions independently.
-3. After a **minimum review period of 14 days**, the maintainer evaluates community feedback.
-4. If endorsed by at least **1-2 independent contributors** (besides the proposer), the change proceeds.
-5. The maintainer incorporates the change, updates the relevant version, and merges to `devel`.
-6. Periodically, `devel` is merged to `main` as a new release.
-
-For urgent fixes i.e `bump:patch` versioning updates (typos, broken links, clear errors), no review period is necessary.
 
 ## What Makes a Good Standards Proposal?
 
