@@ -222,6 +222,8 @@ The **Microbes** and **Experiment** sheets in `Template.xlsx` maps to `ASSAY.tsv
 
 **Experimental conditions** (maps to `ASSAY_PARAM.tsv`):
 
+You can ass more columns and they will appear as assay parameters for all your files.
+
 | Template Column | Required | Description |
 |----------------|----------|-------------|
 | `Oxygen_conditions` | Recommended | if these conditions apply to all your assays, write `all` or `most` if most of the assays have these conditions; add another row if some of the assays have different conditions, and mention your self defined assay_identifier here, wither single, or a list of idenfiers with those conditions as a comma separated list |
@@ -241,37 +243,44 @@ The **Microbes** and **Experiment** sheets in `Template.xlsx` maps to `ASSAY.tsv
 | `Sample_preparation` | Recommended | Details of how the sample was prepared for analysis |
 | `Instrument_and_measurement` | Recommended | Instrument used for measurement; mention technology and instrument name (e.g., LC-MS, Orbitrap) |
 
-### Biotransformation metadata file(s)
+### 4. Biotransformation metadata file(s)
 
-#### ACTIVITY.tsv
-All biotransformation events occurring between `COMPOUND` and `ASSAY`, are mentioned in the `ACTIVITY.tsv`, including no biotransformation detected events. For details please refer to the tutorial provided by ChEMBL on how to generate the [ACTIVITY.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/activity.tsv).
-
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| CIDX | Yes | String | Compound identifier |
-| AIDX | Yes | String | Assay identifier |
-| RIDX | Yes | String | Reference identifier |
-| TEXT_VALUE | No | String | Qualitative result |
-| RELATION | No | String | =, <, >, ~ |
-| VALUE | No | Numeric | Quantitative value |
-| UNITS | No | String | Unit of measurement |
-| TYPE | Yes | String | Activity type |
-| ACTION_TYPE | No | String | SUBSTRATE, PRODUCT, etc. |
-| ACTIVITY_COMMENT | No | String | Notes on activity |
-
-**Activity Types for Biotransformation:**
-- `Biotransformation` - General transformation
-- `Metabolism` - Metabolic conversion
-- `Substrate` - Compound consumed
-- `Product` - Compound produced
-- `Inhibition` - Transformation inhibited
+**4.1. ACTIVITY.tsv:**
+All biotransformation events occurring between `COMPOUND` and `ASSAY`, are mentioned in the `ACTIVITY.tsv`, including `no biotransformation` events. For details please refer to the tutorial provided by ChEMBL on how to generate the [ACTIVITY.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/activity.tsv).
 
 
-#### Other optional activity files -  not part of the MIX-MB template
-`ACTIVITY_PROPERTIES.tsv` - Adding context to experimental results. <br>
-`ACTIVITY_SUPP.tsv` - Multiplex assays, supporting data, and complex results sets. <br>
+**4.2. Other optional activity files -  not part of the MIX-MB template**
+- `ACTIVITY_PROPERTIES.tsv` - Adding context to experimental results. <br>
+- `ACTIVITY_SUPP.tsv` - Multiplex assays, supporting data, and complex results sets. <br>
 
+#### How are biotransformation data files are integrated into the Template.xlsx
 
+The **Biotransformation** sheet in `Template.xlsx` maps to `ACTIVITY.tsv`. Each row links one compound to one assay and records the outcome of the biotransformation event.
+
+| Template Column | Maps to | Required | Auto-filled by BioXend | Description |
+|----------------|---------|----------|------------------------|-------------|
+| `Chemical_identifier` | `CIDX` | **Mandatory** | Yes (from Xenobiotics sheet) | Auto-filled from the Xenobiotics sheet; supply your own defined identifier if preferred |
+| `Common_Name` | — | Optional | Yes (from Xenobiotics sheet) | Common name of the compound; auto-filled by BioXend |
+| `SMILES` | — | Optional | Yes (from Xenobiotics sheet) | SMILES of the compound; auto-filled by BioXend |
+| `ASSAY_identifier` | `AIDX` | **Mandatory** | No | Must match the `assay_identifier` from the Microbes sheet exactly; used to link activities to assays |
+| `TEXT_VALUE` | `TEXT_VALUE` | Conditional | No | Use for non-numerical activity values (e.g., "biotransformed", "not detected"); leave empty if filling `VALUE` |
+| `VALUE` | `VALUE` | Conditional | No | Numerical value of the activity measurement (e.g., IC50, % biotransformation); leave empty if filling `TEXT_VALUE` |
+| `RELATION` | `RELATION` | Optional | No | Relational symbol for the value (e.g., `=`, `>`, `<`, `~`) |
+| `UPPER_VALUE` | `UPPER_VALUE` | Optional | No | Upper limit if the activity measurement is a range; use `VALUE` for the lower limit in that case |
+| `UNITS` | `UNITS` | Recommended | No | Unit of the activity value (e.g., `%`, `µM`, `nM`) |
+| `ACTIVITY_COMMENT` | `ACTIVITY_COMMENT` | Recommended | Yes (partial, if left empty) | Free-text details: thresholds, p-values, which rows are actives; BioXend will auto-populate from `VALUE` or `TEXT_VALUE` if left empty |
+| `Metabolite_mz` | — | Optional | No | Measured m/z of the xenobiotic metabolite |
+| `Metabolite_retention_time` | — | Optional | No | Measured retention time of the xenobiotic metabolite |
+| `Metabolite_annotation` | — | Optional | No | Top annotation as SMILES, compound name, or chemical class (ChemONT); leave empty if no annotation was performed |
+| `Metabolite_annotation_level` | — | Optional | No | Annotation confidence level 1–5; refer to MIX-MB documentation for level definitions |
+| `Kinetic_parameter_type` | — | Optional | No | Type of kinetic parameter measured (e.g., `Km`, `Vmax`, `kcat`); fill only if kinetic data are available |
+| `Kinetic_parameter_value` | — | Optional | No | Numerical value associated with the kinetic parameter type |
+| `Reaction_type` | — | Recommended | No | Type of biotransformation reaction (e.g., hydrolysis, hydroxylation, reduction); for biotransformation assays only |
+| `Activity_type` | `ACTIVITY_TYPE` | Recommended | No | User-defined activity label (e.g., `biotransformation`, `inhibition`); populate only for confirmed active compounds |
+| `ACTION_TYPE` | `ACTION_TYPE` | Optional | No | ChEMBL-controlled vocabulary for the effect on the target (e.g., `INHIBITOR`, `SUBSTRATE`); populate only for confirmed active compounds; must match the ChEMBL ACTION_TYPE list |
+| `Classify_activity` | — | Optional | No | Binary or categorical activity label (e.g., `0` = no activity, `1` = active); populate only for confirmed outcomes |
+
+> **Note on TEXT_VALUE vs VALUE:** Use `TEXT_VALUE` when the result is qualitative (e.g., "metabolised", "no biotransformation detected"). Use `VALUE` when you have a quantitative measurement. Do not fill both columns in the same row.
 
 ## Identifiers and Cross-Referencing
 
