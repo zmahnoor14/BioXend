@@ -150,26 +150,26 @@ The CTAB is an sdf file (V2000 molfile format) storing the chemical strcuture of
 
 #### How are xenobiotics data files are integrated into the Template.xlsx
 
-The **Xenobiotics** sheet in `Template.xlsx` maps to `COMPOUND_RECORD.tsv` and `COMPOUND_CTAB.sdf`. Fill in one row per compound. Columns auto-filled by BioXend can be left empty; all others should be completed where available.
+The **Chemicals** sheet in `Template.xlsx` maps to `COMPOUND_RECORD.tsv` and `COMPOUND_CTAB.sdf`. Fill in one row per compound. Columns auto-filled by BioXend (powered by RDKit) can be left empty; all others should be completed where available.
 
 | Template Column | Maps to | Required | Auto-filled by BioXend | Description |
 |----------------|---------|----------|------------------------|-------------|
 | `Chemical_identifier` | `CIDX` | **Mandatory** | Yes (if left empty) | Unique compound index; BioXend auto-generates if not provided — or supply your own |
 | `Common_Name` | `COMPOUND_NAME` | **Mandatory** | No | Common name of the xenobiotic, chemical, drug, or pesticide |
-| `SMILES` | `SMILES` | **Mandatory** | No | SMILES string of the compound |
-| `Local_Synonym` | — | Optional | No | Any local synonym used in the manuscript (e.g. "compound 23") |
-| `IUPAC_Name` | `IUPAC_NAME` | Recommended | Yes (if left empty) | Systematic IUPAC name; auto-filled by BioXend if not provided |
-| `InChI` | `STANDARD_INCHI` | Recommended | Yes (if left empty) | Standard InChI; auto-filled by BioXend if not provided |
-| `InChIKey` | `STANDARD_INCHI_KEY` | Recommended | Yes (if left empty) | InChIKey; auto-filled by BioXend if not provided |
-| `database_ID` | `COMPOUND_KEY` | Optional | No | ChEMBL, PubChem, or other database identifier; prefix with database name (e.g. `ChEMBL:CHEMBL25`) |
+| `SMILES` | `COMPOUND_CTAB.sdf file` | **Mandatory** | No | SMILES string of the compound |
+| `Local_Synonym` | `COMPOUND_KEY` | **Mandatory**  | Yes (if left empty, COMPOUND_NAME will be used) | Any local synonym used in the manuscript (e.g. "compound 23") |
+| `IUPAC_Name` | - | Recommended | Yes (if left empty) | Systematic IUPAC name; auto-filled by BioXend if not provided |
+| `InChI` | - | Recommended | Yes (if left empty) | Standard InChI; auto-filled by BioXend if not provided |
+| `InChIKey` | - | Recommended | Yes (if left empty) | InChIKey; auto-filled by BioXend if not provided |
+| `database_ID` | - | Optional | No | ChEMBL, PubChem, or other database identifier; prefix with database name (e.g. `ChEMBL:CHEMBL25`) |
 | `CAS_number` | — | Optional | No | CAS registry number of the xenobiotic |
 | `Vendor` | — | Optional | No | Vendor who supplied the compound |
 | `Purity` | — | Optional | No | Purity of the compound (%) |
 | `Solubility` | — | Optional | No | Solubility value |
 | `Stock_concentration` | — | Optional | No | Concentration of the stock solution |
 | `Stock_solvent` | — | Optional | No | Solvent used to prepare the stock solution |
-| `Molecular_formula` | `MOLECULAR_FORMULA` | Recommended | Yes (if left empty) | Molecular formula; auto-filled by BioXend if empty |
-| `Molecular_weight` | `MOLECULAR_WEIGHT` | Recommended | Yes (if left empty) | Molecular weight; auto-filled by BioXend if empty |
+| `Molecular_formula` | - | Recommended | Yes (if left empty) | Molecular formula; auto-filled by BioXend if empty |
+| `Molecular_weight` | - | Recommended | Yes (if left empty) | Molecular weight; auto-filled by BioXend if empty |
 | `Monoisotopic_mass` | — | Optional | Yes (if left empty) | Monoisotopic mass; auto-filled by BioXend if empty |
 | `m/z` | — | Optional | No | Measured m/z of the xenobiotic |
 | `Column_separation` | — | Optional | No | Separation technique used (e.g. LC, GC) |
@@ -178,43 +178,67 @@ The **Xenobiotics** sheet in `Template.xlsx` maps to `COMPOUND_RECORD.tsv` and `
 | `Eluted_compound` | — | Optional | No | Was the eluted compound the same as the original? Note if different (relevant for MS/biotransformation studies) |
 | `Eluted_compound_SMILES` | — | Optional | No | SMILES of the eluted compound if different from the original |
 | `Physicochemical_properties` | — | Optional | Yes (partial) | LogP, functional groups, etc.; BioXend will auto-extract where possible — select from drop-down |
-| `mMSI_file_source` | — | Optional | No | Source file for MSI (mass spectrometry imaging) fragment data, if applicable |
+| `mzML_file_source` | — | Optional | No | Source file for MSI (mass spectrometry imaging) fragment data, if applicable |
 
 ### 3. Microbe/ Assay metadata files
 
 **3.1. ASSAY.tsv:** 
 `ASSAY.tsv` file gives description of the assay along with the microorganism, microbial community or microbial protein. For details please refer to the tutorial provided by ChEMBL on how to generate the [ASSAY.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/assay.tsv). 
 
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| AIDX | Yes | String | Assay identifier |
-| DESCRIPTION | Yes | String | Assay description |
-| ASSAY_TYPE | Yes | String | Biotransformation/Metabolism |
-| ASSAY_ORGANISM | Yes | String | Microorganism name |
-| ASSAY_TAX_ID | Yes | Integer | NCBI Taxonomy ID |
-| ASSAY_STRAIN | No | String | Strain designation |
-| ASSAY_CELL_TYPE | No | String | Cell type/compartment |
-| RIDX | Yes | String | Reference identifier |
 
 **3.2. ASSAY_PARAM.tsv:**  
 Assay parameters associated with `ASSAY.tsv` are mentioned within this optional file. For details please refer to the tutorial provided by ChEMBL on how to generate the [ASSAY_PARAM.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/supplementary-data-files/assay_param.tsv-adding-additional-assay-information.).
 
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| AIDX | Yes | String | Assay identifier |
-| TYPE | Yes | String | Parameter type |
-| RELATION | No | String | =, <, >, ~, etc. |
-| VALUE | Yes | Numeric | Parameter value |
-| UNITS | No | String | Unit of measurement |
-| TEXT_VALUE | No | String | Qualitative description |
-| COMMENTS | No | String | Additional notes |
+#### How are assay/microbe data files are integrated into the Template.xlsx
 
-**Common Parameters:**
-- Temperature (°C)
-- Incubation time (hours)
-- pH
-- Cell density (OD600, CFU/mL)
-- Substrate concentration (µM, mM)
+The **Microbes** sheet in `Template.xlsx` maps to `ASSAY.tsv` and `ASSAY_PARAM.tsv`. Fill in one row per assay/strain condition.
+
+**Assay identity and sample metadata** (maps to `ASSAY.tsv`):
+
+| Template Column | Maps to | Required | Description |
+|----------------|---------|----------|-------------|
+| `assay_identifier` | `AIDX` | **Mandatory** | Unique assay identifier; auto-generated by BioXend if left empty, or supply your own |
+| `internal_sample_identifier` | — | Optional | Internal identifier used in the manuscript or lab for the sample/assay |
+| `Vendor` | — | Optional | Vendor or source from whom the strain/sample was obtained |
+| `Sample_isolation_source` | `ASSAY_DESCRIPTION` (partial) | Recommended | Isolation source of the sample (e.g., blood, stool, soil) |
+| `Human_donor_metadata` | — | Mandatory if human-derived | Donor metadata required if the sample originates from a human source |
+| `Environmental_sample_metadata` | — | Mandatory if environmental | Environmental context required if sample comes from an environmental source |
+| `ENAorSRA_project_Accession_number` | — | Recommended | ENA or SRA project accession number for deposited sequencing data |
+| `ENAorSRA_sample_Accession_number` | — | Recommended | ENA or SRA sample accession number |
+| `Bacteria_scientific_name` | `ASSAY_ORGANISM` | **Mandatory** | Scientific name of the bacterium; for communities, provide the community name |
+| `Strain` | `ASSAY_DESCRIPTION` (partial) | Recommended | Strain name or identifier |
+| `NCBI_Tax_ID` | `ASSAY_TAX_ID` | **Mandatory** | NCBI Taxonomy ID; mandatory even for communities (use community proxy ID) |
+| `Tissue` | — | Optional | Tissue type if applicable (e.g., MRC-5) |
+| `Cell_type` | — | Optional | Cell type description if a cell-based assay |
+| `SUBCELLULAR_FRACTION` | `ASSAY_SUBCELLULAR_FRACTION` | Optional | Subcellular fraction used (e.g., cytoplasm, membrane) |
+| `TARGET_TYPE` | `TARGET_TYPE` | Recommended | Type of target being assayed; refer to ChEMBL TARGET_TYPES (e.g., `ORGANISM`, `PROTEIN`, `CELL-LINE`) |
+| `Protein_name` | — | Optional | Name of the protein if a protein/enzyme assay |
+| `UniProt_ID` | — | Optional | UniProt accession ID of the target protein |
+| `TARGET_ORGANISM` | `TARGET_ORGANISM` | Recommended | Organism of the target; becomes mandatory if `TARGET_TYPE` is filled |
+| `TARGET_TAX_ID` | `TARGET_TAX_ID` | Recommended | NCBI Tax ID of the target organism |
+| `Gene_name` | — | Optional | Gene name associated with the target protein |
+| `ASSAY_GROUP` | `ASSAY_GROUP` | Optional | Group label for assays considered comparable by the depositor |
+| `ASSAY_TYPE` | `ASSAY_TYPE` | **Mandatory** | ChEMBL assay type code; for MIX-MB use `B` (Biotransformation). Other codes: `A` = ADMET, `F` = Functional, `T` = Toxicity, `U` = Unclassified |
+
+**Experimental conditions** (maps to `ASSAY_PARAM.tsv`):
+
+| Template Column | Maps to | Required | Description |
+|----------------|---------|----------|-------------|
+| `Oxygen_conditions` | `ASSAY_PARAM` | Recommended | Oxygen conditions (e.g., anaerobic/aerobic/CO2); write `all` if the same for all assays |
+| `Media_composition` | `ASSAY_PARAM` | Recommended | Growth medium used (e.g., GMM, mBHI, minimal media) |
+| `Incubation_temperature_celsius` | `ASSAY_PARAM` | Recommended | Incubation temperature in °C |
+| `Shaking_speed` | `ASSAY_PARAM` | Optional | Shaking speed (rpm) during incubation |
+| `Negative_controls` | `ASSAY_PARAM` | Recommended | Negative controls used (e.g., heat-killed or sterile media) |
+| `Pre-culture_preparation_and_conditions` | `ASSAY_PARAM` | Optional | Pre-culture conditions before the main assay |
+| `Antibiotic_pre-treatment` | `ASSAY_PARAM` | Optional | Whether antibiotics were used; include name(s) of antibiotic(s) |
+| `Biomass_inoculum_density_at_start` | `ASSAY_PARAM` | Recommended | Biomass or inoculum density at the start of incubation |
+| `Incubation_duration` | `ASSAY_PARAM` | **Mandatory** | Total incubation time (numeric value, e.g., `24`) |
+| `Time_unit` | `ASSAY_PARAM` | **Mandatory** | Unit for incubation duration: `hr` or `day`; use one consistently |
+| `Time-course_information` | `ASSAY_PARAM` | Optional | Number and timing of timepoints for time-course studies (e.g., 0, 3, 6, 12, 24 hr) |
+| `Biomass_inoculum_density_at_end` | `ASSAY_PARAM` | Optional | Biomass or inoculum density at end of incubation |
+| `Sample_storage` | `ASSAY_PARAM` | Recommended | How and where samples were stored |
+| `Sample_preparation` | `ASSAY_PARAM` | Recommended | Details of how the sample was prepared for analysis |
+| `Instrument_and_measurement` | `ASSAY_PARAM` | Recommended | Instrument used for measurement; mention technology and instrument name (e.g., LC-MS, Orbitrap) |
 
 ### Biotransformation metadata file(s)
 
