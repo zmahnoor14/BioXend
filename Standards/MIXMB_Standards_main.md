@@ -15,19 +15,19 @@
 - [Scope and Applicability](#scope-and-applicability)
   - [In Scope](#in-scope)
   - [Out of Scope](#out-of-scope)
-  - [Applicability Note](#applicability-note)
-- [How to Use This Document](#how-to-use-this-document)
 - [Component Standards](#component-standards)
+- [Template](#template)
+  - [1. Study Metadata Files](#1-study-metadata-files)
+    - [How are study data files integrated into the Template.xlsx](#how-are-study-data-files-are-integrated-into-the-templatexlsx)
+  - [2. Xenobiotics Metadata Files](#2-xenobiotics-metadata-files)
+    - [How are xenobiotics data files integrated into the Template.xlsx](#how-are-xenobiotics-data-files-are-integrated-into-the-templatexlsx)
+  - [3. Microbe / Assay Metadata Files](#3-microbe-assay-metadata-files)
+    - [How are assay/microbe data files integrated into the Template.xlsx](#how-are-assaymicrobe-data-files-are-integrated-into-the-templatexlsx)
+  - [4. Biotransformation Metadata File(s)](#4-biotransformation-metadata-files)
+    - [How are biotransformation data files integrated into the Template.xlsx](#how-are-biotransformation-data-files-are-integrated-into-the-templatexlsx)
 - [Identifiers and Cross-Referencing](#identifiers-and-cross-referencing)
-  - [Naming Your Compounds Properly](#naming-your-compounds-properly)
-  - [Naming Your Organisms Properly](#naming-your-organisms-properly)
   - [Minting Scheme for Unknowns](#minting-scheme-for-unknowns)
-  - [sameAs Linking Policy](#sameas-linking-policy)
-- [ChEMBL Submission Files](#chembl-submission-files)
-  - [Study Metadata Files](#study-metadata-files)
-  - [Xenobiotics Metadata Files](#xenobiotics-metadata-files)
-  - [Microbe / Assay Metadata Files](#microbe-assay-metadata-files)
-  - [Biotransformation Metadata Files](#biotransformation-metadata-files)
+- [ChEMBL Links and FAQs](#chembl-links-and-faqs)
 
 ---
 
@@ -65,22 +65,6 @@ MIX-MB does not currently cover:
 
 - **Purely computational predictions** of biotransformation (e.g. metabolite prediction tools with no experimental validation)
 - **Metabolomics, Genomics or transcriptomics data** describing biotransformation enzymes or metabolites or equivalent sequence standards. This standard is for reporting biotransformation (bioactivity), and not for the experimental omics data (which have already their own established standards)
-
-### Applicability note
-
-Compliance with MIX-MB is recommended for studies intended for submission to public bioactivity databases (e.g. ChEMBL) or publications in journals that require FAIR data deposition. The standard defines three compliance tiers (Gold, Silver, Bronze) described in each component sub-standard.
-
----
-
-## How to Use This Document
-
-Different readers will need different parts of this standard. Use the table below to navigate directly to the sections most relevant to you.
-
-| I am a… | I want to… | Start here |
-|---------|-----------|-----------|
-| **Data submitter** (researcher depositing study data) | Understand what metadata and files to prepare | [ChEMBL Submission Files](#chembl-submission-files), [Controlled Vocabularies](#controlled-vocabularies) |
-| **Experimental scientist** (designing or reporting a study) | Know what to record during and after experiments | [Template](Templates/Template.xlsx), [Component Standards](#component-standards) |
-| **Contributor** (proposing changes to the standard) | Understand the versioning policy and contribution process and edit the standards | [Versioning.md](Versioning.md), [CONTRIBUTING.md](../CONTRIBUTING.md), [Component Standards](#component-standards) |
 
 ---
 
@@ -260,12 +244,12 @@ The **Biotransformation** sheet in `Template.xlsx` maps to `ACTIVITY.tsv`. Each 
 | Template Column | Maps to | Required | Auto-filled by BioXend | Description |
 |----------------|---------|----------|------------------------|-------------|
 | `Chemical_identifier` | `CIDX` | **Mandatory** | Yes (from Xenobiotics sheet) | Auto-filled from the Xenobiotics sheet; supply your own defined identifier if preferred |
-| `Common_Name` | — | Optional | Yes (from Xenobiotics sheet) | Common name of the compound; auto-filled by BioXend |
+| `Common_Name` | — | **Mandatory**  | Yes (from Xenobiotics sheet) | Common name of the compound; auto-filled by BioXend |
 | `SMILES` | — | Optional | Yes (from Xenobiotics sheet) | SMILES of the compound; auto-filled by BioXend |
 | `ASSAY_identifier` | `AIDX` | **Mandatory** | No | Must match the `assay_identifier` from the Microbes sheet exactly; used to link activities to assays |
 | `TEXT_VALUE` | `TEXT_VALUE` | Conditional | No | Use for non-numerical activity values (e.g., "biotransformed", "not detected"); leave empty if filling `VALUE` |
 | `VALUE` | `VALUE` | Conditional | No | Numerical value of the activity measurement (e.g., IC50, % biotransformation); leave empty if filling `TEXT_VALUE` |
-| `RELATION` | `RELATION` | Optional | No | Relational symbol for the value (e.g., `=`, `>`, `<`, `~`) |
+| `RELATION` | `RELATION` | Optional | No | Relational symbol for the `VALUE` (e.g., `=`, `>`, `<`, `~`) |
 | `UPPER_VALUE` | `UPPER_VALUE` | Optional | No | Upper limit if the activity measurement is a range; use `VALUE` for the lower limit in that case |
 | `UNITS` | `UNITS` | Recommended | No | Unit of the activity value (e.g., `%`, `µM`, `nM`) |
 | `ACTIVITY_COMMENT` | `ACTIVITY_COMMENT` | Recommended | Yes (partial, if left empty) | Free-text details: thresholds, p-values, which rows are actives; BioXend will auto-populate from `VALUE` or `TEXT_VALUE` if left empty |
@@ -282,36 +266,19 @@ The **Biotransformation** sheet in `Template.xlsx` maps to `ACTIVITY.tsv`. Each 
 
 > **Note on TEXT_VALUE vs VALUE:** Use `TEXT_VALUE` when the result is qualitative (e.g., "metabolised", "no biotransformation detected"). Use `VALUE` when you have a quantitative measurement. Do not fill both columns in the same row.
 
-## Identifiers and Cross-Referencing
+## Naming convention for identifiers and cross-referencing in ChEMBL
 
 **This is the first practical step before entering any data: assign identifiers to every entity in your study.**
 
 MIX-MB uses a three-layer identifier system based on ChEMBL submission guidelines. Every biotransformation event is a record that links all three layers:
 
-| Identifier | Abbreviation | Entity | Defined in |
-|-----------|-------------|--------|-----------|
-| Reference Index | **RIDX** | Study / publication | `REFERENCE.tsv` |
-| Compound Index | **CIDX** | Chemical compound |`COMPOUND_RECORD.tsv` |
-| Assay Index | **AIDX** | Organism × condition | `ASSAY.tsv` |
+| Identifier | Abbreviation | Entity | Defined in | One example |
+|-----------|-------------|--------|-----------|-----------|
+| Reference Index | **RIDX** | Study / publication | `REFERENCE.tsv` | HumanDrugMetabolism |
+| Compound Index | **CIDX** | Chemical compound |`COMPOUND_RECORD.tsv` | HDM001 |
+| Assay Index | **AIDX** | Organism × condition | `ASSAY.tsv` | Bacteriodetes_theta_microaerobic |
 
 All three identifiers must appear together in every row of `ACTIVITY.tsv` to create an unambiguous, linkable record of a biotransformation event.
-
-### Naming Your Compounds Properly
-
-Use the **InChIKey** as the canonical chemical identifier for all known compounds — it is structure-based, database-independent, and collision-resistant. Alongside it, record the highest-priority external database identifier available:
-
-1. ChEMBL ID (preferred — this is the target submission database)
-2. PubChem CID
-3. ChEBI ID
-4. CAS Registry Number (fallback only)
-
-See [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md) for full CIDX minting rules and identifier priority.
-
-### Naming Your Organisms Properly
-
-Use the **NCBI TaxID** as the mandatory organism identifier for all assay entries (`ASSAY_TAX_ID`). Pair it with the full binomial scientific name (`ASSAY_ORGANISM`). For strains, add the culture collection identifier (e.g. ATCC, DSMZ) as an additional property.
-
-See [MIX-MB(M) Section 1.4](MIXMB_Microbes.md) for full AIDX minting rules and organism identifier guidance.
 
 ### Minting Scheme for Unknowns
 
@@ -325,72 +292,14 @@ Not all entities will have established external identifiers at the time of submi
 
 Once an unknown entity is formally identified and registered in an external database, update its identifier across all affected files before resubmission.
 
-### sameAs Linking Policy
-
-Use the `sameAs` property (schema.org / Bioschemas) to declare equivalence between an entity in your submission and the same entity in an external database. This is what makes MIX-MB data interoperable with ChEMBL, PubChem, NCBI, and other resources.
-
-**Rules that apply across all component standards:**
-
-1. **Compounds:** Link to ChEMBL, PubChem, and/or ChEBI using canonical compound page URLs. Required for Gold tier; strongly recommended for Silver. See [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md).
-2. **Organisms:** Link to the NCBI Taxonomy URL (mandatory) and LPSN (recommended for prokaryotes). See [MIX-MB(M) Section 1.4](MIXMB_Microbes.md).
-3. **Unknowns:** Do not add `sameAs` until the entity has a confirmed, registered external record. Speculative `sameAs` links are not permitted.
-4. **Deprecated identifiers:** If a linked database entry is merged or retired, update `sameAs` to the new canonical URL.
-
-Activity records in `ACTIVITY.tsv` are not linked via `sameAs` directly — interoperability at the activity level is achieved through the consistent use of InChIKey (compounds) and NCBI TaxID (organisms). See [MIX-MB(B) Section 1.4](MIXMB_Biotransformation.md) for cross-referencing rules specific to activity records.
-
 ---
-
-
-
-
-
----
-<!--
-## 7. Controlled Vocabularies not defined by any ontologies?
-
-### 7.1 Transformation Types
-
-Use standardized terms:
-- `hydroxylation` - Addition of hydroxyl group
-- `reduction` - Reduction reaction
-- `oxidation` - Oxidation reaction
-- `hydrolysis` - Hydrolytic cleavage
-- `decarboxylation` - Loss of CO₂
-- `deamination` - Loss of amino group
-- `conjugation` - Addition of molecular moiety
-- `demethylation` - Loss of methyl group
-- `acetylation` - Addition of acetyl group
-- `glucuronidation` - Addition of glucuronic acid
-- `sulfation` - Addition of sulfate group
-
-### 7.2 Assay Types
-
-- `cell-based assay` - Whole cell biotransformation
-- `lysate assay` - Cell-free lysate system
-- `purified enzyme assay` - Isolated enzyme
-- `community assay` - Mixed microbial community
-- `in vivo assay` - Animal model
-- `ex vivo assay` - Extracted sample
-
-### 7.3 Activity Outcomes
-
-- `Substrate` - Compound consumed by microorganism
-- `Product` - Compound produced by transformation
-- `No Activity` - No biotransformation detected
-- `Inhibition` - Transformation inhibited
-- `Stimulation` - Transformation enhanced
-
-#### TO DOs:
-1. Vocabulary section?
-2.
--->
 
 ## ChEMBL links and FAQs
 Here are some details on different files required by ChEMBL.
-#### Links: 
+### Links: 
 * Information on ChEMBL: https://chembl.gitbook.io/chembl-interface-documentation 
 * ChEMBL submission guidelines: https://chembl.gitbook.io/chembl-data-deposition-guide 
-#### FAQs: 
+### FAQs: 
 1. General Questions: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/general-questions
 2. Compounds: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/drug-and-compound-questions
 3. Assay and activities: https://chembl.gitbook.io/chembl-interface-documentation/frequently-asked-questions/chembl-data-questions
