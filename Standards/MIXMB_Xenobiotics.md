@@ -5,14 +5,10 @@
 This document identifies the Minimum Information (MI) required to report xenobiotics involved in microbial biotransformation studies, ensuring comprehensive documentation of chemical substrates and their transformation products.
 
 **Author:** Mahnoor Zulfiqar
-**Version:** 0.1.0  
-**Release Date:** March 16, 2026 (Draft)  
-**Status:** Draft Standard  
-**Part of:** MIX-MB Standard v0.1  
-**Replaces:** N/A  
+**Part of:** MIX-MB Standard_main     
 **Compatible with:** 
-- MIX-MB(M) v0.1.0
-- MIX-MB(B) v0.1.0
+- MIX-MB(M) 
+- MIX-MB(B) 
 
 **Alignment:** BioSchemas, ChEMBL, ChEBI, ChemONT, MSI Standards, FAIR principles
 
@@ -51,28 +47,8 @@ MIX-MB(X) establishes minimum information standards for reporting microbial biot
 - **Accessible:** Standardized formats for submission to public repositories
 - **Interoperable:** Uses community ontologies and controlled vocabularies
 - **Reusable:** Provenance and methodology information
-
-### 1.1 How is this document organised?
-- **Section 1** — Introduction to MIX-MB(X) for Xenobiotics and how to use it.
-- **Section 2** — Bioschemas profiles: what metadata fields to use for substrates and metabolites, with JSON examples.
-- **Section 3** — Ontologies: which controlled vocabularies and identifiers to use (ChEBI, ChemOnt, GO, Unit Ontology).
-- **Section 4** — Validation rules
-- **Section 5** — Data quality tiers
-- **Section 6** — How to use template
 - 
 
-### 1.2 Which sections are important for contributors?
-
-If you want to propose changes to the standard, focus on **Sections 2 and 3** (the metadata fields and ontologies), then follow the contribution process in [Versioning.md](Versioning.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Changes require a 7-day community review and 2 independent endorsements.
-
-### 1.3 Which sections are important for data submitters?
-
-If you are preparing data for submission, you need:
-- **Section 2.1** — required fields for xenobiotic substrates
-- **Section 2.3** — how to report concentrations
-- **Section 4.1** — what analytical information to include
-- **Section 5** — validation checklist before you submit
-- **[Template.xlsx](Templates/Template.xlsx)** — colour-coded submission template (green = mandatory, blue = recommended, yellow = optional) specifically the Compounds sheet.
 
 ### 1.4 Identifiers and Cross-Referencing
 
