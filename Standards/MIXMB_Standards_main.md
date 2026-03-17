@@ -106,15 +106,15 @@ The template is based on the above 3 components ([MIXMB_Xenobiotics.md](MIXMB_Xe
   <img src="chembl-files.jpg" />
 </p>
 
-### Study metadata files
+### 1. Study metadata files
 
-**1. REFERENCE.tsv:** <br>
+**1.1. REFERENCE.tsv:** <br>
 Reference file provides metadata regarding the study, including the DOI/ PMID, title, abstract, authors, journal, or dataset (if unpublished). For details please refer to the tutorial provided by ChEMBL on how to generate the [REFERENCE.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/reference.tsv). 
 
-**2. INFO.txt:** <br>
+**1.2. INFO.txt:** <br>
 Optional file with free text space to mention any additional information about the study. For details please refer to the tutorial provided by ChEMBL on how to generate the [INFO.txt file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/supplementary-data-files/info.txt).
 
-#### How are these files integrated into the Template.xlsx
+#### How are study data files are integrated into the Template.xlsx
 
 The **Reference** sheet in `Template.xlsx` maps directly to `REFERENCE.tsv` and one column for `INFO.txt`. Fill in one row per study. Columns marked **Mandatory** must be completed; all others are optional or even can be automatically extracted by the nf workflow.
 
@@ -138,33 +138,51 @@ The **Reference** sheet in `Template.xlsx` maps directly to `REFERENCE.tsv` and 
 | `AUTHORS` | `AUTHORS` | Recommended | List of the authors |
 | `INFO` | — | Optional | Any additional context to include with the deposited data (ChEMBL internal usage only) |
 
-### Xenobiotics metadata files
+### 2. Xenobiotics metadata files
 
-#### COMPOUND_RECORD.tsv
+**2.1. COMPOUND_RECORD.tsv:** <br>
 
 These files contain reference identifiers and chemical identifiers, along with the name of the compound. For details please refer to the tutorial provided by ChEMBL on how to generate the [COMPOUND_RECORD.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/compound_record.tsv).
 
-| Column | Required | Type | Description |
-|--------|----------|------|-------------|
-| CIDX | Yes | String | Compound index |
-| COMPOUND_NAME | Yes | String | Preferred compound name |
-| RIDX | Yes | String | Reference identifier |
-| COMPOUND_KEY | No | String | Unique compound key |
-| SRC_ID | No | String | Source database ID |
-
-#### COMPOUND_CTAB.sdf
+**2.2. COMPOUND_CTAB.sdf:** <br> 
 
 The CTAB is an sdf file (V2000 molfile format) storing the chemical strcuture of the compounds mentioned in the `COMPOUNDS_RECORD.tsv`, together with the same chemical identifiers. For details please refer to the tutorial provided by ChEMBL on how to generate the [COMPOUND_CTAB.sdf file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/compound_ctab.sdf).
 
-**Requirements:**
-- Canonical SMILES
-- 2D or 3D coordinates
-- InChI and InChI Key
-- Associated CIDX for linkage
+#### How are xenobiotics data files are integrated into the Template.xlsx
 
-### Microbe/ Assay metadata files
+The **Xenobiotics** sheet in `Template.xlsx` maps to `COMPOUND_RECORD.tsv` and `COMPOUND_CTAB.sdf`. Fill in one row per compound. Columns auto-filled by BioXend can be left empty; all others should be completed where available.
 
-#### ASSAY.tsv
+| Template Column | Maps to | Required | Auto-filled by BioXend | Description |
+|----------------|---------|----------|------------------------|-------------|
+| `Chemical_identifier` | `CIDX` | **Mandatory** | Yes (if left empty) | Unique compound index; BioXend auto-generates if not provided — or supply your own |
+| `Common_Name` | `COMPOUND_NAME` | **Mandatory** | No | Common name of the xenobiotic, chemical, drug, or pesticide |
+| `SMILES` | `SMILES` | **Mandatory** | No | SMILES string of the compound |
+| `Local_Synonym` | — | Optional | No | Any local synonym used in the manuscript (e.g. "compound 23") |
+| `IUPAC_Name` | `IUPAC_NAME` | Recommended | Yes (if left empty) | Systematic IUPAC name; auto-filled by BioXend if not provided |
+| `InChI` | `STANDARD_INCHI` | Recommended | Yes (if left empty) | Standard InChI; auto-filled by BioXend if not provided |
+| `InChIKey` | `STANDARD_INCHI_KEY` | Recommended | Yes (if left empty) | InChIKey; auto-filled by BioXend if not provided |
+| `database_ID` | `COMPOUND_KEY` | Optional | No | ChEMBL, PubChem, or other database identifier; prefix with database name (e.g. `ChEMBL:CHEMBL25`) |
+| `CAS_number` | — | Optional | No | CAS registry number of the xenobiotic |
+| `Vendor` | — | Optional | No | Vendor who supplied the compound |
+| `Purity` | — | Optional | No | Purity of the compound (%) |
+| `Solubility` | — | Optional | No | Solubility value |
+| `Stock_concentration` | — | Optional | No | Concentration of the stock solution |
+| `Stock_solvent` | — | Optional | No | Solvent used to prepare the stock solution |
+| `Molecular_formula` | `MOLECULAR_FORMULA` | Recommended | Yes (if left empty) | Molecular formula; auto-filled by BioXend if empty |
+| `Molecular_weight` | `MOLECULAR_WEIGHT` | Recommended | Yes (if left empty) | Molecular weight; auto-filled by BioXend if empty |
+| `Monoisotopic_mass` | — | Optional | Yes (if left empty) | Monoisotopic mass; auto-filled by BioXend if empty |
+| `m/z` | — | Optional | No | Measured m/z of the xenobiotic |
+| `Column_separation` | — | Optional | No | Separation technique used (e.g. LC, GC) |
+| `Retention_time` | — | Optional | No | Retention time recorded; fill if `Column_separation` is provided |
+| `Time_unit` | — | Optional | No | Unit for retention time: `sec`, `min`, or `hr` |
+| `Eluted_compound` | — | Optional | No | Was the eluted compound the same as the original? Note if different (relevant for MS/biotransformation studies) |
+| `Eluted_compound_SMILES` | — | Optional | No | SMILES of the eluted compound if different from the original |
+| `Physicochemical_properties` | — | Optional | Yes (partial) | LogP, functional groups, etc.; BioXend will auto-extract where possible — select from drop-down |
+| `mMSI_file_source` | — | Optional | No | Source file for MSI (mass spectrometry imaging) fragment data, if applicable |
+
+### 3. Microbe/ Assay metadata files
+
+**3.1. ASSAY.tsv:** 
 `ASSAY.tsv` file gives description of the assay along with the microorganism, microbial community or microbial protein. For details please refer to the tutorial provided by ChEMBL on how to generate the [ASSAY.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/assay.tsv). 
 
 | Column | Required | Type | Description |
@@ -178,7 +196,7 @@ The CTAB is an sdf file (V2000 molfile format) storing the chemical strcuture of
 | ASSAY_CELL_TYPE | No | String | Cell type/compartment |
 | RIDX | Yes | String | Reference identifier |
 
-#### ASSAY_PARAM.tsv
+**3.2. ASSAY_PARAM.tsv:**  
 Assay parameters associated with `ASSAY.tsv` are mentioned within this optional file. For details please refer to the tutorial provided by ChEMBL on how to generate the [ASSAY_PARAM.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/supplementary-data-files/assay_param.tsv-adding-additional-assay-information.).
 
 | Column | Required | Type | Description |
