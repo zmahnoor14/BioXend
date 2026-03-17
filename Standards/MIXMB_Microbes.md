@@ -5,17 +5,13 @@
 This document identifies Minimum Information (MI) required to report microbial organisms involved in biotransformation of xenobiotics, ensuring comprehensive documentation of bacterial, and archaeal species/strains used in biotransformation studies and information on the assays.
 
 **Author:** Mahnoor Zulfiqar
-**Version:** 0.1.0  
-**Release Date:** March 16, 2026 (Draft)  
-**Status:** Draft Standard  
-**Part of:** MIX-MB Standard v0.1  
-**Replaces:** N/A  
-**Compatible with:** 
-- MIX-MB(X) v0.1.0
-- MIX-MB(B) v0.1.0
 
-**Alignment:** NCBI Taxonomy, MIxS, GSC Standards, ChEMBL, FAIR principles
-[Fix]
+**Part of:** MIX-MB Standard_main      
+**Compatible with:** 
+- MIX-MB(X) 
+- MIX-MB(B) 
+**Alignment:** NCBI Taxonomy, MIxS, ChEMBL, FAIR principles
+
 ---
 
 ## Table of Contents
@@ -63,32 +59,6 @@ MIX-MB(M) establishes minimum information standards for reporting microbial orga
 - **Reusable:** Complete provenance, cultivation, and experimental conditions
 
 This standard complements MIX-MB(X) for xenobiotics documentation.
-
-### 1.1 How is this document organised?
-
-- **Section 1** — Introduction to MIX-MB(M) for Microbes and how to use it.
-- **Section 2** — Bioschemas profiles: what metadata fields to use for microbial organisms and strains, with JSON examples (Taxon, BioSample, Study profiles).
-- **Section 3** — Ontologies and standards: which controlled vocabularies and identifiers to use (NCBI Taxonomy, MIxS, ENVO, PATO/OMP, GO/EC, ARO, BAO, Unit Ontology).Controlled vocabularies: standard terms for oxygen requirements, cell morphology, sample types, and growth phases.
-- **Section 4** — Growth and cultivation standards: how to document culture media, growth conditions, growth phases, and quality control.
-- **Section 5** — Data validation rules
-- **Section 6** — Data quality tiers
-- **Section 7** — How to use template
-
-
-### 1.2 Which sections are important for contributors?
-
-If you want to propose changes to the standard, focus on **Sections 2 and 3** (the metadata fields and ontologies), then follow the contribution process in [Versioning.md](Versioning.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Changes require a 7-day community review and 2 independent endorsements.
-
-### 1.3 Which sections are important for data submitters?
-
-If you are preparing data for submission, you need:
-- **Section 2.1** — required Taxon fields for the organism (NCBI TaxID, scientific name, rank)
-- **Section 2.2** — BioSample fields for strain-specific information (strain designation, culture collection numbers)
-- **Section 3.1** — NCBI Taxonomy requirements: TaxID, full lineage, and strain-level details
-- **Section 5** — how to document cultivation conditions (medium, temperature, atmosphere) and quality control
-- **Section 6.1** — how to populate the ChEMBL ASSAY.tsv format for microbial assays
-- **Section 8** — validation checklist before you submit
-- **[Template.xlsx](Templates/Template.xlsx)** — colour-coded submission template (green = mandatory, blue = recommended, yellow = optional), specifically the **Assay** sheet.
 
 ### 1.4 Identifiers and Cross-Referencing
 

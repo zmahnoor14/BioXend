@@ -3,18 +3,12 @@
 
 This document identifies Minimum Information (MI) required to report the biotransformation process between microorganisms and xenobiotic compounds. MIX-MB(B) bridges MIX-MB(X) (xenobiotics) and MIX-MB(M) (microbes) by defining standards for the experimental assays, measurements, and outcomes.
 
-**Author:** Mahnoor Zulfiqar
-**Version:** 0.1.0
-**Release Date:** February 16, 2026 (Draft)
-**Status:** Draft Standard  
-**Part of:** MIX-MB Standard v0.1  
-**Replaces:** N/A  
+**Author:** Mahnoor Zulfiqar 
+**Part of:** MIX-MB Standard_main  
 **Compatible with:** 
-- MIX-MB(X) v0.1.0
-- MIX-MB(M) v0.1.0
-
-**Breaking Changes:** N/A  
-**Alignment:** ChEMBL, BioAssay Ontology (BAO), STRENDA, MIAME, FAIR principles
+- MIX-MB(X) 
+- MIX-MB(M) 
+**Alignment:** ChEMBL, Bioschemas, BioAssay Ontology (BAO), FAIR principles
 
 ---
 
@@ -94,35 +88,6 @@ MIX-MB(X)              MIX-MB(B)              MIX-MB(M)
    Structure             Activity               Strain
 ```
 
-### 1.1 How is this document organised?
-
-- **Section 1** — Introduction to MIX-MB(B): scope, relationship to MIX-MB(X) and MIX-MB(M), and how to use this document.
-- **Section 2** — Bioschemas profiles: structured metadata for the experimental study, assay protocol, and activity datasets.
-- **Section 3** — Ontologies: BAO for assay classification, GO for biological processes and molecular functions, CHMO for analytical techniques, and reaction type classification.
-- **Section 4** — Assay design and experimental setup: how to classify assay types, document substrate and cell/enzyme preparation, reaction conditions, and sampling strategy.
-- **Section 5** — Analytical methods and detection: which LC-MS/MS acquisition parameters and data processing steps to report.
-- **Section 6** — Activity measurements and outcomes: how to record substrate depletion, product formation, transformation rates, dose-response, and time-course data.
-- **Section 7** — Product characterization: MSI metabolite identification confidence levels, structural elucidation, and transformation pathway documentation.
-- **Section 8** — Data formats: how to populate ChEMBL `ACTIVITY.tsv` and `ASSAY.tsv` submission files.
-- **Section 9** — Controls and validation: required experimental controls and analytical quality assurance criteria.
-- **Section 10** — Statistical analysis: minimum statistical reporting requirements.
-- **Section 11** — Data quality tiers: Gold / Silver / Bronze compliance levels.
-- **Section 12** — Example complete record: a fully annotated MIX-MB(B)-compliant biotransformation study.
-- **Section 13** — Integration with MIX-MB(X) and MIX-MB(M): complete data package structure and cross-referencing strategy.
-- **Section 14** — Software tools and resources: data acquisition, processing, and deposition tools.
-
-### 1.2 Which sections are important for contributors?
-
-If you want to propose changes to the standard, focus on **Sections 2 and 3** (the Bioschemas metadata fields and ontologies), then follow the contribution process in [Versioning.md](Versioning.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Changes require a 7-day community review and 2 independent endorsements.
-
-### 1.3 Which sections are important for data submitters?
-
-If you are preparing data for submission, you need:
-- **Section 4** — how to classify your assay type and document the experimental setup
-- **Section 6** — how to quantify and record biotransformation activity results
-- **Section 8** — how to populate `ACTIVITY.tsv` and `ASSAY.tsv` for ChEMBL submission
-- **Section 9** — minimum controls required for a valid submission
-- **[Template.xlsx](Templates/Template.xlsx)** — colour-coded submission template (green = mandatory, blue = recommended, yellow = optional), specifically the **Activity** and **Assay** sheets.
 
 ### 1.4 Identifiers and Cross-Referencing
 
