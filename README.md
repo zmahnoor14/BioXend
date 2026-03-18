@@ -7,7 +7,7 @@
 ![Contributors](https://img.shields.io/github/contributors/zmahnoor14/BioXend)
 
 # BioXend 
-BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. 
+BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. You can checkout the webpage for BioXend project here: https://zmahnoor14.github.io/BioXend/
 - WP1: is to develop minimum reporting standards based on community consensus
 - WP2: is to automate the metadata collection
 - WP3: is to develop a submission workflow to [ChEMBL](https://www.ebi.ac.uk/chembl/)

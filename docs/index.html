@@ -10,12 +10,13 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      /* BioXend teal + NFDI4Microbiota amber */
       --teal:       #0aabb5;
       --teal-dark:  #077a83;
       --teal-light: #14c4d0;
       --amber:      #F5A800;
       --amber-dark: #d48f00;
+      --orange:     #f97316;
+      --purple:     #8b5cf6;
       --bg:         #f7fafb;
       --surface:    #ffffff;
       --border:     #e2e8f0;
@@ -49,9 +50,9 @@
     .nav-inner {
       max-width: 1100px; margin: 0 auto;
       display: flex; align-items: center; justify-content: space-between;
-      height: 60px;
+      height: 90px;
     }
-    .nav-logo img { height: 36px; display: block; }
+    .nav-logo img { height: 80px; width: auto; display: block; }
     .nav-links { display: flex; gap: 1.6rem; list-style: none; align-items: center; }
     .nav-links a {
       color: var(--muted); text-decoration: none; font-size: .9rem;
@@ -118,12 +119,16 @@
       letter-spacing: -.03em; margin-bottom: 1rem;
     }
     .section-intro { color: var(--muted); max-width: 680px; font-size: 1.05rem; }
+    .sub-heading {
+      font-size: 1.15rem; font-weight: 700; letter-spacing: -.02em;
+      margin-bottom: 1.5rem; color: var(--text);
+    }
 
-    /* ── OVERVIEW CARDS ──────────────────────────── */
+    /* ── OVERVIEW / WP CARDS ─────────────────────── */
     #overview { background: var(--surface); }
     .overview-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1.5rem; margin-top: 3rem;
+      gap: 1.5rem; margin-top: 1.5rem;
     }
     .ov-card {
       border: 1px solid var(--border); border-radius: var(--radius);
@@ -145,7 +150,7 @@
     #standards { background: var(--bg); }
     .standards-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.75rem; margin-top: 3rem;
+      gap: 1.75rem; margin-top: 1.5rem;
     }
     .std-card {
       background: var(--surface); border: 1px solid var(--border);
@@ -156,16 +161,16 @@
       content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
     }
     .std-x::before { background: var(--teal-light); }
-    .std-m::before { background: var(--teal); }
-    .std-b::before { background: var(--amber); }
+    .std-m::before { background: var(--orange); }
+    .std-b::before { background: var(--purple); }
     .std-tag {
       display: inline-block; padding: .25rem .7rem;
       border-radius: 99px; font-size: .75rem; font-weight: 600;
       margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace;
     }
     .std-x .std-tag { background: #d0f5f7; color: var(--teal-dark); }
-    .std-m .std-tag { background: #c7f2f4; color: var(--teal-dark); }
-    .std-b .std-tag { background: #fef3cd; color: #92630a; }
+    .std-m .std-tag { background: #ffedd5; color: #c2410c; }
+    .std-b .std-tag { background: #ede9fe; color: #6d28d9; }
     .std-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .6rem; }
     .std-card p  { font-size: .9rem; color: var(--muted); margin-bottom: 1.2rem; }
     .std-fields { list-style: none; display: flex; flex-direction: column; gap: .35rem; }
@@ -176,95 +181,30 @@
       content: ''; width: 6px; height: 6px; border-radius: 50%;
       background: var(--teal); flex-shrink: 0;
     }
-    .std-b .std-fields li::before { background: var(--amber); }
+    .std-m .std-fields li::before { background: var(--orange); }
+    .std-b .std-fields li::before { background: var(--purple); }
+    .std-main::before { background: #0369a1; }
+    .std-card { cursor: default; }
+    .std-link {
+      display: inline-block; margin-top: 1.2rem;
+      font-size: .85rem; font-weight: 600; color: var(--teal);
+      text-decoration: none;
+    }
+    .std-link:hover { text-decoration: underline; }
     .field-code {
       font-family: 'JetBrains Mono', monospace;
       background: var(--code-bg); padding: .1rem .35rem;
       border-radius: 4px; font-size: .775rem; color: var(--teal-dark);
     }
 
-    /* ── WORKFLOW ────────────────────────────────── */
-    #workflow { background: var(--surface); }
-    .workflow-steps {
-      margin-top: 3rem; display: flex; flex-direction: column; gap: 0;
-      position: relative;
-    }
-    .workflow-steps::before {
-      content: ''; position: absolute; left: 23px; top: 16px;
-      bottom: 16px; width: 2px; background: var(--border);
-    }
-    .wf-step {
-      display: flex; gap: 1.5rem; align-items: flex-start;
-      background: var(--surface); padding: 1.2rem 1.4rem 1.2rem 0;
-      position: relative; z-index: 1;
-    }
-    .wf-num {
-      width: 48px; height: 48px; border-radius: 50%;
-      background: var(--teal); color: #fff;
-      display: flex; align-items: center; justify-content: center;
-      font-weight: 700; font-size: 1rem; flex-shrink: 0;
-      border: 3px solid var(--surface);
-    }
-    .wf-body h3 { font-size: 1rem; font-weight: 600; margin-bottom: .3rem; }
-    .wf-body p  { font-size: .875rem; color: var(--muted); }
-    .wf-body .lang-tag {
-      display: inline-block; font-family: 'JetBrains Mono', monospace;
-      font-size: .7rem; background: var(--code-bg); color: var(--muted);
-      padding: .1rem .45rem; border-radius: 4px; margin-left: .4rem;
-      font-weight: 500;
-    }
-    .io-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
-      margin-top: 2.5rem;
-    }
-    .io-box {
-      background: var(--bg); border: 1px solid var(--border);
-      border-radius: var(--radius); padding: 1.4rem;
-    }
-    .io-box h4 {
-      font-size: .8rem; font-weight: 600; text-transform: uppercase;
-      letter-spacing: .08em; color: var(--muted); margin-bottom: .8rem;
-    }
-    .io-box ul { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
-    .io-box li {
-      font-family: 'JetBrains Mono', monospace; font-size: .8rem;
-      color: var(--teal-dark); display: flex; align-items: center; gap: .5rem;
-    }
-    .io-box li::before { content: '›'; font-size: 1rem; color: var(--teal-light); }
-
-    /* ── GETTING STARTED ─────────────────────────── */
-    #started { background: var(--bg); }
-    .code-block {
-      background: #1e293b; border-radius: var(--radius);
-      padding: 1.5rem 1.75rem; margin-top: 1.2rem; overflow-x: auto;
-    }
-    .code-block pre {
-      font-family: 'JetBrains Mono', monospace; font-size: .83rem;
-      color: #e2e8f0; line-height: 1.8; white-space: pre;
-    }
-    .code-block .cmt { color: #64748b; }
-    .code-block .kw  { color: #67e8f9; }
-    .code-block .str { color: #86efac; }
-    .started-cols {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;
-    }
-    .started-step { margin-bottom: 2rem; }
-    .step-num {
-      font-family: 'JetBrains Mono', monospace; font-size: .75rem;
-      font-weight: 700; color: var(--teal); margin-bottom: .35rem;
-    }
-    .started-step h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
-    .started-step p  { font-size: .875rem; color: var(--muted); }
-
-    /* ── CONTRIBUTE ──────────────────────────────── */
-    #contribute { background: var(--surface); }
+    /* ── CONTRIBUTE (inside standards) ───────────── */
     .contribute-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1.5rem; margin-top: 3rem;
+      gap: 1.5rem; margin-top: 1.5rem;
     }
     .contrib-card {
       border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 1.6rem; background: var(--bg);
+      padding: 1.6rem; background: var(--surface);
       transition: box-shadow .2s;
     }
     .contrib-card:hover { box-shadow: var(--shadow-md); }
@@ -278,10 +218,35 @@
     .contrib-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
     .contrib-card p  { font-size: .875rem; color: var(--muted); margin-bottom: 1rem; }
     .contrib-card a {
-      font-size: .85rem; font-weight: 600; color: var(--teal);
-      text-decoration: none;
+      font-size: .85rem; font-weight: 600; color: var(--teal); text-decoration: none;
     }
     .contrib-card a:hover { text-decoration: underline; }
+
+    /* ── WORKFLOW — COMING SOON ───────────────────── */
+    #workflow { background: var(--surface); }
+    .coming-soon-box {
+      margin-top: 2.5rem;
+      border: 2px dashed var(--border); border-radius: var(--radius);
+      padding: 3rem 2rem; text-align: center;
+      background: var(--bg);
+    }
+    .coming-soon-badge {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+      font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+      background: #fef3cd; color: #92630a;
+      padding: .3rem .8rem; border-radius: 99px; margin-bottom: 1rem;
+    }
+    .coming-soon-box h3 {
+      font-size: 1.2rem; font-weight: 700; margin-bottom: .6rem;
+    }
+    .coming-soon-box p {
+      font-size: .95rem; color: var(--muted); max-width: 520px; margin: 0 auto 1.5rem;
+    }
+    .coming-soon-box a {
+      font-size: .875rem; font-weight: 600; color: var(--teal); text-decoration: none;
+    }
+    .coming-soon-box a:hover { text-decoration: underline; }
 
     /* ── TEAM ────────────────────────────────────── */
     #team { background: var(--bg); }
@@ -308,7 +273,6 @@
       font-family: 'JetBrains Mono', monospace;
     }
     .team-card a:hover { text-decoration: underline; }
-
     .funding-box {
       margin-top: 3rem; background: var(--surface);
       border: 1px solid var(--border); border-radius: var(--radius);
@@ -330,16 +294,21 @@
       display: flex; align-items: center; justify-content: space-between;
       flex-wrap: wrap; gap: 1.5rem;
     }
-    .footer-logo img { height: 30px; filter: brightness(0) invert(1); opacity: .7; }
+    .footer-logo img { height: 44px; border-radius: 6px; }
     .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
     .footer-links a { color: #94a3b8; text-decoration: none; font-size: .85rem; }
     .footer-links a:hover { color: #fff; }
     .footer-copy { font-size: .8rem; color: #64748b; }
 
+    /* ── DIVIDER ─────────────────────────────────── */
+    .section-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 3.5rem 0;
+    }
+
     /* ── RESPONSIVE ──────────────────────────────── */
     @media (max-width: 700px) {
       .nav-links { display: none; }
-      .io-grid, .started-cols { grid-template-columns: 1fr; }
       .hero { padding: 4rem 1.5rem 3.5rem; }
       .footer-inner { flex-direction: column; align-items: flex-start; }
     }
@@ -351,14 +320,14 @@
 <nav>
   <div class="nav-inner">
     <a class="nav-logo" href="#top">
-      <img src="assets/bioxend-logo.png" alt="BioXend" />
+      <img src="assets/logo_bioxend.png" alt="BioXend" />
     </a>
     <ul class="nav-links">
       <li><a href="#overview">Overview</a></li>
       <li><a href="#standards">Standards</a></li>
-      <li><a href="#workflow">Workflow</a></li>
-      <li><a href="#started">Get Started</a></li>
       <li><a href="#contribute">Contribute</a></li>
+      <li><a href="#workflow">Workflow</a></li>
+      <li><a href="#team">Team</a></li>
       <li><a href="https://github.com/zmahnoor14/BioXend" class="nav-cta">GitHub ↗</a></li>
     </ul>
   </div>
@@ -377,7 +346,7 @@
     xenobiotic metabolism research FAIR and reproducible.
   </p>
   <div class="hero-actions">
-    <a class="btn btn-white" href="#started">Get Started</a>
+    <a class="btn btn-white" href="#standards">View Standards</a>
     <a class="btn btn-amber" href="https://forms.gle/towuMVYYuqDi7pEJ7">Take the Survey</a>
     <a class="btn btn-ghost" href="https://github.com/zmahnoor14/BioXend">View on GitHub</a>
   </div>
@@ -394,13 +363,17 @@
 <section id="overview">
   <div class="container">
     <p class="section-label">What is BioXend?</p>
-    <h2 class="section-title">Four work packages, one unified framework</h2>
+    <h2 class="section-title">Four work packages/ components</h2>
     <p class="section-intro">
       Microbial biotransformation of xenobiotics — the process by which microorganisms
       chemically modify drugs, environmental contaminants, and other foreign compounds —
       is poorly represented in public databases due to a lack of reporting standards.
       BioXend fixes that.
     </p>
+
+    <hr class="section-divider" />
+
+    <p class="sub-heading">Work Packages</p>
     <div class="overview-grid">
       <div class="ov-card">
         <div class="ov-icon">WP1</div>
@@ -414,47 +387,57 @@
       </div>
       <div class="ov-card">
         <div class="ov-icon">WP3</div>
-        <h3>ChEMBL Submission</h3>
+        <h3>ChEMBL Submission Workflow</h3>
         <p>Nextflow DSL2 pipeline that generates six ChEMBL-ready submission files from simple tabular inputs — no manual formatting.</p>
       </div>
       <div class="ov-card">
         <div class="ov-icon">WP4</div>
-        <h3>NFDI4Microbiota Workflow</h3>
+        <h3>NFDI4Microbiota Integration</h3>
         <p>Release BioXend as part of the NFDI4Microbiota workflow ecosystem for broad community adoption and long-term maintenance.</p>
       </div>
     </div>
   </div>
 </section>
 
-<!-- STANDARDS -->
+<!-- STANDARDS + CONTRIBUTE -->
 <section id="standards">
   <div class="container">
+
+    <!-- Standards -->
     <p class="section-label">MIX-MB Standards</p>
     <h2 class="section-title">Minimum Information about Xenobiotics-Microbiome Biotransformation</h2>
     <p class="section-intro">
-      Three interconnected sub-standards — each independently versioned — define exactly
-      what metadata must be reported for reproducible and database-ready experiments.
-      All standards are Bioschemas-aligned and follow FAIR principles.
+      Three interconnected sub-standards define exactly what metadata must be reported for reproducible and database-ready experiments.
+      The standards are continuously undergoing updates and are versioned. We appreciate your feedback.
     </p>
+
     <div class="standards-grid">
+
+      <!-- Main standards doc card -->
+      <div class="std-card std-main" style="grid-column: 1 / -1;">
+        <span class="std-tag" style="background:#e0f2fe;color:#0369a1;">MIX-MB Overview</span>
+        <h3>Standards Main Document</h3>
+        <p>Top-level overview of all three sub-standards, version matrix, identifier scheme, ChEMBL field mappings, and FAIR alignment. Start here to understand the full MIX-MB framework.</p>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Standards_main.md" class="std-link">View MIX-MB Standards overview →</a>
+      </div>
 
       <div class="std-card std-x">
         <span class="std-tag">MIX-MB(X)</span>
         <h3>Xenobiotics / Chemicals</h3>
-        <p>Minimum metadata for the chemical substrate of biotransformation reactions — structure, identity, and classification.</p>
+        <p>Minimum metadata for the chemical substrate of biotransformation reactions: structure, identity, and classification.</p>
         <ul class="std-fields">
-          <li><span class="field-code">CIDX</span> Compound index identifier</li>
+          <li><span class="field-code">Comp_ID</span> Compound index identifier</li>
           <li><span class="field-code">SMILES</span> Valid canonical SMILES or InChIKey</li>
           <li><span class="field-code">COMPOUND_NAME</span> Preferred chemical name</li>
           <li><span class="field-code">ChEBI / ChEMBL ID</span> Cross-reference identifiers</li>
-          <li><span class="field-code">RIDX</span> Linked reference index</li>
         </ul>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Xenobiotics.md" class="std-link">View MIX-MB(X) standard →</a>
       </div>
 
       <div class="std-card std-m">
         <span class="std-tag">MIX-MB(M)</span>
         <h3>Microbes / Organisms</h3>
-        <p>Minimum metadata for the microbial agent — taxonomy, culture conditions, and sample provenance — aligned to Bioschemas Taxon profile.</p>
+        <p>Minimum metadata for the microbial agent: taxonomy, culture conditions, and sample provenance — aligned to Bioschemas Taxon profile.</p>
         <ul class="std-fields">
           <li><span class="field-code">NCBI TaxID</span> Primary taxonomy identifier</li>
           <li><span class="field-code">ASSAY_ORGANISM</span> Organism name (genus, species)</li>
@@ -462,188 +445,60 @@
           <li><span class="field-code">SAMPLE_TYPE</span> Bacterium, community, enzyme</li>
           <li><span class="field-code">ENA / BioSample ID</span> Sequencing data links</li>
         </ul>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Microbes.md" class="std-link">View MIX-MB(M) standard →</a>
       </div>
 
       <div class="std-card std-b">
         <span class="std-tag">MIX-MB(B)</span>
         <h3>Biotransformation / Assay</h3>
-        <p>Minimum metadata for the experimental assay — conditions, analytical methods, products, and activity measurements.</p>
+        <p>Minimum metadata for the experimental assay and activity: conditions, analytical methods, products, and activity measurements.</p>
         <ul class="std-fields">
-          <li><span class="field-code">AIDX</span> Assay index identifier</li>
+          <li><span class="field-code">Assay_ID</span> Assay index identifier</li>
           <li><span class="field-code">ASSAY_TYPE</span> bacteria / enzyme / community</li>
           <li><span class="field-code">ACTION_TYPE</span> Substrate / Product / No Activity</li>
           <li><span class="field-code">TEXT_VALUE</span> Measured activity value</li>
           <li><span class="field-code">ASSAY_DESCRIPTION</span> Free-text assay description</li>
         </ul>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Biotransformation.md" class="std-link">View MIX-MB(B) standard →</a>
       </div>
 
     </div>
 
-    <div style="margin-top:2.5rem; padding:1.4rem 1.75rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);">
-      <p style="font-size:.9rem; color:var(--muted);">
-        <strong style="color:var(--text);">Template color coding:</strong> &nbsp;
-        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;vertical-align:middle;margin-right:4px;"></span>Green = Mandatory &nbsp;
-        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2563eb;vertical-align:middle;margin-right:4px;"></span>Blue = Recommended &nbsp;
-        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ca8a04;vertical-align:middle;margin-right:4px;"></span>Yellow = Optional
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx" style="color:var(--teal);font-weight:600;text-decoration:none;">Download Template.xlsx ↓</a>
-      </p>
+    <!-- Template download — prominent -->
+    <div style="margin-top:2rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;">
+      <div style="background:var(--teal); padding:1rem 1.75rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <p style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.2rem;">Submission Template</p>
+          <p style="font-size:1rem;font-weight:700;color:#fff;">Template.xlsx — 5 sheets covering all three standards</p>
+        </div>
+        <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx"
+           style="background:#fff;color:var(--teal);font-weight:700;font-size:.875rem;padding:.55rem 1.3rem;border-radius:7px;text-decoration:none;white-space:nowrap;flex-shrink:0;">
+          Download Template.xlsx ↓
+        </a>
+      </div>
+      <div style="padding:1rem 1.75rem; display:flex; gap:2rem; flex-wrap:wrap;">
+        <div>
+          <p style="font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:.35rem;">5 template sheets</p>
+          <p style="font-size:.8rem;color:var(--muted);">Reference · Compound · Assay · Assay Parameters · Activity</p>
+        </div>
+        <div style="border-left:1px solid var(--border);padding-left:2rem;">
+          <p style="font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:.35rem;">Color coding</p>
+          <p style="font-size:.8rem;color:var(--muted);">
+            <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#16a34a;vertical-align:middle;margin-right:3px;"></span>Green = Mandatory &nbsp;
+            <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#2563eb;vertical-align:middle;margin-right:3px;"></span>Blue = Recommended &nbsp;
+            <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#ca8a04;vertical-align:middle;margin-right:3px;"></span>Yellow = Optional
+          </p>
+        </div>
+      </div>
     </div>
-  </div>
-</section>
 
-<!-- WORKFLOW -->
-<section id="workflow">
-  <div class="container">
-    <p class="section-label">Nextflow Pipeline</p>
-    <h2 class="section-title">From spreadsheet to ChEMBL in one command</h2>
+    <!-- Contribute to standards -->
+    <hr class="section-divider" id="contribute" />
+
+    <p class="section-label">Contribute</p>
+    <h2 class="section-title" style="font-size:clamp(1.3rem,3vw,1.9rem);">Help shape the standards</h2>
     <p class="section-intro">
-      The BioXend Nextflow DSL2 pipeline reads two tabular input files and produces
-      six ChEMBL-ready submission files automatically.
-    </p>
-
-    <div class="io-grid" style="margin-bottom:2.5rem;">
-      <div class="io-box">
-        <h4>Inputs</h4>
-        <ul>
-          <li>smiles_list.txt &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">SMILES, Names, Study_ID</span></li>
-          <li>strain_cond.csv &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">strain, species, O2 condition</span></li>
-          <li>Reference parameters &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">DOI, title, authors</span></li>
-        </ul>
-      </div>
-      <div class="io-box">
-        <h4>Outputs (results/)</h4>
-        <ul>
-          <li>REFERENCE.tsv</li>
-          <li>COMPOUND_RECORD.tsv</li>
-          <li>COMPOUND_CTAB.sdf</li>
-          <li>ASSAY.tsv &amp; ASSAY_PARAM.tsv</li>
-          <li>ACTIVITY.tsv</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="workflow-steps">
-      <div class="wf-step">
-        <div class="wf-num">1</div>
-        <div class="wf-body">
-          <h3>GENERATE_REFERENCE <span class="lang-tag">R</span></h3>
-          <p>Creates <code>REFERENCE.tsv</code> from DOI, title, authors, and year parameters.</p>
-        </div>
-      </div>
-      <div class="wf-step">
-        <div class="wf-num">2</div>
-        <div class="wf-body">
-          <h3>GENERATE_COMPOUNDS <span class="lang-tag">Python + RDKit</span></h3>
-          <p>Validates SMILES structures, queries ChEMBL API, and generates <code>COMPOUND_RECORD.tsv</code> and <code>COMPOUND_CTAB.sdf</code>.</p>
-        </div>
-      </div>
-      <div class="wf-step">
-        <div class="wf-num">3</div>
-        <div class="wf-body">
-          <h3>GENERATE_ASSAY <span class="lang-tag">R</span></h3>
-          <p>Builds one assay entry per strain/condition row in <code>strain_cond.csv</code>, outputting <code>ASSAY.tsv</code> and <code>ASSAY_PARAM.tsv</code>.</p>
-        </div>
-      </div>
-      <div class="wf-step">
-        <div class="wf-num">4</div>
-        <div class="wf-body">
-          <h3>GENERATE_ACTIVITY <span class="lang-tag">R</span></h3>
-          <p>Links compound CIDXs to assay AIDXs and constructs the <code>ACTIVITY.tsv</code> table with action types and measured values.</p>
-        </div>
-      </div>
-      <div class="wf-step">
-        <div class="wf-num">5</div>
-        <div class="wf-body">
-          <h3>VALIDATE_SUBMISSION</h3>
-          <p>Checks all six output files were generated and conform to ChEMBL submission requirements before deposition.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- GETTING STARTED -->
-<section id="started">
-  <div class="container">
-    <p class="section-label">Quick Start</p>
-    <h2 class="section-title">Start using BioXend</h2>
-    <p class="section-intro">
-      Choose the path that fits your workflow — download the template to prepare your data,
-      or run the full Nextflow pipeline to generate ChEMBL submission files automatically.
-    </p>
-
-    <div class="started-cols">
-      <div>
-        <div class="started-step">
-          <div class="step-num">STEP 01</div>
-          <h3>Clone the repository</h3>
-          <p>Get the latest version of BioXend from GitHub.</p>
-        </div>
-        <div class="code-block">
-          <pre><span class="cmt"># Clone BioXend</span>
-<span class="kw">git clone</span> https://github.com/zmahnoor14/BioXend.git
-<span class="kw">cd</span> BioXend</pre>
-        </div>
-
-        <div class="started-step" style="margin-top:2rem;">
-          <div class="step-num">STEP 02</div>
-          <h3>Set up environments</h3>
-          <p>Create the Conda environments for Python and R dependencies.</p>
-        </div>
-        <div class="code-block">
-          <pre><span class="cmt"># Python env (RDKit, pandas, requests)</span>
-<span class="kw">conda env create</span> -f envs/py_env.yml
-
-<span class="cmt"># R env (tidyverse, optparse)</span>
-<span class="kw">conda env create</span> -f envs/r_env.yml</pre>
-        </div>
-      </div>
-
-      <div>
-        <div class="started-step">
-          <div class="step-num">STEP 03</div>
-          <h3>Run the pipeline</h3>
-          <p>Execute the full Nextflow workflow with your input data.</p>
-        </div>
-        <div class="code-block">
-          <pre><span class="kw">nextflow run</span> main.nf \
-  --input_csv bin/smiles_list.txt \
-  --strain_cond bin/strain_cond.csv \
-  --outdir results \
-  --doi <span class="str">"10.1000/example"</span> \
-  --title <span class="str">"Study Title"</span> \
-  --authors <span class="str">"Last, First"</span> \
-  --year <span class="str">2025</span></pre>
-        </div>
-
-        <div class="started-step" style="margin-top:2rem;">
-          <div class="step-num">FOR DATA SUBMITTERS</div>
-          <h3>Use the Excel template</h3>
-          <p>Not running the pipeline? Download the template, fill in your data, and provide feedback.</p>
-        </div>
-        <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem;">
-          <a class="btn" style="background:var(--teal);color:#fff;font-size:.875rem;padding:.55rem 1.2rem;"
-             href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx">
-            Download Template.xlsx
-          </a>
-          <a class="btn" style="border:1px solid var(--border);color:var(--text);font-size:.875rem;padding:.55rem 1.2rem;"
-             href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Standards_main.md">
-            Read the Standards
-          </a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CONTRIBUTE -->
-<section id="contribute">
-  <div class="container">
-    <p class="section-label">Community</p>
-    <h2 class="section-title">Help shape the standards</h2>
-    <p class="section-intro">
-      MIX-MB is community-driven. Your expertise in microbiology, cheminformatics, or data science
+      MIX-MB is community-driven. Your expertise in microbiology, metabolomics, cheminformatics, or data science
       directly shapes what gets standardized. Every form of participation counts.
     </p>
     <div class="contribute-grid">
@@ -684,6 +539,29 @@
         <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIX-MB_Survey_Analysis.ipynb">Browse Analysis →</a>
       </div>
     </div>
+
+  </div>
+</section>
+
+<!-- WORKFLOW — COMING SOON -->
+<section id="workflow">
+  <div class="container">
+    <p class="section-label">Nextflow Pipeline</p>
+    <h2 class="section-title">Automated ChEMBL Submission Workflow</h2>
+    <p class="section-intro">
+      BioXend will provide a Nextflow DSL2 pipeline to generate ChEMBL-ready submission
+      files directly from tabular inputs — no manual formatting required.
+    </p>
+
+    <div class="coming-soon-box">
+      <div class="coming-soon-badge">Under Construction</div>
+      <h3>Nextflow workflow coming soon</h3>
+      <p>
+        The automated submission pipeline is currently in active development as part of WP3.
+        Follow the repository to be notified when it is released.
+      </p>
+      <a href="https://github.com/zmahnoor14/BioXend">Watch the repository on GitHub →</a>
+    </div>
   </div>
 </section>
 
@@ -704,6 +582,18 @@
         <h3>Eleonora Mastrorilli</h3>
         <p class="role">Maintainer · EMBL, Molecular Systems Biology Unit</p>
         <a href="https://orcid.org/0000-0003-2127-4150">ORCID: 0000-0003-2127-4150 ↗</a>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background:var(--teal-dark);font-size:.7rem;">ZG</div>
+        <h3>Zimmermann Group</h3>
+        <p class="role">Host Lab · EMBL, Molecular Systems Biology Unit</p>
+        <a href="https://www.embl.org/groups/zimmermann/">embl.org/groups/zimmermann ↗</a>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar" style="background:var(--purple);font-size:.7rem;">CBG</div>
+        <h3>Chemical Biology Group</h3>
+        <p class="role">Collaborator · European Bioinformatics Institute (EBI)</p>
+        <a href="https://www.ebi.ac.uk/about/teams/chemical-biology-services/">ebi.ac.uk/about/teams/chemical-biology-services/ ↗</a>
       </div>
     </div>
 
