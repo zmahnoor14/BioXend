@@ -17,9 +17,6 @@ This document identifies the Minimum Information (MI) required to report xenobio
 ## Table of Contents
 
 - [1. Overview](#1-overview)
-  - [1.1 How is this document organised?](#11-how-is-this-document-organised)
-  - [1.2 Which sections are important for contributors?](#12-which-sections-are-important-for-contributors)
-  - [1.3 Which sections are important for data submitters?](#13-which-sections-are-important-for-data-submitters)
   - [1.4 Identifiers and Cross-Referencing](#14-identifiers-and-cross-referencing)
 - [2. Bioschemas](#2-bioschemas)
   - [2.1 Xenobiotics — ChemicalSubstance Profile with Concentration](#21-xenobiotics----chemicalsubstance-profile-with-concentration)
@@ -47,7 +44,6 @@ MIX-MB(X) establishes minimum information standards for reporting microbial biot
 - **Accessible:** Standardized formats for submission to public repositories
 - **Interoperable:** Uses community ontologies and controlled vocabularies
 - **Reusable:** Provenance and methodology information
-- 
 
 
 ### 1.4 Identifiers and Cross-Referencing
@@ -91,23 +87,6 @@ For biotransformation products that cannot be fully identified at the time of su
 - `[RIDX]` is the reference index for the study (e.g. `GutMeta`)
 - `[n]` is a sequential integer within the study
 - Once an unknown compound is formally identified, replace its `UNKNOWN_` CIDX with a standard CIDX and update all linked `ACTIVITY.tsv` rows accordingly
-
-#### sameAs Linking Policy
-
-Use the `sameAs` property to assert equivalence between a compound in your submission and the same compound in an external database. This is **required** for Gold-tier submissions and **strongly recommended** for Silver.
-
-| Database | URL pattern | Example |
-|----------|-----------|---------|
-| ChEMBL | `https://www.ebi.ac.uk/chembl/compound_report_card/{ID}/` | `https://www.ebi.ac.uk/chembl/compound_report_card/CHEMBL1201246/` |
-| PubChem | `https://pubchem.ncbi.nlm.nih.gov/compound/{CID}` | `https://pubchem.ncbi.nlm.nih.gov/compound/4583` |
-| ChEBI | `https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:{n}` | `https://www.ebi.ac.uk/chebi/searchId.do?chebiId=CHEBI:3686` |
-| Wikidata | `https://www.wikidata.org/wiki/{QID}` | `https://www.wikidata.org/wiki/Q412690` |
-
-**Rules:**
-- Include at least one `sameAs` URL for every known compound
-- For unknowns (`UNKNOWN_` / `PUTATIVE_` CIDXs), omit `sameAs` — do not add speculative links
-- When a compound exists in multiple databases, list all confirmed `sameAs` URLs
-- If a database entry is merged or deprecated, update `sameAs` to the canonical replacement URL
 
 ---
 
