@@ -183,6 +183,14 @@
     }
     .std-m .std-fields li::before { background: var(--orange); }
     .std-b .std-fields li::before { background: var(--purple); }
+    .std-main::before { background: #0369a1; }
+    .std-card { cursor: default; }
+    .std-link {
+      display: inline-block; margin-top: 1.2rem;
+      font-size: .85rem; font-weight: 600; color: var(--teal);
+      text-decoration: none;
+    }
+    .std-link:hover { text-decoration: underline; }
     .field-code {
       font-family: 'JetBrains Mono', monospace;
       background: var(--code-bg); padding: .1rem .35rem;
@@ -399,30 +407,37 @@
     <p class="section-label">MIX-MB Standards</p>
     <h2 class="section-title">Minimum Information about Xenobiotics-Microbiome Biotransformation</h2>
     <p class="section-intro">
-      Three interconnected sub-standards — each independently versioned — define exactly
-      what metadata must be reported for reproducible and database-ready experiments.
-      All standards are Bioschemas-aligned and follow FAIR principles.
+      Three interconnected sub-standards define exactly what metadata must be reported for reproducible and database-ready experiments.
+      The standards are continuously undergoing updates and are versioned. We appreciate your feedback.
     </p>
 
     <div class="standards-grid">
 
+      <!-- Main standards doc card -->
+      <div class="std-card std-main" style="grid-column: 1 / -1;">
+        <span class="std-tag" style="background:#e0f2fe;color:#0369a1;">MIX-MB Overview</span>
+        <h3>Standards Main Document</h3>
+        <p>Top-level overview of all three sub-standards, version matrix, identifier scheme, ChEMBL field mappings, and FAIR alignment. Start here to understand the full MIX-MB framework.</p>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Standards_main.md" class="std-link">View MIX-MB Standards overview →</a>
+      </div>
+
       <div class="std-card std-x">
         <span class="std-tag">MIX-MB(X)</span>
         <h3>Xenobiotics / Chemicals</h3>
-        <p>Minimum metadata for the chemical substrate of biotransformation reactions — structure, identity, and classification.</p>
+        <p>Minimum metadata for the chemical substrate of biotransformation reactions: structure, identity, and classification.</p>
         <ul class="std-fields">
-          <li><span class="field-code">CIDX</span> Compound index identifier</li>
+          <li><span class="field-code">Comp_ID</span> Compound index identifier</li>
           <li><span class="field-code">SMILES</span> Valid canonical SMILES or InChIKey</li>
           <li><span class="field-code">COMPOUND_NAME</span> Preferred chemical name</li>
           <li><span class="field-code">ChEBI / ChEMBL ID</span> Cross-reference identifiers</li>
-          <li><span class="field-code">RIDX</span> Linked reference index</li>
         </ul>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Xenobiotics.md" class="std-link">View MIX-MB(X) standard →</a>
       </div>
 
       <div class="std-card std-m">
         <span class="std-tag">MIX-MB(M)</span>
         <h3>Microbes / Organisms</h3>
-        <p>Minimum metadata for the microbial agent — taxonomy, culture conditions, and sample provenance — aligned to Bioschemas Taxon profile.</p>
+        <p>Minimum metadata for the microbial agent: taxonomy, culture conditions, and sample provenance — aligned to Bioschemas Taxon profile.</p>
         <ul class="std-fields">
           <li><span class="field-code">NCBI TaxID</span> Primary taxonomy identifier</li>
           <li><span class="field-code">ASSAY_ORGANISM</span> Organism name (genus, species)</li>
@@ -430,32 +445,51 @@
           <li><span class="field-code">SAMPLE_TYPE</span> Bacterium, community, enzyme</li>
           <li><span class="field-code">ENA / BioSample ID</span> Sequencing data links</li>
         </ul>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Microbes.md" class="std-link">View MIX-MB(M) standard →</a>
       </div>
 
       <div class="std-card std-b">
         <span class="std-tag">MIX-MB(B)</span>
         <h3>Biotransformation / Assay</h3>
-        <p>Minimum metadata for the experimental assay — conditions, analytical methods, products, and activity measurements.</p>
+        <p>Minimum metadata for the experimental assay and activity: conditions, analytical methods, products, and activity measurements.</p>
         <ul class="std-fields">
-          <li><span class="field-code">AIDX</span> Assay index identifier</li>
+          <li><span class="field-code">Assay_ID</span> Assay index identifier</li>
           <li><span class="field-code">ASSAY_TYPE</span> bacteria / enzyme / community</li>
           <li><span class="field-code">ACTION_TYPE</span> Substrate / Product / No Activity</li>
           <li><span class="field-code">TEXT_VALUE</span> Measured activity value</li>
           <li><span class="field-code">ASSAY_DESCRIPTION</span> Free-text assay description</li>
         </ul>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Biotransformation.md" class="std-link">View MIX-MB(B) standard →</a>
       </div>
 
     </div>
 
-    <div style="margin-top:2rem; padding:1.4rem 1.75rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);">
-      <p style="font-size:.9rem; color:var(--muted);">
-        <strong style="color:var(--text);">Template color coding:</strong> &nbsp;
-        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;vertical-align:middle;margin-right:4px;"></span>Green = Mandatory &nbsp;
-        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2563eb;vertical-align:middle;margin-right:4px;"></span>Blue = Recommended &nbsp;
-        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ca8a04;vertical-align:middle;margin-right:4px;"></span>Yellow = Optional
-        &nbsp;&nbsp;|&nbsp;&nbsp;
-        <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx" style="color:var(--teal);font-weight:600;text-decoration:none;">Download Template.xlsx ↓</a>
-      </p>
+    <!-- Template download — prominent -->
+    <div style="margin-top:2rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden;">
+      <div style="background:var(--teal); padding:1rem 1.75rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
+        <div>
+          <p style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.2rem;">Submission Template</p>
+          <p style="font-size:1rem;font-weight:700;color:#fff;">Template.xlsx — 5 sheets covering all three standards</p>
+        </div>
+        <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx"
+           style="background:#fff;color:var(--teal);font-weight:700;font-size:.875rem;padding:.55rem 1.3rem;border-radius:7px;text-decoration:none;white-space:nowrap;flex-shrink:0;">
+          Download Template.xlsx ↓
+        </a>
+      </div>
+      <div style="padding:1rem 1.75rem; display:flex; gap:2rem; flex-wrap:wrap;">
+        <div>
+          <p style="font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:.35rem;">5 template sheets</p>
+          <p style="font-size:.8rem;color:var(--muted);">Reference · Compound · Assay · Assay Parameters · Activity</p>
+        </div>
+        <div style="border-left:1px solid var(--border);padding-left:2rem;">
+          <p style="font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:.35rem;">Color coding</p>
+          <p style="font-size:.8rem;color:var(--muted);">
+            <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#16a34a;vertical-align:middle;margin-right:3px;"></span>Green = Mandatory &nbsp;
+            <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#2563eb;vertical-align:middle;margin-right:3px;"></span>Blue = Recommended &nbsp;
+            <span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#ca8a04;vertical-align:middle;margin-right:3px;"></span>Yellow = Optional
+          </p>
+        </div>
+      </div>
     </div>
 
     <!-- Contribute to standards -->
