@@ -10,23 +10,24 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
     :root {
-      --teal:      #0d7377;
-      --teal-dark: #0a5c5f;
-      --teal-light:#14a085;
-      --accent:    #e8003d;
-      --bg:        #f8fafb;
-      --surface:   #ffffff;
-      --border:    #e2e8f0;
-      --text:      #1a202c;
-      --muted:     #64748b;
-      --code-bg:   #f1f5f9;
-      --radius:    10px;
-      --shadow:    0 2px 12px rgba(0,0,0,.06);
-      --shadow-md: 0 4px 24px rgba(0,0,0,.10);
+      /* BioXend teal + NFDI4Microbiota amber */
+      --teal:       #0aabb5;
+      --teal-dark:  #077a83;
+      --teal-light: #14c4d0;
+      --amber:      #F5A800;
+      --amber-dark: #d48f00;
+      --bg:         #f7fafb;
+      --surface:    #ffffff;
+      --border:     #e2e8f0;
+      --text:       #111827;
+      --muted:      #64748b;
+      --code-bg:    #f1f5f9;
+      --radius:     10px;
+      --shadow:     0 2px 12px rgba(0,0,0,.06);
+      --shadow-md:  0 4px 24px rgba(0,0,0,.10);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     html { scroll-behavior: smooth; }
 
     body {
@@ -40,7 +41,7 @@
     /* ── NAV ─────────────────────────────────────── */
     nav {
       position: sticky; top: 0; z-index: 100;
-      background: rgba(255,255,255,.95);
+      background: rgba(255,255,255,.96);
       backdrop-filter: blur(8px);
       border-bottom: 1px solid var(--border);
       padding: 0 2rem;
@@ -50,11 +51,8 @@
       display: flex; align-items: center; justify-content: space-between;
       height: 60px;
     }
-    .nav-logo {
-      font-size: 1.2rem; font-weight: 700; color: var(--teal);
-      text-decoration: none; letter-spacing: -.02em;
-    }
-    .nav-links { display: flex; gap: 1.6rem; list-style: none; }
+    .nav-logo img { height: 36px; display: block; }
+    .nav-links { display: flex; gap: 1.6rem; list-style: none; align-items: center; }
     .nav-links a {
       color: var(--muted); text-decoration: none; font-size: .9rem;
       font-weight: 500; transition: color .2s;
@@ -69,24 +67,28 @@
 
     /* ── HERO ────────────────────────────────────── */
     .hero {
-      background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 50%, var(--teal-light) 100%);
+      background: linear-gradient(140deg, var(--teal-dark) 0%, var(--teal) 55%, #0ecad6 100%);
       color: #fff; padding: 6rem 2rem 5rem;
       text-align: center;
     }
     .hero-badge {
-      display: inline-flex; align-items: center; gap: .4rem;
+      display: inline-flex; align-items: center; gap: .5rem;
       background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
-      border-radius: 99px; padding: .3rem .85rem;
-      font-size: .8rem; font-weight: 500; letter-spacing: .04em;
+      border-radius: 99px; padding: .3rem .9rem;
+      font-size: .78rem; font-weight: 600; letter-spacing: .05em;
       text-transform: uppercase; margin-bottom: 1.5rem;
+    }
+    .hero-badge-dot {
+      width: 7px; height: 7px; border-radius: 50%;
+      background: var(--amber); flex-shrink: 0;
     }
     .hero h1 {
       font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 700;
       letter-spacing: -.04em; line-height: 1.1; margin-bottom: .75rem;
     }
-    .hero h1 span { color: rgba(255,255,255,.7); font-weight: 300; }
+    .hero h1 span { color: rgba(255,255,255,.72); font-weight: 300; }
     .hero-sub {
-      font-size: 1.15rem; max-width: 640px; margin: 0 auto 2.5rem;
+      font-size: 1.1rem; max-width: 640px; margin: 0 auto 2.5rem;
       color: rgba(255,255,255,.85); font-weight: 300;
     }
     .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
@@ -98,6 +100,7 @@
     }
     .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.2); }
     .btn-white  { background: #fff; color: var(--teal); }
+    .btn-amber  { background: var(--amber); color: #111; }
     .btn-ghost  { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.4); }
     .hero-badges { margin-top: 3rem; display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
     .hero-badges img { height: 22px; border-radius: 3px; }
@@ -132,7 +135,8 @@
       width: 44px; height: 44px; border-radius: 10px;
       background: var(--teal); color: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem; margin-bottom: 1rem;
+      font-size: .75rem; font-weight: 700; letter-spacing: .01em;
+      margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace;
     }
     .ov-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
     .ov-card p  { font-size: .875rem; color: var(--muted); line-height: 1.6; }
@@ -149,20 +153,19 @@
       box-shadow: var(--shadow); position: relative; overflow: hidden;
     }
     .std-card::before {
-      content: ''; position: absolute; top: 0; left: 0; right: 0;
-      height: 4px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px;
     }
-    .std-x::before { background: #3b82f6; }
+    .std-x::before { background: var(--teal-light); }
     .std-m::before { background: var(--teal); }
-    .std-b::before { background: #8b5cf6; }
+    .std-b::before { background: var(--amber); }
     .std-tag {
       display: inline-block; padding: .25rem .7rem;
       border-radius: 99px; font-size: .75rem; font-weight: 600;
       margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace;
     }
-    .std-x .std-tag { background: #dbeafe; color: #1d4ed8; }
-    .std-m .std-tag { background: #ccfbf1; color: #0d7377; }
-    .std-b .std-tag { background: #ede9fe; color: #6d28d9; }
+    .std-x .std-tag { background: #d0f5f7; color: var(--teal-dark); }
+    .std-m .std-tag { background: #c7f2f4; color: var(--teal-dark); }
+    .std-b .std-tag { background: #fef3cd; color: #92630a; }
     .std-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .6rem; }
     .std-card p  { font-size: .9rem; color: var(--muted); margin-bottom: 1.2rem; }
     .std-fields { list-style: none; display: flex; flex-direction: column; gap: .35rem; }
@@ -173,6 +176,7 @@
       content: ''; width: 6px; height: 6px; border-radius: 50%;
       background: var(--teal); flex-shrink: 0;
     }
+    .std-b .std-fields li::before { background: var(--amber); }
     .field-code {
       font-family: 'JetBrains Mono', monospace;
       background: var(--code-bg); padding: .1rem .35rem;
@@ -239,7 +243,7 @@
       color: #e2e8f0; line-height: 1.8; white-space: pre;
     }
     .code-block .cmt { color: #64748b; }
-    .code-block .kw  { color: #7dd3fc; }
+    .code-block .kw  { color: #67e8f9; }
     .code-block .str { color: #86efac; }
     .started-cols {
       display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;
@@ -264,7 +268,13 @@
       transition: box-shadow .2s;
     }
     .contrib-card:hover { box-shadow: var(--shadow-md); }
-    .contrib-icon { font-size: 1.6rem; margin-bottom: .75rem; }
+    .contrib-label {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace; font-size: .7rem;
+      font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+      color: var(--teal); background: #d0f5f7;
+      padding: .2rem .55rem; border-radius: 4px; margin-bottom: .75rem;
+    }
     .contrib-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
     .contrib-card p  { font-size: .875rem; color: var(--muted); margin-bottom: 1rem; }
     .contrib-card a {
@@ -288,7 +298,8 @@
       width: 52px; height: 52px; border-radius: 50%;
       background: var(--teal); color: #fff;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem;
+      font-size: .9rem; font-weight: 700; margin-bottom: 1rem;
+      font-family: 'JetBrains Mono', monospace;
     }
     .team-card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: .2rem; }
     .team-card .role { font-size: .85rem; color: var(--muted); margin-bottom: .75rem; }
@@ -297,35 +308,40 @@
       font-family: 'JetBrains Mono', monospace;
     }
     .team-card a:hover { text-decoration: underline; }
+
     .funding-box {
       margin-top: 3rem; background: var(--surface);
       border: 1px solid var(--border); border-radius: var(--radius);
-      padding: 1.6rem 2rem; display: flex; align-items: center; gap: 1rem;
-      flex-wrap: wrap;
+      padding: 1.75rem 2rem;
+      display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;
     }
-    .funding-box .fund-label {
-      font-size: .8rem; text-transform: uppercase; letter-spacing: .08em;
-      font-weight: 600; color: var(--muted); flex-shrink: 0;
-    }
-    .funding-box p { font-size: .9rem; color: var(--text); }
+    .funding-box img { height: 52px; flex-shrink: 0; }
+    .funding-box p { font-size: .9rem; color: var(--text); flex: 1; min-width: 200px; }
     .funding-box a { color: var(--teal); text-decoration: none; font-weight: 500; }
     .funding-box a:hover { text-decoration: underline; }
 
     /* ── FOOTER ──────────────────────────────────── */
     footer {
       background: #0f172a; color: #94a3b8;
-      padding: 2.5rem 2rem; text-align: center;
+      padding: 2.5rem 2rem;
     }
-    footer .foot-logo { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: .5rem; }
-    footer p { font-size: .85rem; }
-    footer a { color: #7dd3fc; text-decoration: none; }
-    footer a:hover { text-decoration: underline; }
+    .footer-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 1.5rem;
+    }
+    .footer-logo img { height: 30px; filter: brightness(0) invert(1); opacity: .7; }
+    .footer-links { display: flex; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-links a { color: #94a3b8; text-decoration: none; font-size: .85rem; }
+    .footer-links a:hover { color: #fff; }
+    .footer-copy { font-size: .8rem; color: #64748b; }
 
     /* ── RESPONSIVE ──────────────────────────────── */
     @media (max-width: 700px) {
       .nav-links { display: none; }
       .io-grid, .started-cols { grid-template-columns: 1fr; }
       .hero { padding: 4rem 1.5rem 3.5rem; }
+      .footer-inner { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -334,7 +350,9 @@
 <!-- NAV -->
 <nav>
   <div class="nav-inner">
-    <a class="nav-logo" href="#top">BioXend</a>
+    <a class="nav-logo" href="#top">
+      <img src="assets/bioxend-logo.png" alt="BioXend" />
+    </a>
     <ul class="nav-links">
       <li><a href="#overview">Overview</a></li>
       <li><a href="#standards">Standards</a></li>
@@ -349,7 +367,8 @@
 <!-- HERO -->
 <header class="hero" id="top">
   <div class="hero-badge">
-    ⚗️ &nbsp;NFDI4Microbiota FlexFund 2026
+    <span class="hero-badge-dot"></span>
+    NFDI4Microbiota FlexFund 2026
   </div>
   <h1>BioXend<br><span>Microbial Biotransformation of Xenobiotics</span></h1>
   <p class="hero-sub">
@@ -359,8 +378,8 @@
   </p>
   <div class="hero-actions">
     <a class="btn btn-white" href="#started">Get Started</a>
+    <a class="btn btn-amber" href="https://forms.gle/towuMVYYuqDi7pEJ7">Take the Survey</a>
     <a class="btn btn-ghost" href="https://github.com/zmahnoor14/BioXend">View on GitHub</a>
-    <a class="btn btn-ghost" href="https://forms.gle/towuMVYYuqDi7pEJ7">Take the Survey</a>
   </div>
   <div class="hero-badges">
     <img src="https://img.shields.io/github/v/tag/zmahnoor14/BioXend?style=flat&label=version" alt="version" />
@@ -384,23 +403,23 @@
     </p>
     <div class="overview-grid">
       <div class="ov-card">
-        <div class="ov-icon">📋</div>
-        <h3>WP1 — Minimum Standards</h3>
+        <div class="ov-icon">WP1</div>
+        <h3>Minimum Standards</h3>
         <p>Develop community-consensus minimum reporting standards (MIX-MB) covering chemicals, microbes, and biotransformation assays.</p>
       </div>
       <div class="ov-card">
-        <div class="ov-icon">⚙️</div>
-        <h3>WP2 — Metadata Automation</h3>
+        <div class="ov-icon">WP2</div>
+        <h3>Metadata Automation</h3>
         <p>Automate metadata collection from user inputs, external APIs (ChEMBL, NCBI Taxonomy), and Bioschemas-aligned identifiers.</p>
       </div>
       <div class="ov-card">
-        <div class="ov-icon">🗃️</div>
-        <h3>WP3 — ChEMBL Submission</h3>
+        <div class="ov-icon">WP3</div>
+        <h3>ChEMBL Submission</h3>
         <p>Nextflow DSL2 pipeline that generates six ChEMBL-ready submission files from simple tabular inputs — no manual formatting.</p>
       </div>
       <div class="ov-card">
-        <div class="ov-icon">🌐</div>
-        <h3>WP4 — NFDI4Microbiota Workflow</h3>
+        <div class="ov-icon">WP4</div>
+        <h3>NFDI4Microbiota Workflow</h3>
         <p>Release BioXend as part of the NFDI4Microbiota workflow ecosystem for broad community adoption and long-term maintenance.</p>
       </div>
     </div>
@@ -440,7 +459,7 @@
           <li><span class="field-code">NCBI TaxID</span> Primary taxonomy identifier</li>
           <li><span class="field-code">ASSAY_ORGANISM</span> Organism name (genus, species)</li>
           <li><span class="field-code">O2_CONDITION</span> Oxygen requirement (controlled vocab)</li>
-          <li><span class="field-code">SAMPLE_TYPE</span> Bacterium, community, enzyme…</li>
+          <li><span class="field-code">SAMPLE_TYPE</span> Bacterium, community, enzyme</li>
           <li><span class="field-code">ENA / BioSample ID</span> Sequencing data links</li>
         </ul>
       </div>
@@ -452,7 +471,7 @@
         <ul class="std-fields">
           <li><span class="field-code">AIDX</span> Assay index identifier</li>
           <li><span class="field-code">ASSAY_TYPE</span> bacteria / enzyme / community</li>
-          <li><span class="field-code">ACTION_TYPE</span> Substrate / Product / No Activity…</li>
+          <li><span class="field-code">ACTION_TYPE</span> Substrate / Product / No Activity</li>
           <li><span class="field-code">TEXT_VALUE</span> Measured activity value</li>
           <li><span class="field-code">ASSAY_DESCRIPTION</span> Free-text assay description</li>
         </ul>
@@ -460,13 +479,14 @@
 
     </div>
 
-    <div style="margin-top:2.5rem; padding:1.5rem 1.75rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);">
-      <p style="font-size:.925rem; color:var(--muted);">
+    <div style="margin-top:2.5rem; padding:1.4rem 1.75rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);">
+      <p style="font-size:.9rem; color:var(--muted);">
         <strong style="color:var(--text);">Template color coding:</strong> &nbsp;
         <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;vertical-align:middle;margin-right:4px;"></span>Green = Mandatory &nbsp;
         <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2563eb;vertical-align:middle;margin-right:4px;"></span>Blue = Recommended &nbsp;
         <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ca8a04;vertical-align:middle;margin-right:4px;"></span>Yellow = Optional
-        &nbsp;&nbsp;|&nbsp;&nbsp; Download: <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx" style="color:var(--teal);font-weight:600;text-decoration:none;">Template.xlsx ↓</a>
+        &nbsp;&nbsp;|&nbsp;&nbsp;
+        <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx" style="color:var(--teal);font-weight:600;text-decoration:none;">Download Template.xlsx ↓</a>
       </p>
     </div>
   </div>
@@ -487,8 +507,8 @@
         <h4>Inputs</h4>
         <ul>
           <li>smiles_list.txt &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">SMILES, Names, Study_ID</span></li>
-          <li>strain_cond.csv &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">strain, species, O₂ condition</span></li>
-          <li>Reference parameters &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">DOI, title, authors…</span></li>
+          <li>strain_cond.csv &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">strain, species, O2 condition</span></li>
+          <li>Reference parameters &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">DOI, title, authors</span></li>
         </ul>
       </div>
       <div class="io-box">
@@ -605,7 +625,7 @@
         <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem;">
           <a class="btn" style="background:var(--teal);color:#fff;font-size:.875rem;padding:.55rem 1.2rem;"
              href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx">
-            ↓ Download Template.xlsx
+            Download Template.xlsx
           </a>
           <a class="btn" style="border:1px solid var(--border);color:var(--text);font-size:.875rem;padding:.55rem 1.2rem;"
              href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Standards_main.md">
@@ -628,37 +648,37 @@
     </p>
     <div class="contribute-grid">
       <div class="contrib-card">
-        <div class="contrib-icon">📝</div>
+        <span class="contrib-label">Survey</span>
         <h3>Fill out the Survey</h3>
         <p>No GitHub account needed. Share your opinion on which fields are truly essential for biotransformation data.</p>
         <a href="https://forms.gle/towuMVYYuqDi7pEJ7">Open Survey →</a>
       </div>
       <div class="contrib-card">
-        <div class="contrib-icon">🐛</div>
+        <span class="contrib-label">Issue</span>
         <h3>Open an Issue</h3>
         <p>Propose a new field, report a bug, or flag missing vocabulary terms via GitHub Issues — templates provided.</p>
         <a href="https://github.com/zmahnoor14/BioXend/issues/new/choose">Open an Issue →</a>
       </div>
       <div class="contrib-card">
-        <div class="contrib-icon">💬</div>
+        <span class="contrib-label">Discussion</span>
         <h3>Join the Discussion</h3>
         <p>Have a broader idea or question? GitHub Discussions is the place for open-ended proposals and community debate.</p>
         <a href="https://github.com/zmahnoor14/BioXend/discussions">Go to Discussions →</a>
       </div>
       <div class="contrib-card">
-        <div class="contrib-icon">👍</div>
+        <span class="contrib-label">Endorse</span>
         <h3>Endorse Proposals</h3>
-        <p>Browse the Project Board and add a 👍 to issues and PRs you support. Community endorsement drives the standards forward.</p>
+        <p>Browse the Project Board and add a thumbs-up to issues and PRs you support. Community endorsement drives the standards forward.</p>
         <a href="https://github.com/users/zmahnoor14/projects/6">View Project Board →</a>
       </div>
       <div class="contrib-card">
-        <div class="contrib-icon">🔀</div>
+        <span class="contrib-label">PR</span>
         <h3>Submit a Pull Request</h3>
         <p>Comfortable with Git? Submit PRs against the <code>devel</code> branch. Standards changes require a 14-day review period.</p>
         <a href="https://github.com/zmahnoor14/BioXend/blob/main/CONTRIBUTING.md">Read Contributing Guide →</a>
       </div>
       <div class="contrib-card">
-        <div class="contrib-icon">📊</div>
+        <span class="contrib-label">Analysis</span>
         <h3>View Survey Results</h3>
         <p>Explore community survey results and analysis to see what the field considers most important to standardize.</p>
         <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIX-MB_Survey_Analysis.ipynb">Browse Analysis →</a>
@@ -688,7 +708,7 @@
     </div>
 
     <div class="funding-box">
-      <span class="fund-label">Funding</span>
+      <img src="assets/nfdi4microbiota-logo.png" alt="NFDI4Microbiota" />
       <p>
         BioXend is funded by the
         <a href="https://nfdi4microbiota.de/newsroom/flexfunds/">NFDI4Microbiota FlexFund 2026</a>.
@@ -701,16 +721,18 @@
 
 <!-- FOOTER -->
 <footer>
-  <div class="foot-logo">BioXend</div>
-  <p>
-    MIT License &nbsp;·&nbsp;
-    <a href="https://github.com/zmahnoor14/BioXend">GitHub</a> &nbsp;·&nbsp;
-    <a href="https://github.com/zmahnoor14/BioXend/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a> &nbsp;·&nbsp;
-    <a href="https://github.com/zmahnoor14/BioXend/blob/main/CONTRIBUTING.md">Contributing</a>
-  </p>
-  <p style="margin-top:.5rem; font-size:.8rem;">
-    EMBL · Molecular Systems Biology Unit · Funded by NFDI4Microbiota FlexFund 2026
-  </p>
+  <div class="footer-inner">
+    <div class="footer-logo">
+      <img src="assets/bioxend-logo.png" alt="BioXend" />
+    </div>
+    <div class="footer-links">
+      <a href="https://github.com/zmahnoor14/BioXend">GitHub</a>
+      <a href="https://github.com/zmahnoor14/BioXend/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a>
+      <a href="https://github.com/zmahnoor14/BioXend/blob/main/CONTRIBUTING.md">Contributing</a>
+      <a href="https://github.com/zmahnoor14/BioXend/blob/main/LICENSE">MIT License</a>
+    </div>
+    <p class="footer-copy">EMBL · Molecular Systems Biology Unit · NFDI4Microbiota FlexFund 2026</p>
+  </div>
 </footer>
 
 </body>
