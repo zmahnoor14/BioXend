@@ -11,7 +11,7 @@
 ## Document structure overview
 
 <p align="center">
-  <img src="standards-main.png" />
+  <img src="standards-main.png" width="600" />
 </p>
 
 
