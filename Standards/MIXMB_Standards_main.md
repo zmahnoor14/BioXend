@@ -4,10 +4,16 @@
 **Version:** 0.1.1  
 **Release Date:** March 16, 2026 (Draft)  
 **Status:** Draft Standard  
-**DOI:** XXXXXXX (to be assigned upon stable release)
 
 
 ---
+
+## Document structure overview
+
+<p align="center">
+  <img src="standards-main.png" />
+</p>
+
 
 ## Table of Contents
 
@@ -25,7 +31,7 @@
     - [How are assay/microbe data files integrated into the Template.xlsx](#how-are-assaymicrobe-data-files-are-integrated-into-the-templatexlsx)
   - [4. Biotransformation Metadata File(s)](#4-biotransformation-metadata-files)
     - [How are biotransformation data files integrated into the Template.xlsx](#how-are-biotransformation-data-files-are-integrated-into-the-templatexlsx)
-- [Identifiers and Cross-Referencing](#identifiers-and-cross-referencing)
+- [Identifiers and Cross-Referencing](#naming-convention-for-identifiers-and-cross-referencing-in-ChEMBL)
   - [Minting Scheme for Unknowns](#minting-scheme-for-unknowns)
 - [ChEMBL Links and FAQs](#chembl-links-and-faqs)
 
@@ -70,7 +76,7 @@ MIX-MB does not currently cover:
 
 ## Component Standards
 
-This standard comprises three interconnected sub-standards:
+This standard comprises three interconnected sub-standards: (individual components under construction)
 
 | Component | Description | Version | Last Updated (YYYY-MM-DD) | Document |
 |-----------|-------------|---------|--------------------------|----------|
