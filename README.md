@@ -7,7 +7,7 @@
 ![Contributors](https://img.shields.io/github/contributors/zmahnoor14/BioXend)
 
 <p align="left">
-  <img src="logo_bioxend.png" />
+  <img src="logo_bioxend.png" width="150" />
 </p>
 
 # BioXend 
