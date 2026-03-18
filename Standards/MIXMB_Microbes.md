@@ -5,25 +5,18 @@
 This document identifies Minimum Information (MI) required to report microbial organisms involved in biotransformation of xenobiotics, ensuring comprehensive documentation of bacterial, and archaeal species/strains used in biotransformation studies and information on the assays.
 
 **Author:** Mahnoor Zulfiqar
-**Version:** 0.1.0  
-**Release Date:** March 16, 2026 (Draft)  
-**Status:** Draft Standard  
-**Part of:** MIX-MB Standard v0.1  
-**Replaces:** N/A  
-**Compatible with:** 
-- MIX-MB(X) v0.1.0
-- MIX-MB(B) v0.1.0
 
-**Alignment:** NCBI Taxonomy, MIxS, GSC Standards, ChEMBL, FAIR principles
-[Fix]
+**Part of:** MIX-MB Standard_main      
+**Compatible with:** 
+- MIX-MB(X) 
+- MIX-MB(B) 
+**Alignment:** NCBI Taxonomy, MIxS, ChEMBL, FAIR principles
+
 ---
 
 ## Table of Contents
 
 - [1. Overview](#1-overview)
-  - [1.1 How is this document organised?](#11-how-is-this-document-organised)
-  - [1.2 Which sections are important for contributors?](#12-which-sections-are-important-for-contributors)
-  - [1.3 Which sections are important for data submitters?](#13-which-sections-are-important-for-data-submitters)
   - [1.4 Identifiers and Cross-Referencing](#14-identifiers-and-cross-referencing)
 - [2. Bioschemas](#2-bioschemas)
   - [2.1 Taxon Profile](#21-taxon-profile)
@@ -62,33 +55,7 @@ MIX-MB(M) establishes minimum information standards for reporting microbial orga
 - **Interoperable:** Uses community ontologies and controlled vocabularies
 - **Reusable:** Complete provenance, cultivation, and experimental conditions
 
-This standard complements MIX-MB(X) for xenobiotics documentation.
 
-### 1.1 How is this document organised?
-
-- **Section 1** — Introduction to MIX-MB(M) for Microbes and how to use it.
-- **Section 2** — Bioschemas profiles: what metadata fields to use for microbial organisms and strains, with JSON examples (Taxon, BioSample, Study profiles).
-- **Section 3** — Ontologies and standards: which controlled vocabularies and identifiers to use (NCBI Taxonomy, MIxS, ENVO, PATO/OMP, GO/EC, ARO, BAO, Unit Ontology).Controlled vocabularies: standard terms for oxygen requirements, cell morphology, sample types, and growth phases.
-- **Section 4** — Growth and cultivation standards: how to document culture media, growth conditions, growth phases, and quality control.
-- **Section 5** — Data validation rules
-- **Section 6** — Data quality tiers
-- **Section 7** — How to use template
-
-
-### 1.2 Which sections are important for contributors?
-
-If you want to propose changes to the standard, focus on **Sections 2 and 3** (the metadata fields and ontologies), then follow the contribution process in [Versioning.md](Versioning.md) and [CONTRIBUTING.md](../CONTRIBUTING.md). Changes require a 7-day community review and 2 independent endorsements.
-
-### 1.3 Which sections are important for data submitters?
-
-If you are preparing data for submission, you need:
-- **Section 2.1** — required Taxon fields for the organism (NCBI TaxID, scientific name, rank)
-- **Section 2.2** — BioSample fields for strain-specific information (strain designation, culture collection numbers)
-- **Section 3.1** — NCBI Taxonomy requirements: TaxID, full lineage, and strain-level details
-- **Section 5** — how to document cultivation conditions (medium, temperature, atmosphere) and quality control
-- **Section 6.1** — how to populate the ChEMBL ASSAY.tsv format for microbial assays
-- **Section 8** — validation checklist before you submit
-- **[Template.xlsx](Templates/Template.xlsx)** — colour-coded submission template (green = mandatory, blue = recommended, yellow = optional), specifically the **Assay** sheet.
 
 ### 1.4 Identifiers and Cross-Referencing
 
@@ -111,13 +78,15 @@ NCBI TaxID is **mandatory** for all organisms. If a strain does not yet have a r
 
 #### Assay Index (AIDX)
 
-Each assay — representing one organism × condition combination — is assigned an **AIDX**, which links `ASSAY.tsv`, `ASSAY_PARAM.tsv`, and `ACTIVITY.tsv`.
+Each assay — representing one organism × condition combination × type — is assigned an **AIDX**, which links `ASSAY.tsv`, `ASSAY_PARAM.tsv`, and `ACTIVITY.tsv`.
 
 **Minting rules:**
-- Format: `[FirstAuthorLastName]_[Genus]_[species]_[ConditionOrNote]`, e.g. `Zimmermann_Actinomyces_graevenitzii_biotransformation`
+- Format: `[FirstAuthorLastName]_[Genus]_[species]_[ConditionOrNote]_[type]`, e.g. `Zimmermann_Actinomyces_graevenitzii_anaerobic_biotransformation`
 - AIDXs must be unique within a study
 - Use only ASCII letters, digits, underscores, and hyphens — no spaces
-- Each distinct organism–condition combination gets its own AIDX; do not reuse AIDXs across different strain batches or oxygen conditions
+- add protein ID, if its an enzyme assay
+- Each distinct organism–condition combination gets its own AIDX; do not reuse AIDXs across
+ different strain batches or oxygen conditions
 
 #### Minting Scheme for Uncharacterised or Novel Organisms
 
@@ -127,24 +96,6 @@ Each assay — representing one organism × condition combination — is assigne
 | Known species, undesignated strain | `[Author]_[Genus]_[species]_unknown_strain` | Full binomial name | Species-level TaxID |
 | Novel isolate (unclassified) | `[Author]_unclassified_[IsolateID]` | `unclassified bacteria` | `2` (root Bacteria) or closest assigned TaxID |
 | Mixed / community assay | `[Author]_mixed_community_[SourceDescription]` | `mixed microbial community` | `1` (root) or metagenome TaxID |
-
-#### sameAs Linking Policy
-
-Use `sameAs` to cross-reference the organism across external databases. For organisms, the NCBI Taxonomy URL is the **mandatory** `sameAs` target.
-
-| Database | URL pattern | Example |
-|----------|-----------|---------|
-| NCBI Taxonomy | `https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={TaxID}` | `https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=1351` |
-| LPSN | `https://lpsn.dsmz.de/species/{genus}-{species}` | `https://lpsn.dsmz.de/species/enterococcus-faecalis` |
-| BacDive | `https://bacdive.dsmz.de/strain/{ID}` | `https://bacdive.dsmz.de/strain/12345` |
-| Wikidata | `https://www.wikidata.org/wiki/{QID}` | `https://www.wikidata.org/wiki/Q132537` |
-
-**Rules:**
-- NCBI Taxonomy URL is mandatory for all organisms with a registered TaxID
-- Include LPSN for prokaryotes where available
-- For novel isolates with no registered external record, omit `sameAs` until an accession is obtained (e.g. upon NCBI BioSample registration)
-- BioSample or ENA accessions belong in the Sample profile `@id` field, not in `sameAs`
-- Do not use `sameAs` for speculative taxonomic assignments
 
 ---
 
