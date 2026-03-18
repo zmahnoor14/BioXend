@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BioXend — Microbial Biotransformation of Xenobiotics</title>
+  <meta name="description" content="BioXend is a computational framework for standardizing and automating the submission of microbial biotransformation of xenobiotics data to ChEMBL." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --teal:      #0d7377;
+      --teal-dark: #0a5c5f;
+      --teal-light:#14a085;
+      --accent:    #e8003d;
+      --bg:        #f8fafb;
+      --surface:   #ffffff;
+      --border:    #e2e8f0;
+      --text:      #1a202c;
+      --muted:     #64748b;
+      --code-bg:   #f1f5f9;
+      --radius:    10px;
+      --shadow:    0 2px 12px rgba(0,0,0,.06);
+      --shadow-md: 0 4px 24px rgba(0,0,0,.10);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+      font-size: 16px;
+    }
+
+    /* ── NAV ─────────────────────────────────────── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(255,255,255,.95);
+      backdrop-filter: blur(8px);
+      border-bottom: 1px solid var(--border);
+      padding: 0 2rem;
+    }
+    .nav-inner {
+      max-width: 1100px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 60px;
+    }
+    .nav-logo {
+      font-size: 1.2rem; font-weight: 700; color: var(--teal);
+      text-decoration: none; letter-spacing: -.02em;
+    }
+    .nav-links { display: flex; gap: 1.6rem; list-style: none; }
+    .nav-links a {
+      color: var(--muted); text-decoration: none; font-size: .9rem;
+      font-weight: 500; transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--teal); }
+    .nav-cta {
+      background: var(--teal); color: #fff !important;
+      padding: .35rem .9rem; border-radius: 6px;
+      transition: background .2s !important;
+    }
+    .nav-cta:hover { background: var(--teal-dark) !important; color: #fff !important; }
+
+    /* ── HERO ────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, var(--teal-dark) 0%, var(--teal) 50%, var(--teal-light) 100%);
+      color: #fff; padding: 6rem 2rem 5rem;
+      text-align: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: .4rem;
+      background: rgba(255,255,255,.15); border: 1px solid rgba(255,255,255,.3);
+      border-radius: 99px; padding: .3rem .85rem;
+      font-size: .8rem; font-weight: 500; letter-spacing: .04em;
+      text-transform: uppercase; margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 700;
+      letter-spacing: -.04em; line-height: 1.1; margin-bottom: .75rem;
+    }
+    .hero h1 span { color: rgba(255,255,255,.7); font-weight: 300; }
+    .hero-sub {
+      font-size: 1.15rem; max-width: 640px; margin: 0 auto 2.5rem;
+      color: rgba(255,255,255,.85); font-weight: 300;
+    }
+    .hero-actions { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn {
+      display: inline-flex; align-items: center; gap: .45rem;
+      padding: .7rem 1.6rem; border-radius: 8px;
+      font-size: .95rem; font-weight: 600; text-decoration: none;
+      transition: transform .15s, box-shadow .15s;
+    }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,0,0,.2); }
+    .btn-white  { background: #fff; color: var(--teal); }
+    .btn-ghost  { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(255,255,255,.4); }
+    .hero-badges { margin-top: 3rem; display: flex; gap: .5rem; flex-wrap: wrap; justify-content: center; }
+    .hero-badges img { height: 22px; border-radius: 3px; }
+
+    /* ── SECTION SHELL ───────────────────────────── */
+    section { padding: 5rem 2rem; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label {
+      text-transform: uppercase; letter-spacing: .1em;
+      font-size: .75rem; font-weight: 600; color: var(--teal);
+      margin-bottom: .5rem;
+    }
+    .section-title {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700;
+      letter-spacing: -.03em; margin-bottom: 1rem;
+    }
+    .section-intro { color: var(--muted); max-width: 680px; font-size: 1.05rem; }
+
+    /* ── OVERVIEW CARDS ──────────────────────────── */
+    #overview { background: var(--surface); }
+    .overview-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .ov-card {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.6rem 1.4rem; background: var(--bg);
+      transition: box-shadow .2s, transform .2s;
+    }
+    .ov-card:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+    .ov-icon {
+      width: 44px; height: 44px; border-radius: 10px;
+      background: var(--teal); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.25rem; margin-bottom: 1rem;
+    }
+    .ov-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
+    .ov-card p  { font-size: .875rem; color: var(--muted); line-height: 1.6; }
+
+    /* ── STANDARDS ───────────────────────────────── */
+    #standards { background: var(--bg); }
+    .standards-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.75rem; margin-top: 3rem;
+    }
+    .std-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 2rem;
+      box-shadow: var(--shadow); position: relative; overflow: hidden;
+    }
+    .std-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0;
+      height: 4px;
+    }
+    .std-x::before { background: #3b82f6; }
+    .std-m::before { background: var(--teal); }
+    .std-b::before { background: #8b5cf6; }
+    .std-tag {
+      display: inline-block; padding: .25rem .7rem;
+      border-radius: 99px; font-size: .75rem; font-weight: 600;
+      margin-bottom: 1rem; font-family: 'JetBrains Mono', monospace;
+    }
+    .std-x .std-tag { background: #dbeafe; color: #1d4ed8; }
+    .std-m .std-tag { background: #ccfbf1; color: #0d7377; }
+    .std-b .std-tag { background: #ede9fe; color: #6d28d9; }
+    .std-card h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: .6rem; }
+    .std-card p  { font-size: .9rem; color: var(--muted); margin-bottom: 1.2rem; }
+    .std-fields { list-style: none; display: flex; flex-direction: column; gap: .35rem; }
+    .std-fields li {
+      font-size: .825rem; display: flex; align-items: center; gap: .5rem;
+    }
+    .std-fields li::before {
+      content: ''; width: 6px; height: 6px; border-radius: 50%;
+      background: var(--teal); flex-shrink: 0;
+    }
+    .field-code {
+      font-family: 'JetBrains Mono', monospace;
+      background: var(--code-bg); padding: .1rem .35rem;
+      border-radius: 4px; font-size: .775rem; color: var(--teal-dark);
+    }
+
+    /* ── WORKFLOW ────────────────────────────────── */
+    #workflow { background: var(--surface); }
+    .workflow-steps {
+      margin-top: 3rem; display: flex; flex-direction: column; gap: 0;
+      position: relative;
+    }
+    .workflow-steps::before {
+      content: ''; position: absolute; left: 23px; top: 16px;
+      bottom: 16px; width: 2px; background: var(--border);
+    }
+    .wf-step {
+      display: flex; gap: 1.5rem; align-items: flex-start;
+      background: var(--surface); padding: 1.2rem 1.4rem 1.2rem 0;
+      position: relative; z-index: 1;
+    }
+    .wf-num {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--teal); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 700; font-size: 1rem; flex-shrink: 0;
+      border: 3px solid var(--surface);
+    }
+    .wf-body h3 { font-size: 1rem; font-weight: 600; margin-bottom: .3rem; }
+    .wf-body p  { font-size: .875rem; color: var(--muted); }
+    .wf-body .lang-tag {
+      display: inline-block; font-family: 'JetBrains Mono', monospace;
+      font-size: .7rem; background: var(--code-bg); color: var(--muted);
+      padding: .1rem .45rem; border-radius: 4px; margin-left: .4rem;
+      font-weight: 500;
+    }
+    .io-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;
+      margin-top: 2.5rem;
+    }
+    .io-box {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.4rem;
+    }
+    .io-box h4 {
+      font-size: .8rem; font-weight: 600; text-transform: uppercase;
+      letter-spacing: .08em; color: var(--muted); margin-bottom: .8rem;
+    }
+    .io-box ul { list-style: none; display: flex; flex-direction: column; gap: .4rem; }
+    .io-box li {
+      font-family: 'JetBrains Mono', monospace; font-size: .8rem;
+      color: var(--teal-dark); display: flex; align-items: center; gap: .5rem;
+    }
+    .io-box li::before { content: '›'; font-size: 1rem; color: var(--teal-light); }
+
+    /* ── GETTING STARTED ─────────────────────────── */
+    #started { background: var(--bg); }
+    .code-block {
+      background: #1e293b; border-radius: var(--radius);
+      padding: 1.5rem 1.75rem; margin-top: 1.2rem; overflow-x: auto;
+    }
+    .code-block pre {
+      font-family: 'JetBrains Mono', monospace; font-size: .83rem;
+      color: #e2e8f0; line-height: 1.8; white-space: pre;
+    }
+    .code-block .cmt { color: #64748b; }
+    .code-block .kw  { color: #7dd3fc; }
+    .code-block .str { color: #86efac; }
+    .started-cols {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 3rem;
+    }
+    .started-step { margin-bottom: 2rem; }
+    .step-num {
+      font-family: 'JetBrains Mono', monospace; font-size: .75rem;
+      font-weight: 700; color: var(--teal); margin-bottom: .35rem;
+    }
+    .started-step h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
+    .started-step p  { font-size: .875rem; color: var(--muted); }
+
+    /* ── CONTRIBUTE ──────────────────────────────── */
+    #contribute { background: var(--surface); }
+    .contribute-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .contrib-card {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.6rem; background: var(--bg);
+      transition: box-shadow .2s;
+    }
+    .contrib-card:hover { box-shadow: var(--shadow-md); }
+    .contrib-icon { font-size: 1.6rem; margin-bottom: .75rem; }
+    .contrib-card h3 { font-size: 1rem; font-weight: 600; margin-bottom: .4rem; }
+    .contrib-card p  { font-size: .875rem; color: var(--muted); margin-bottom: 1rem; }
+    .contrib-card a {
+      font-size: .85rem; font-weight: 600; color: var(--teal);
+      text-decoration: none;
+    }
+    .contrib-card a:hover { text-decoration: underline; }
+
+    /* ── TEAM ────────────────────────────────────── */
+    #team { background: var(--bg); }
+    .team-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 1.5rem; margin-top: 3rem;
+    }
+    .team-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.75rem;
+      box-shadow: var(--shadow);
+    }
+    .team-avatar {
+      width: 52px; height: 52px; border-radius: 50%;
+      background: var(--teal); color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.3rem; font-weight: 700; margin-bottom: 1rem;
+    }
+    .team-card h3 { font-size: 1.05rem; font-weight: 600; margin-bottom: .2rem; }
+    .team-card .role { font-size: .85rem; color: var(--muted); margin-bottom: .75rem; }
+    .team-card a {
+      font-size: .8rem; color: var(--teal); text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+    }
+    .team-card a:hover { text-decoration: underline; }
+    .funding-box {
+      margin-top: 3rem; background: var(--surface);
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.6rem 2rem; display: flex; align-items: center; gap: 1rem;
+      flex-wrap: wrap;
+    }
+    .funding-box .fund-label {
+      font-size: .8rem; text-transform: uppercase; letter-spacing: .08em;
+      font-weight: 600; color: var(--muted); flex-shrink: 0;
+    }
+    .funding-box p { font-size: .9rem; color: var(--text); }
+    .funding-box a { color: var(--teal); text-decoration: none; font-weight: 500; }
+    .funding-box a:hover { text-decoration: underline; }
+
+    /* ── FOOTER ──────────────────────────────────── */
+    footer {
+      background: #0f172a; color: #94a3b8;
+      padding: 2.5rem 2rem; text-align: center;
+    }
+    footer .foot-logo { font-size: 1.1rem; font-weight: 700; color: #fff; margin-bottom: .5rem; }
+    footer p { font-size: .85rem; }
+    footer a { color: #7dd3fc; text-decoration: none; }
+    footer a:hover { text-decoration: underline; }
+
+    /* ── RESPONSIVE ──────────────────────────────── */
+    @media (max-width: 700px) {
+      .nav-links { display: none; }
+      .io-grid, .started-cols { grid-template-columns: 1fr; }
+      .hero { padding: 4rem 1.5rem 3.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <a class="nav-logo" href="#top">BioXend</a>
+    <ul class="nav-links">
+      <li><a href="#overview">Overview</a></li>
+      <li><a href="#standards">Standards</a></li>
+      <li><a href="#workflow">Workflow</a></li>
+      <li><a href="#started">Get Started</a></li>
+      <li><a href="#contribute">Contribute</a></li>
+      <li><a href="https://github.com/zmahnoor14/BioXend" class="nav-cta">GitHub ↗</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero" id="top">
+  <div class="hero-badge">
+    ⚗️ &nbsp;NFDI4Microbiota FlexFund 2026
+  </div>
+  <h1>BioXend<br><span>Microbial Biotransformation of Xenobiotics</span></h1>
+  <p class="hero-sub">
+    A community-driven computational framework for standardizing, collecting, and
+    submitting microbial biotransformation data to <strong>ChEMBL</strong> — making
+    xenobiotic metabolism research FAIR and reproducible.
+  </p>
+  <div class="hero-actions">
+    <a class="btn btn-white" href="#started">Get Started</a>
+    <a class="btn btn-ghost" href="https://github.com/zmahnoor14/BioXend">View on GitHub</a>
+    <a class="btn btn-ghost" href="https://forms.gle/towuMVYYuqDi7pEJ7">Take the Survey</a>
+  </div>
+  <div class="hero-badges">
+    <img src="https://img.shields.io/github/v/tag/zmahnoor14/BioXend?style=flat&label=version" alt="version" />
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License" />
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" alt="PRs welcome" />
+    <img src="https://img.shields.io/badge/Bioschemas-aligned-e87722" alt="Bioschemas" />
+    <img src="https://img.shields.io/badge/ChEMBL-submission--ready-e8003d" alt="ChEMBL" />
+  </div>
+</header>
+
+<!-- OVERVIEW -->
+<section id="overview">
+  <div class="container">
+    <p class="section-label">What is BioXend?</p>
+    <h2 class="section-title">Four work packages, one unified framework</h2>
+    <p class="section-intro">
+      Microbial biotransformation of xenobiotics — the process by which microorganisms
+      chemically modify drugs, environmental contaminants, and other foreign compounds —
+      is poorly represented in public databases due to a lack of reporting standards.
+      BioXend fixes that.
+    </p>
+    <div class="overview-grid">
+      <div class="ov-card">
+        <div class="ov-icon">📋</div>
+        <h3>WP1 — Minimum Standards</h3>
+        <p>Develop community-consensus minimum reporting standards (MIX-MB) covering chemicals, microbes, and biotransformation assays.</p>
+      </div>
+      <div class="ov-card">
+        <div class="ov-icon">⚙️</div>
+        <h3>WP2 — Metadata Automation</h3>
+        <p>Automate metadata collection from user inputs, external APIs (ChEMBL, NCBI Taxonomy), and Bioschemas-aligned identifiers.</p>
+      </div>
+      <div class="ov-card">
+        <div class="ov-icon">🗃️</div>
+        <h3>WP3 — ChEMBL Submission</h3>
+        <p>Nextflow DSL2 pipeline that generates six ChEMBL-ready submission files from simple tabular inputs — no manual formatting.</p>
+      </div>
+      <div class="ov-card">
+        <div class="ov-icon">🌐</div>
+        <h3>WP4 — NFDI4Microbiota Workflow</h3>
+        <p>Release BioXend as part of the NFDI4Microbiota workflow ecosystem for broad community adoption and long-term maintenance.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- STANDARDS -->
+<section id="standards">
+  <div class="container">
+    <p class="section-label">MIX-MB Standards</p>
+    <h2 class="section-title">Minimum Information about Xenobiotics-Microbiome Biotransformation</h2>
+    <p class="section-intro">
+      Three interconnected sub-standards — each independently versioned — define exactly
+      what metadata must be reported for reproducible and database-ready experiments.
+      All standards are Bioschemas-aligned and follow FAIR principles.
+    </p>
+    <div class="standards-grid">
+
+      <div class="std-card std-x">
+        <span class="std-tag">MIX-MB(X)</span>
+        <h3>Xenobiotics / Chemicals</h3>
+        <p>Minimum metadata for the chemical substrate of biotransformation reactions — structure, identity, and classification.</p>
+        <ul class="std-fields">
+          <li><span class="field-code">CIDX</span> Compound index identifier</li>
+          <li><span class="field-code">SMILES</span> Valid canonical SMILES or InChIKey</li>
+          <li><span class="field-code">COMPOUND_NAME</span> Preferred chemical name</li>
+          <li><span class="field-code">ChEBI / ChEMBL ID</span> Cross-reference identifiers</li>
+          <li><span class="field-code">RIDX</span> Linked reference index</li>
+        </ul>
+      </div>
+
+      <div class="std-card std-m">
+        <span class="std-tag">MIX-MB(M)</span>
+        <h3>Microbes / Organisms</h3>
+        <p>Minimum metadata for the microbial agent — taxonomy, culture conditions, and sample provenance — aligned to Bioschemas Taxon profile.</p>
+        <ul class="std-fields">
+          <li><span class="field-code">NCBI TaxID</span> Primary taxonomy identifier</li>
+          <li><span class="field-code">ASSAY_ORGANISM</span> Organism name (genus, species)</li>
+          <li><span class="field-code">O2_CONDITION</span> Oxygen requirement (controlled vocab)</li>
+          <li><span class="field-code">SAMPLE_TYPE</span> Bacterium, community, enzyme…</li>
+          <li><span class="field-code">ENA / BioSample ID</span> Sequencing data links</li>
+        </ul>
+      </div>
+
+      <div class="std-card std-b">
+        <span class="std-tag">MIX-MB(B)</span>
+        <h3>Biotransformation / Assay</h3>
+        <p>Minimum metadata for the experimental assay — conditions, analytical methods, products, and activity measurements.</p>
+        <ul class="std-fields">
+          <li><span class="field-code">AIDX</span> Assay index identifier</li>
+          <li><span class="field-code">ASSAY_TYPE</span> bacteria / enzyme / community</li>
+          <li><span class="field-code">ACTION_TYPE</span> Substrate / Product / No Activity…</li>
+          <li><span class="field-code">TEXT_VALUE</span> Measured activity value</li>
+          <li><span class="field-code">ASSAY_DESCRIPTION</span> Free-text assay description</li>
+        </ul>
+      </div>
+
+    </div>
+
+    <div style="margin-top:2.5rem; padding:1.5rem 1.75rem; background:var(--surface); border:1px solid var(--border); border-radius:var(--radius);">
+      <p style="font-size:.925rem; color:var(--muted);">
+        <strong style="color:var(--text);">Template color coding:</strong> &nbsp;
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#16a34a;vertical-align:middle;margin-right:4px;"></span>Green = Mandatory &nbsp;
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#2563eb;vertical-align:middle;margin-right:4px;"></span>Blue = Recommended &nbsp;
+        <span style="display:inline-block;width:10px;height:10px;border-radius:2px;background:#ca8a04;vertical-align:middle;margin-right:4px;"></span>Yellow = Optional
+        &nbsp;&nbsp;|&nbsp;&nbsp; Download: <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx" style="color:var(--teal);font-weight:600;text-decoration:none;">Template.xlsx ↓</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- WORKFLOW -->
+<section id="workflow">
+  <div class="container">
+    <p class="section-label">Nextflow Pipeline</p>
+    <h2 class="section-title">From spreadsheet to ChEMBL in one command</h2>
+    <p class="section-intro">
+      The BioXend Nextflow DSL2 pipeline reads two tabular input files and produces
+      six ChEMBL-ready submission files automatically.
+    </p>
+
+    <div class="io-grid" style="margin-bottom:2.5rem;">
+      <div class="io-box">
+        <h4>Inputs</h4>
+        <ul>
+          <li>smiles_list.txt &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">SMILES, Names, Study_ID</span></li>
+          <li>strain_cond.csv &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">strain, species, O₂ condition</span></li>
+          <li>Reference parameters &nbsp;<span style="color:var(--muted);font-family:sans-serif;font-size:.75rem;">DOI, title, authors…</span></li>
+        </ul>
+      </div>
+      <div class="io-box">
+        <h4>Outputs (results/)</h4>
+        <ul>
+          <li>REFERENCE.tsv</li>
+          <li>COMPOUND_RECORD.tsv</li>
+          <li>COMPOUND_CTAB.sdf</li>
+          <li>ASSAY.tsv &amp; ASSAY_PARAM.tsv</li>
+          <li>ACTIVITY.tsv</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="workflow-steps">
+      <div class="wf-step">
+        <div class="wf-num">1</div>
+        <div class="wf-body">
+          <h3>GENERATE_REFERENCE <span class="lang-tag">R</span></h3>
+          <p>Creates <code>REFERENCE.tsv</code> from DOI, title, authors, and year parameters.</p>
+        </div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">2</div>
+        <div class="wf-body">
+          <h3>GENERATE_COMPOUNDS <span class="lang-tag">Python + RDKit</span></h3>
+          <p>Validates SMILES structures, queries ChEMBL API, and generates <code>COMPOUND_RECORD.tsv</code> and <code>COMPOUND_CTAB.sdf</code>.</p>
+        </div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">3</div>
+        <div class="wf-body">
+          <h3>GENERATE_ASSAY <span class="lang-tag">R</span></h3>
+          <p>Builds one assay entry per strain/condition row in <code>strain_cond.csv</code>, outputting <code>ASSAY.tsv</code> and <code>ASSAY_PARAM.tsv</code>.</p>
+        </div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">4</div>
+        <div class="wf-body">
+          <h3>GENERATE_ACTIVITY <span class="lang-tag">R</span></h3>
+          <p>Links compound CIDXs to assay AIDXs and constructs the <code>ACTIVITY.tsv</code> table with action types and measured values.</p>
+        </div>
+      </div>
+      <div class="wf-step">
+        <div class="wf-num">5</div>
+        <div class="wf-body">
+          <h3>VALIDATE_SUBMISSION</h3>
+          <p>Checks all six output files were generated and conform to ChEMBL submission requirements before deposition.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- GETTING STARTED -->
+<section id="started">
+  <div class="container">
+    <p class="section-label">Quick Start</p>
+    <h2 class="section-title">Start using BioXend</h2>
+    <p class="section-intro">
+      Choose the path that fits your workflow — download the template to prepare your data,
+      or run the full Nextflow pipeline to generate ChEMBL submission files automatically.
+    </p>
+
+    <div class="started-cols">
+      <div>
+        <div class="started-step">
+          <div class="step-num">STEP 01</div>
+          <h3>Clone the repository</h3>
+          <p>Get the latest version of BioXend from GitHub.</p>
+        </div>
+        <div class="code-block">
+          <pre><span class="cmt"># Clone BioXend</span>
+<span class="kw">git clone</span> https://github.com/zmahnoor14/BioXend.git
+<span class="kw">cd</span> BioXend</pre>
+        </div>
+
+        <div class="started-step" style="margin-top:2rem;">
+          <div class="step-num">STEP 02</div>
+          <h3>Set up environments</h3>
+          <p>Create the Conda environments for Python and R dependencies.</p>
+        </div>
+        <div class="code-block">
+          <pre><span class="cmt"># Python env (RDKit, pandas, requests)</span>
+<span class="kw">conda env create</span> -f envs/py_env.yml
+
+<span class="cmt"># R env (tidyverse, optparse)</span>
+<span class="kw">conda env create</span> -f envs/r_env.yml</pre>
+        </div>
+      </div>
+
+      <div>
+        <div class="started-step">
+          <div class="step-num">STEP 03</div>
+          <h3>Run the pipeline</h3>
+          <p>Execute the full Nextflow workflow with your input data.</p>
+        </div>
+        <div class="code-block">
+          <pre><span class="kw">nextflow run</span> main.nf \
+  --input_csv bin/smiles_list.txt \
+  --strain_cond bin/strain_cond.csv \
+  --outdir results \
+  --doi <span class="str">"10.1000/example"</span> \
+  --title <span class="str">"Study Title"</span> \
+  --authors <span class="str">"Last, First"</span> \
+  --year <span class="str">2025</span></pre>
+        </div>
+
+        <div class="started-step" style="margin-top:2rem;">
+          <div class="step-num">FOR DATA SUBMITTERS</div>
+          <h3>Use the Excel template</h3>
+          <p>Not running the pipeline? Download the template, fill in your data, and provide feedback.</p>
+        </div>
+        <div style="display:flex;gap:.75rem;flex-wrap:wrap;margin-top:.75rem;">
+          <a class="btn" style="background:var(--teal);color:#fff;font-size:.875rem;padding:.55rem 1.2rem;"
+             href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx">
+            ↓ Download Template.xlsx
+          </a>
+          <a class="btn" style="border:1px solid var(--border);color:var(--text);font-size:.875rem;padding:.55rem 1.2rem;"
+             href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Standards_main.md">
+            Read the Standards
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTRIBUTE -->
+<section id="contribute">
+  <div class="container">
+    <p class="section-label">Community</p>
+    <h2 class="section-title">Help shape the standards</h2>
+    <p class="section-intro">
+      MIX-MB is community-driven. Your expertise in microbiology, cheminformatics, or data science
+      directly shapes what gets standardized. Every form of participation counts.
+    </p>
+    <div class="contribute-grid">
+      <div class="contrib-card">
+        <div class="contrib-icon">📝</div>
+        <h3>Fill out the Survey</h3>
+        <p>No GitHub account needed. Share your opinion on which fields are truly essential for biotransformation data.</p>
+        <a href="https://forms.gle/towuMVYYuqDi7pEJ7">Open Survey →</a>
+      </div>
+      <div class="contrib-card">
+        <div class="contrib-icon">🐛</div>
+        <h3>Open an Issue</h3>
+        <p>Propose a new field, report a bug, or flag missing vocabulary terms via GitHub Issues — templates provided.</p>
+        <a href="https://github.com/zmahnoor14/BioXend/issues/new/choose">Open an Issue →</a>
+      </div>
+      <div class="contrib-card">
+        <div class="contrib-icon">💬</div>
+        <h3>Join the Discussion</h3>
+        <p>Have a broader idea or question? GitHub Discussions is the place for open-ended proposals and community debate.</p>
+        <a href="https://github.com/zmahnoor14/BioXend/discussions">Go to Discussions →</a>
+      </div>
+      <div class="contrib-card">
+        <div class="contrib-icon">👍</div>
+        <h3>Endorse Proposals</h3>
+        <p>Browse the Project Board and add a 👍 to issues and PRs you support. Community endorsement drives the standards forward.</p>
+        <a href="https://github.com/users/zmahnoor14/projects/6">View Project Board →</a>
+      </div>
+      <div class="contrib-card">
+        <div class="contrib-icon">🔀</div>
+        <h3>Submit a Pull Request</h3>
+        <p>Comfortable with Git? Submit PRs against the <code>devel</code> branch. Standards changes require a 14-day review period.</p>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/CONTRIBUTING.md">Read Contributing Guide →</a>
+      </div>
+      <div class="contrib-card">
+        <div class="contrib-icon">📊</div>
+        <h3>View Survey Results</h3>
+        <p>Explore community survey results and analysis to see what the field considers most important to standardize.</p>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIX-MB_Survey_Analysis.ipynb">Browse Analysis →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TEAM -->
+<section id="team">
+  <div class="container">
+    <p class="section-label">Team &amp; Funding</p>
+    <h2 class="section-title">Who is behind BioXend?</h2>
+    <div class="team-grid">
+      <div class="team-card">
+        <div class="team-avatar">MZ</div>
+        <h3>Mahnoor Zulfiqar</h3>
+        <p class="role">Maintainer · EMBL, Molecular Systems Biology Unit</p>
+        <a href="https://orcid.org/0000-0002-8330-4071">ORCID: 0000-0002-8330-4071 ↗</a>
+      </div>
+      <div class="team-card">
+        <div class="team-avatar">EM</div>
+        <h3>Eleonora Mastrorilli</h3>
+        <p class="role">Maintainer · EMBL, Molecular Systems Biology Unit</p>
+        <a href="https://orcid.org/0000-0003-2127-4150">ORCID: 0000-0003-2127-4150 ↗</a>
+      </div>
+    </div>
+
+    <div class="funding-box">
+      <span class="fund-label">Funding</span>
+      <p>
+        BioXend is funded by the
+        <a href="https://nfdi4microbiota.de/newsroom/flexfunds/">NFDI4Microbiota FlexFund 2026</a>.
+        NFDI4Microbiota is part of Germany's National Research Data Infrastructure (NFDI)
+        initiative, dedicated to making microbiome research data FAIR and accessible.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="foot-logo">BioXend</div>
+  <p>
+    MIT License &nbsp;·&nbsp;
+    <a href="https://github.com/zmahnoor14/BioXend">GitHub</a> &nbsp;·&nbsp;
+    <a href="https://github.com/zmahnoor14/BioXend/blob/main/CODE_OF_CONDUCT.md">Code of Conduct</a> &nbsp;·&nbsp;
+    <a href="https://github.com/zmahnoor14/BioXend/blob/main/CONTRIBUTING.md">Contributing</a>
+  </p>
+  <p style="margin-top:.5rem; font-size:.8rem;">
+    EMBL · Molecular Systems Biology Unit · Funded by NFDI4Microbiota FlexFund 2026
+  </p>
+</footer>
+
+</body>
+</html>
