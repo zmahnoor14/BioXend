@@ -6,6 +6,10 @@
 [![ChEMBL](https://img.shields.io/badge/ChEMBL-submission--ready-e8003d)](https://www.ebi.ac.uk/chembl/)
 ![Contributors](https://img.shields.io/github/contributors/zmahnoor14/BioXend)
 
+<p align="left">
+  <img src="logo_bioxend.png" />
+</p>
+
 # BioXend 
 BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. 
 - WP1: is to develop minimum reporting standards based on community consensus
