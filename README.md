@@ -1,16 +1,18 @@
-![GitHub tag](https://img.shields.io/github/v/tag/zmahnoor14/BioXend?style=flat&label=version)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
-![Issues](https://img.shields.io/github/issues/zmahnoor14/BioXend)
-![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
-[![Bioschemas](https://img.shields.io/badge/Bioschemas-aligned-e87722)](https://bioschemas.org/)
-[![ChEMBL](https://img.shields.io/badge/ChEMBL-submission--ready-e8003d)](https://www.ebi.ac.uk/chembl/)
-![Contributors](https://img.shields.io/github/contributors/zmahnoor14/BioXend)
+<div align="center">
+  <img src="logo_bioxend.png" width="130" />
+  <h1>BioXend</h1>
+  <p>
+    <img src="https://img.shields.io/github/v/tag/zmahnoor14/BioXend?style=flat&label=version" />
+    <img src="https://img.shields.io/badge/License-MIT-blue.svg" />
+    <img src="https://img.shields.io/github/issues/zmahnoor14/BioXend" />
+    <img src="https://img.shields.io/badge/PRs-welcome-brightgreen.svg" />
+    <img src="https://img.shields.io/badge/Bioschemas-aligned-e87722" />
+    <img src="https://img.shields.io/badge/ChEMBL-submission--ready-e8003d" />
+    <img src="https://img.shields.io/github/contributors/zmahnoor14/BioXend" />
+  </p>
+</div>
 
-<p align="left">
-  <img src="logo_bioxend.png" width="150" />
-</p>
 
-# BioXend 
 BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. 
 - WP1: is to develop minimum reporting standards based on community consensus
 - WP2: is to automate the metadata collection
