@@ -15,9 +15,6 @@ This document identifies Minimum Information (MI) required to report the biotran
 ## Table of Contents
 
 - [1. Overview](#1-overview)
-  - [1.1 How is this document organised?](#11-how-is-this-document-organised)
-  - [1.2 Which sections are important for contributors?](#12-which-sections-are-important-for-contributors)
-  - [1.3 Which sections are important for data submitters?](#13-which-sections-are-important-for-data-submitters)
   - [1.4 Identifiers and Cross-Referencing](#14-identifiers-and-cross-referencing)
 - [2. Bioschemas](#2-bioschemas)
   - [2.1 Study Profile](#21-study-profile)
@@ -78,14 +75,14 @@ MIX-MB(B) establishes minimum information standards for documenting biotransform
 - **Traceability:** Links between substrates, organisms, and products
 - **Quality:** Validation and quality control measures
 
-This standard covers in vitro biotransformation assays (whole cells, lysates, purified enzymes), ex vivo studies, in situ community-level measurements, time-course experiments, dose-response studies, and product identification. It bridges MIX-MB(X) (xenobiotics) and MIX-MB(M) (microbes):
+It bridges MIX-MB(X) (xenobiotics) and MIX-MB(M) (microbes):
 
 ```
 MIX-MB(X)              MIX-MB(B)              MIX-MB(M)
 [Xenobiotics] -----> [Biotransformation] <----- [Microbes]
    Substrate              Process               Organism
-   Product               Assay                  Enzyme
-   Structure             Activity               Strain
+   Product                                      Enzyme
+   Structure             Activity               Assay
 ```
 
 
@@ -135,14 +132,6 @@ Individual rows in `ACTIVITY.tsv` do not require their own unique identifier, bu
 | No biotransformation detected | `No Activity` | Substrate CIDX | Set `TEXT_VALUE` to `"No biotransformation detected"` |
 
 For time-course or dose-response experiments, group multiple measurements under the same `CIDX × AIDX` pair and distinguish individual rows using `ACTIVITY_COMMENT` (e.g. timepoint or concentration) rather than minting new identifiers.
-
-#### sameAs Cross-Referencing for Biotransformation Records
-
-`ACTIVITY.tsv` rows themselves are not linked externally via `sameAs`. Cross-database interoperability is achieved through the compound and assay entities that the activity references:
-- **Compound identity:** via InChIKey and `sameAs` URLs in the compound record — see [MIX-MB(X) Section 1.4](MIXMB_Xenobiotics.md)
-- **Organism identity:** via NCBI TaxID and `sameAs` URLs in the assay record — see [MIX-MB(M) Section 1.4](MIXMB_Microbes.md)
-
-If the same biotransformation event is reported in a separate publication or database, cross-reference it using `ACTIVITY_COMMENT` with a DOI or database accession rather than a `sameAs` property.
 
 ---
 
