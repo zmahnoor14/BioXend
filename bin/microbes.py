@@ -2,34 +2,55 @@
 """
 microbes.py — Module 3 (BioXend / MIX-MB)
 
-Reads the Microbes sheet (and optionally the Chemicals sheet for compound
-context) from a MIX-MB Template_open.ods and produces:
+Reads the Microbes sheet and Experiment sheet from a MIX-MB
+Template_open.ods and produces:
   - ASSAY.tsv     ChEMBL deposition format
 
 Each row in the Microbes sheet = one assay entry.
-ASSAY_DESCRIPTION is auto-built from organism, strain, sample source,
-and compound names (pulled from the Chemicals sheet).
+ASSAY_DESCRIPTION is auto-built using the following rules:
+  - If "metagenome" appears in Bacteria_scientific_name → community template
+  - Otherwise → single-bacteria template
+Experimental context (instrument, time course, oxygen) is joined from the
+Experiment sheet via the 'identifier' column ('all' or comma-separated
+assay_identifiers).
+
+Column mappings  (template column → ChEMBL field):
+  assay_identifier             → AIDX 
+  Bacteria_scientific_name     → ASSAY_ORGANISM
+  Strain                       → ASSAY_STRAIN
+  NCBI Tax ID                  → ASSAY_TAX_ID
+  Sample_isolation_source      → ASSAY_SOURCE
+  Tissue                       → ASSAY_TISSUE
+  Cell type                    → ASSAY_CELL_TYPE
+  SUBCELLULAR_FRACTION         → ASSAY_SUBCELLULAR_FRACTION
+  Protein name (or Gene name)  → TARGET_NAME
+  UniProt ID                   → TARGET_ACCESSION
+  TARGET_TYPE, TARGET_ORGANISM, TARGET_TAX_ID, ASSAY_GROUP, ASSAY_TYPE
+                               → same name in both sheets
 
 Template colour coding:
-  Green  = Mandatory   → AIDX (auto-generated if blank), RIDX,
-                         ASSAY_DESCRIPTION, ASSAY_TYPE,
+  Green  = Mandatory   → AIDX, RIDX, ASSAY_DESCRIPTION, ASSAY_TYPE,
                          ASSAY_ORGANISM, ASSAY_TAX_ID
   Blue   = Recommended → ASSAY_STRAIN, ENAorSRA accessions,
-                         UniProt ID (if Protein name given)
+                         UniProt ID (when Protein name given)
   Yellow = Optional    → ASSAY_SOURCE, ASSAY_TISSUE, ASSAY_CELL_TYPE,
                          ASSAY_SUBCELLULAR_FRACTION, TARGET_* columns,
                          ASSAY_GROUP
 
 Usage:
-    python bin/microbes.py --input Standards/Templates/Template_open.ods \\
-                           --ridx GutMeta --outdir results/
+    python bin/microbes.py \\
+        --input   Standards/Templates/Template_open.ods \\
+        --ridx    GutMeta \\
+        --xenobiotic_class drug \\   # singular form: 'drug' not 'drugs'
+        --outdir  results/
 """
 
 import argparse
 import re
 import sys
 from pathlib import Path
-import odf
+
+import odf  # noqa: F401 — required by pandas odf engine
 import pandas as pd
 
 # ---------------------------------------------------------------------------
@@ -38,23 +59,23 @@ import pandas as pd
 
 # ChEMBL ASSAY.tsv columns (in deposition order)
 CHEMBL_COLS = [
-    "AIDX", # assay_identifier
+    "AIDX",                        # assay_identifier
     "RIDX",
-    "ASSAY_DESCRIPTION", # not present in template
-    "ASSAY_TYPE",
-    "ASSAY_GROUP",
-    "ASSAY_ORGANISM", #Bacteria_scientific_name
-    "ASSAY_STRAIN", # Strain
-    "ASSAY_TAX_ID", # NCBI Tax ID
-    "ASSAY_SOURCE", # Sample_isolation_source
-    "ASSAY_TISSUE", # Tissue
-    "ASSAY_CELL_TYPE", # Cell type
-    "ASSAY_SUBCELLULAR_FRACTION", # SUBCELLULAR_FRACTION
-    "TARGET_TYPE",
-    "TARGET_NAME", # Protein name or Gene name, whichever one is present
-    "TARGET_ACCESSION", # UniProt ID (if Protein name given)
-    "TARGET_ORGANISM",
-    "TARGET_TAX_ID",
+    "ASSAY_DESCRIPTION",           # auto-built
+    "ASSAY_TYPE",                  # same name
+    "ASSAY_GROUP",                 # same name
+    "ASSAY_ORGANISM",              # Bacteria_scientific_name
+    "ASSAY_STRAIN",                # Strain
+    "ASSAY_TAX_ID",                # NCBI Tax ID
+    "ASSAY_SOURCE",                # Sample_isolation_source
+    "ASSAY_TISSUE",                # Tissue
+    "ASSAY_CELL_TYPE",             # Cell type
+    "ASSAY_SUBCELLULAR_FRACTION",  # SUBCELLULAR_FRACTION
+    "TARGET_TYPE",                 # same name
+    "TARGET_NAME",                 # Protein name (fallback: Gene name)
+    "TARGET_ACCESSION",            # UniProt ID
+    "TARGET_ORGANISM",             # same name
+    "TARGET_TAX_ID",               # same name
 ]
 
 MANDATORY_FIELDS = [
@@ -68,7 +89,7 @@ MANDATORY_FIELDS = [
 
 VALID_ASSAY_TYPES = {"A", "F", "B", "U", "P", "T"}
 
-# Template sheet row indices (0-based, read with header=None)
+# Template sheet row offsets (0-based, read with header=None)
 #   row 0 — section group headers  (skip)
 #   row 1 — column names           (use as header)
 #   row 2 — data types             (skip)
@@ -79,7 +100,7 @@ _ROW_DATA_START = 4
 
 
 # ---------------------------------------------------------------------------
-# Reading
+# Reading helpers
 # ---------------------------------------------------------------------------
 
 def _clean(v):
@@ -93,20 +114,16 @@ def _clean(v):
     return "" if v in ("nan", "None", "NaN") else v
 
 
-def read_microbes_sheet(ods_path: Path) -> pd.DataFrame:
+def _read_sheet(ods_path: Path, sheet_name: str) -> pd.DataFrame:
     """
-    Parse the Microbes sheet from Template_open.ods.
-
-    Template layout:
-      row 0 — section group headers  (skip)
-      row 1 — column names           (use as header)
-      row 2 — data types             (skip)
-      row 3 — field descriptions     (skip)
-      row 4+ — data rows
+    Generic ODS sheet reader using the standard template row layout.
+    Strips leading/trailing whitespace from column names.
     """
-    raw = pd.read_excel(ods_path, sheet_name="Microbes", header=None, engine="odf")
-    col_names = raw.iloc[_ROW_COLNAMES].tolist()
-
+    raw = pd.read_excel(ods_path, sheet_name=sheet_name, header=None, engine="odf")
+    col_names = [
+        str(c).strip() if isinstance(c, str) else c
+        for c in raw.iloc[_ROW_COLNAMES].tolist()
+    ]
     df = raw.iloc[_ROW_DATA_START:].copy()
     df.columns = col_names
     df = df.reset_index(drop=True)
@@ -114,30 +131,152 @@ def read_microbes_sheet(ods_path: Path) -> pd.DataFrame:
     return df.map(_clean)
 
 
-def read_compound_names(ods_path: Path) -> list:
-    """
-    Pull compound names from the Chemicals sheet for use in ASSAY_DESCRIPTION.
-    Returns a list of Common_Name strings (empty strings excluded).
-    """
-    raw = pd.read_excel(ods_path, sheet_name="Chemicals", header=None, engine="odf")
-    col_names = raw.iloc[_ROW_COLNAMES].tolist()
+def read_microbes_sheet(ods_path: Path) -> pd.DataFrame:
+    """Parse the Microbes sheet from Template_open.ods."""
+    return _read_sheet(ods_path, "Microbes")
 
-    df = raw.iloc[_ROW_DATA_START:].copy()
-    df.columns = col_names
-    df = df.reset_index(drop=True)
-    df = df.dropna(how="all")
-    df = df.map(_clean)
 
-    names = [
-        str(v).strip()
-        for v in df.get("Common_Name", pd.Series(dtype=str)).tolist()
-        if str(v).strip()
-    ]
-    return names
+def read_experiment_sheet(ods_path: Path) -> pd.DataFrame:
+    """
+    Parse the Experiment sheet from Template_open.ods.
+
+    Key columns used:
+      identifier                                  — links rows to assay(s)
+      Instrument_4_measurement
+      Time-course information (i.e., number of timepoints)
+      Time_unit
+      Oxygen conditions
+    """
+    return _read_sheet(ods_path, "Experiment")
 
 
 # ---------------------------------------------------------------------------
-# Helpers
+# Experiment-join helper
+# ---------------------------------------------------------------------------
+
+def _get_experiment_for_assay(exp_df: pd.DataFrame, aidx: str) -> pd.Series | None:
+    """
+    Return the first Experiment row that applies to *aidx*.
+
+    A row matches when its 'identifier' field is 'all' (case-insensitive)
+    or when aidx appears in the comma-separated list of identifiers.
+    Returns None if no match is found.
+    """
+    for _, row in exp_df.iterrows():
+        raw_id = str(row.get("identifier") or "").strip()
+        if not raw_id:
+            continue
+        if raw_id.lower() == "all":
+            return row
+        ids = [x.strip() for x in raw_id.split(",")]
+        if aidx in ids:
+            return row
+    return None
+
+
+# ---------------------------------------------------------------------------
+# Description helpers
+# ---------------------------------------------------------------------------
+
+def _parse_timecourse(raw: str):
+    """
+    Parse a comma-separated time-course string, e.g. '0,3,6,9,12,24'.
+
+    Returns (n_timepoints, t_min, t_max) as strings, or ('', '', '') if
+    the value is empty or cannot be parsed.
+    """
+    if not raw:
+        return "", "", ""
+    tokens = [t.strip() for t in raw.split(",") if t.strip()]
+    if not tokens:
+        return "", "", ""
+    try:
+        values = [float(t) for t in tokens]
+        n   = str(len(values))
+        lo  = str(int(min(values)) if min(values) == int(min(values)) else min(values))
+        hi  = str(int(max(values)) if max(values) == int(max(values)) else max(values))
+        return n, lo, hi
+    except ValueError:
+        # Non-numeric tokens — just report count
+        return str(len(tokens)), tokens[0], tokens[-1]
+
+
+def _build_description(
+    microbe_row: pd.Series,
+    exp_row: pd.Series | None,
+    xenobiotic_class: str,
+) -> str:
+    """
+    Build ASSAY_DESCRIPTION according to organism type:
+
+    Single-bacteria template:
+      The {xenobiotic_class} is tested on {organism} strain {strain} for
+      biotransformation. The {xenobiotic_class} is measured with
+      {instrument}, over {n} time points, between {t_min} to {t_max}
+      {unit}, over oxygen condition: {oxygen}.
+
+    Community template (triggered when 'metagenome' is in organism name):
+      The {xenobiotic_class} is tested on {organism} community with study
+      accession number {ENA_project} and sample accession number
+      {ENA_sample} for biotransformation. The {xenobiotic_class} is
+      measured with {instrument}, over {n} time points, between {t_min}
+      to {t_max} {unit}, over oxygen condition: {oxygen}.
+
+    Fields that are empty are omitted gracefully.
+    """
+    xeno     = xenobiotic_class.strip() if xenobiotic_class else "xenobiotic compound"
+    organism = str(microbe_row.get("Bacteria_scientific_name") or "").strip()
+    strain   = str(microbe_row.get("Strain") or "").strip()
+    ena_proj = str(microbe_row.get("ENAorSRA_project_Accession_number") or "").strip()
+    ena_samp = str(microbe_row.get("ENAorSRA_sample_Accession_number") or "").strip()
+
+    # Experimental context (may be absent)
+    if exp_row is not None:
+        instrument   = str(exp_row.get("Instrument_4_measurement") or "").strip()
+        timecourse   = str(exp_row.get(
+            "Time-course information (i.e., number of timepoints)") or "").strip()
+        time_unit    = str(exp_row.get("Time_unit") or "").strip()
+        oxygen       = str(exp_row.get("Oxygen conditions") or "").strip()
+    else:
+        instrument = timecourse = time_unit = oxygen = ""
+
+    n_tp, t_min, t_max = _parse_timecourse(timecourse)
+
+    is_community = "metagenome" in organism.lower()
+
+    # --- Sentence 1: who/what is tested ---
+    if is_community:
+        s1 = f"The {xeno} is tested on {organism} community"
+        if ena_proj:
+            s1 += f" with study accession number {ena_proj}"
+        if ena_samp:
+            s1 += f" and sample accession number {ena_samp}"
+        s1 += " for biotransformation."
+    else:
+        s1 = f"The {xeno} is tested on {organism}"
+        if strain:
+            s1 += f" strain {strain}"
+        s1 += " for biotransformation."
+
+    # --- Sentence 2: measurement context ---
+    parts2 = [f"The {xeno} is measured"]
+    if instrument:
+        parts2.append(f"with {instrument}")
+    if n_tp:
+        parts2.append(f"over {n_tp} time points")
+        if t_min and t_max:
+            unit_str = f" {time_unit}" if time_unit else ""
+            parts2.append(f"between {t_min} to {t_max}{unit_str}")
+    if oxygen:
+        parts2.append(f"over oxygen condition: {oxygen}")
+
+    s2 = ", ".join(parts2) + "." if len(parts2) > 1 else ""
+
+    return f"{s1} {s2}".strip() if s2 else s1
+
+
+# ---------------------------------------------------------------------------
+# Identifier helpers
 # ---------------------------------------------------------------------------
 
 def _slugify(text: str) -> str:
@@ -150,10 +289,11 @@ def _slugify(text: str) -> str:
 
 def _make_aidx(organism: str, strain: str, ridx: str, n: int) -> str:
     """
-    Build a meaningful AIDX from organism and RIDX.
+    Build a meaningful AIDX from organism, strain, and RIDX.
 
-    Example: GutMeta_Salmonella_typhimurium_LT2_biotransformation
-             GutMeta_gut_metagenome_1_biotransformation
+    Examples:
+      GutMeta_Salmonella_typhimurium_LT2_biotransformation
+      GutMeta_gut_metagenome_biotransformation
     """
     parts = [ridx]
     if organism:
@@ -166,46 +306,6 @@ def _make_aidx(organism: str, strain: str, ridx: str, n: int) -> str:
     return "_".join(filter(None, parts))
 
 
-def _build_description(row: pd.Series, compound_names: list) -> str:
-    """
-    Auto-build ASSAY_DESCRIPTION from available fields.
-
-    Pattern:
-      Biotransformation assay measuring [compounds] by [organism] [strain]
-      isolated from [source]. [additional context if available]
-    """
-    organism = str(row.get("Bacteria_scientific_name") or "").strip()
-    strain   = str(row.get("Strain") or "").strip()
-    source   = str(row.get("Sample_isolation_source") or "").strip()
-    donor    = str(row.get("Human_donor_metadata") or "").strip()
-    env      = str(row.get("Environmental_sample_metadata") or "").strip()
-    internal = str(row.get("internal_sample_identifier") or "").strip()
-
-    parts = ["Biotransformation assay"]
-
-    if compound_names:
-        compound_str = ", ".join(compound_names)
-        parts.append(f"measuring biotransformation of {compound_str}")
-
-    if organism:
-        organism_str = organism
-        if strain:
-            organism_str += f" {strain}"
-        parts.append(f"by {organism_str}")
-
-    if source:
-        parts.append(f"isolated from {source}")
-
-    if donor:
-        parts.append(f"(donor: {donor})")
-    if env:
-        parts.append(f"(environment: {env})")
-    if internal:
-        parts.append(f"[sample ID: {internal}]")
-
-    return " ".join(parts) + "."
-
-
 # ---------------------------------------------------------------------------
 # Builder
 # ---------------------------------------------------------------------------
@@ -213,42 +313,38 @@ def _build_description(row: pd.Series, compound_names: list) -> str:
 def build_assay_tsv(
     df: pd.DataFrame,
     ridx: str,
-    compound_names: list,
+    exp_df: pd.DataFrame,
+    xenobiotic_class: str,
 ) -> pd.DataFrame:
     """
     Build the ASSAY.tsv records from the Microbes sheet DataFrame.
 
-    One row per assay entry. AIDX is auto-generated if assay_identifier
-    is blank. ASSAY_DESCRIPTION is auto-built from organism + compound context.
+    One row per Microbes sheet entry. AIDX is used as-is from
+    assay_identifier; if blank it is auto-generated from organism + RIDX.
+    ASSAY_DESCRIPTION is built from Microbes + joined Experiment data.
     """
     records = []
-    aidx_counter: dict = {}  # tracks duplicates for auto-AIDX uniqueness
+    aidx_counter: dict = {}
 
     for _, row in df.iterrows():
         organism = str(row.get("Bacteria_scientific_name") or "").strip()
         strain   = str(row.get("Strain") or "").strip()
 
-        # AIDX: use provided assay_identifier or auto-generate
+        # --- AIDX ---
         raw_aidx = str(row.get("assay_identifier") or "").strip()
         if raw_aidx:
             aidx = raw_aidx
         else:
-            base = _make_aidx(organism, strain, ridx, 1)
+            base  = _make_aidx(organism, strain, ridx, 1)
             count = aidx_counter.get(base, 0) + 1
             aidx_counter[base] = count
             aidx = base if count == 1 else f"{base}_{count}"
 
-        # ASSAY_TYPE: normalise to single uppercase letter
-        raw_type = str(row.get("ASSAY_TYPE") or "").strip().upper()
+        # --- ASSAY_TYPE: normalise to single uppercase letter ---
+        raw_type   = str(row.get("ASSAY_TYPE") or "").strip().upper()
         assay_type = raw_type[0] if raw_type else ""
 
-        # ASSAY_DESCRIPTION
-        description = _build_description(row, compound_names)
-
-        # ASSAY_ORGANISM
-        assay_organism = organism
-
-        # ASSAY_TAX_ID: accept integer or string; coerce to string
+        # --- ASSAY_TAX_ID: coerce float cells (e.g. 1348.0) to int string ---
         raw_tax = row.get("NCBI Tax ID")
         if raw_tax == "" or raw_tax is None:
             assay_tax_id = ""
@@ -258,24 +354,29 @@ def build_assay_tsv(
             except (ValueError, TypeError):
                 assay_tax_id = str(raw_tax).strip()
 
-        # Optional fields
-        assay_strain    = strain
+        # --- Join Experiment row for this assay ---
+        exp_row = _get_experiment_for_assay(exp_df, aidx)
+
+        # --- ASSAY_DESCRIPTION ---
+        description = _build_description(row, exp_row, xenobiotic_class)
+
+        # --- Optional Microbes fields ---
         assay_source    = str(row.get("Sample_isolation_source") or "").strip()
         assay_tissue    = str(row.get("Tissue") or "").strip()
         assay_cell_type = str(row.get("Cell type") or "").strip()
         assay_subcell   = str(row.get("SUBCELLULAR_FRACTION") or "").strip()
         assay_group     = str(row.get("ASSAY_GROUP") or "").strip()
 
-        # Target fields (optional)
-        target_type = str(row.get("TARGET_TYPE") or "").strip()
-        # TARGET_NAME: prefer Protein name; fall back to Gene name
-        target_name = (
+        # --- Target fields ---
+        target_type      = str(row.get("TARGET_TYPE") or "").strip()
+        target_name      = (
             str(row.get("Protein name") or "").strip()
             or str(row.get("Gene name") or "").strip()
         )
         target_accession = str(row.get("UniProt ID") or "").strip()
         target_organism  = str(row.get("TARGET_ORGANISM") or "").strip()
-        raw_ttax         = row.get("TARGET_TAX_ID")
+
+        raw_ttax = row.get("TARGET_TAX_ID")
         if raw_ttax == "" or raw_ttax is None:
             target_tax_id = ""
         else:
@@ -284,27 +385,25 @@ def build_assay_tsv(
             except (ValueError, TypeError):
                 target_tax_id = str(raw_ttax).strip()
 
-        records.append(
-            {
-                "AIDX":                     aidx,
-                "RIDX":                     ridx,
-                "ASSAY_DESCRIPTION":        description,
-                "ASSAY_TYPE":               assay_type,
-                "ASSAY_GROUP":              assay_group,
-                "ASSAY_ORGANISM":           assay_organism,
-                "ASSAY_STRAIN":             assay_strain,
-                "ASSAY_TAX_ID":             assay_tax_id,
-                "ASSAY_SOURCE":             assay_source,
-                "ASSAY_TISSUE":             assay_tissue,
-                "ASSAY_CELL_TYPE":          assay_cell_type,
-                "ASSAY_SUBCELLULAR_FRACTION": assay_subcell,
-                "TARGET_TYPE":              target_type,
-                "TARGET_NAME":              target_name,
-                "TARGET_ACCESSION":         target_accession,
-                "TARGET_ORGANISM":          target_organism,
-                "TARGET_TAX_ID":            target_tax_id,
-            }
-        )
+        records.append({
+            "AIDX":                       aidx,
+            "RIDX":                       ridx,
+            "ASSAY_DESCRIPTION":          description,
+            "ASSAY_TYPE":                 assay_type,
+            "ASSAY_GROUP":                assay_group,
+            "ASSAY_ORGANISM":             organism,
+            "ASSAY_STRAIN":               strain,
+            "ASSAY_TAX_ID":               assay_tax_id,
+            "ASSAY_SOURCE":               assay_source,
+            "ASSAY_TISSUE":               assay_tissue,
+            "ASSAY_CELL_TYPE":            assay_cell_type,
+            "ASSAY_SUBCELLULAR_FRACTION": assay_subcell,
+            "TARGET_TYPE":                target_type,
+            "TARGET_NAME":                target_name,
+            "TARGET_ACCESSION":           target_accession,
+            "TARGET_ORGANISM":            target_organism,
+            "TARGET_TAX_ID":              target_tax_id,
+        })
 
     return pd.DataFrame(records, columns=CHEMBL_COLS)
 
@@ -314,7 +413,7 @@ def build_assay_tsv(
 # ---------------------------------------------------------------------------
 
 def validate(assay_df: pd.DataFrame) -> list:
-    """Return a list of validation error strings (empty list -> all OK)."""
+    """Return a list of validation warning strings (empty list → all OK)."""
     errors = []
 
     for i, row in assay_df.iterrows():
@@ -331,7 +430,7 @@ def validate(assay_df: pd.DataFrame) -> list:
                 f"{sorted(VALID_ASSAY_TYPES)}."
             )
 
-        # If TARGET_ORGANISM is filled, TARGET_TAX_ID becomes mandatory
+        # TARGET_TAX_ID required when TARGET_ORGANISM is filled
         if str(row.get("TARGET_ORGANISM") or "").strip():
             if not str(row.get("TARGET_TAX_ID") or "").strip():
                 errors.append(
@@ -339,7 +438,7 @@ def validate(assay_df: pd.DataFrame) -> list:
                     f"TARGET_ORGANISM is filled."
                 )
 
-        # If Protein name is filled, UniProt ID is strongly recommended
+        # TARGET_ACCESSION recommended when TARGET_NAME is filled
         if str(row.get("TARGET_NAME") or "").strip():
             if not str(row.get("TARGET_ACCESSION") or "").strip():
                 errors.append(
@@ -358,7 +457,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Generate ASSAY.tsv from a MIX-MB Template_open.ods "
-            "(Microbes + Chemicals sheets)"
+            "(Microbes + Experiment sheets)"
         ),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -369,6 +468,13 @@ def main() -> None:
     parser.add_argument(
         "--ridx", required=True,
         help="RIDX identifier for this submission (must match REFERENCE.tsv)",
+    )
+    parser.add_argument(
+        "--xenobiotic_class", default="xenobiotic compound",
+        help=(
+            "Singular form of the xenobiotic class used in ASSAY_DESCRIPTION "
+            "(e.g. 'drug', 'pesticide', 'pollutant' — not 'drugs' or 'pesticides')"
+        ),
     )
     parser.add_argument(
         "--outdir", default=".",
@@ -393,14 +499,18 @@ def main() -> None:
     if microbes_df.empty:
         sys.exit("ERROR: no data rows found in the Microbes sheet.")
 
-    compound_names = read_compound_names(ods_path)
-    if not compound_names:
-        print("[WARN] No compound names found in Chemicals sheet — "
-              "ASSAY_DESCRIPTION will omit compound context.", file=sys.stderr)
+    exp_df = read_experiment_sheet(ods_path)
+    if exp_df.empty:
+        print("[WARN] No data rows found in the Experiment sheet — "
+              "ASSAY_DESCRIPTION will omit measurement context.", file=sys.stderr)
 
     # --- Build ---
-    assay_df = build_assay_tsv(microbes_df, ridx=args.ridx,
-                                compound_names=compound_names)
+    assay_df = build_assay_tsv(
+        microbes_df,
+        ridx=args.ridx,
+        exp_df=exp_df,
+        xenobiotic_class=args.xenobiotic_class,
+    )
 
     # --- Validate ---
     errors = validate(assay_df)
@@ -410,7 +520,7 @@ def main() -> None:
         if args.strict:
             sys.exit(1)
 
-    # --- Write ASSAY.tsv ---
+    # --- Write ---
     out_path = outdir / "ASSAY.tsv"
     assay_df.to_csv(out_path, sep="\t", index=False)
     print(f"Written: {out_path}")
