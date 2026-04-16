@@ -3,19 +3,12 @@
 chemicals.py — Module 2 (BioXend / MIX-MB)
 
 Reads the Chemicals sheet from a MIX-MB Template_open.ods and produces:
-  - COMPOUND_RECORD.tsv   ChEMBL deposition format
-  - COMPOUND_CTAB.sdf     2D chemical structures (RDKit)
-
-Template colour coding:
-  Green  = Mandatory   → CIDX (auto-generated if blank), RIDX, COMPOUND_KEY,
-                         COMPOUND_NAME, SMILES
-  Blue   = Recommended → IUPAC_Name, InChI, InChIKey, CAS_number
-  Yellow = Optional    → COMPOUND_SOURCE (Vendor / database_ID), Stock info,
-                         MS columns
+  - COMPOUND_RECORD.tsv   
+  - COMPOUND_CTAB.sdf     
 
 Usage:
     python bin/chemicals.py --input Standards/Templates/Template_open.ods \\
-                        --ridx GutMeta --prefix CIDX --outdir results/
+                        --ridx GutMeta --prefix HMDM --outdir results/
 """
 
 import argparse
@@ -36,13 +29,7 @@ from rdkit.Chem import AllChem
 CHEMBL_COLS = ["CIDX", "RIDX", "COMPOUND_KEY", "COMPOUND_NAME", "COMPOUND_SOURCE"]
 
 MANDATORY_FIELDS = ["CIDX", "RIDX", "COMPOUND_KEY", "COMPOUND_NAME"]
-
-# Template sheet row indices (0-based, read with header=None)
-#   row 0 — section group headers  (skip)
-#   row 1 — column names           (use as header)
-#   row 2 — data types             (skip)
-#   row 3 — field descriptions     (skip)
-#   row 4+ — data rows
+# Template sheet row indices
 _ROW_COLNAMES   = 1
 _ROW_DATA_START = 4
 
@@ -68,8 +55,6 @@ def read_chemicals_sheet(ods_path: Path) -> pd.DataFrame:
 
     def _clean(v):
         if not isinstance(v, str):
-            # NaN floats from empty cells must become "" so downstream
-            # truthiness checks work correctly (float('nan') is truthy!)
             try:
                 return "" if pd.isna(v) else v
             except (TypeError, ValueError):
@@ -79,63 +64,6 @@ def read_chemicals_sheet(ods_path: Path) -> pd.DataFrame:
 
     return df.map(_clean)
 
-
-# ---------------------------------------------------------------------------
-# ChEMBL lookup (optional enrichment / validation)
-# ---------------------------------------------------------------------------
-
-# def _query_chembl(smiles_list: list, batch_size: int = 100) -> dict:
-    # """
-    # Query ChEMBL API for molecules matching the given canonical SMILES.
-
-    # Returns a dict keyed by canonical SMILES ->
-    #     {"chembl_id": str, "pref_name": str}.
-    # Compounds not found in ChEMBL are absent from the dict.
-    # """
-    # url_stem = "https://www.ebi.ac.uk"
-    # fields = "molecule_chembl_id,pref_name,molecule_structures"
-    # found: dict = {}
-
-    # for i in range(0, len(smiles_list), batch_size):
-    #     batch = smiles_list[i : i + batch_size]
-    #     smiles_str = ",".join(batch)
-    #     url = (
-    #         f"{url_stem}/chembl/api/data/molecule?"
-    #         f"molecule_structures__canonical_smiles__in={smiles_str}"
-    #         f"&only={fields}&format=json&limit=1000"
-    #     )
-    #     print(
-    #         f"[INFO] Querying ChEMBL batch "
-    #         f"{i // batch_size + 1}/{(len(smiles_list) - 1) // batch_size + 1}"
-    #     )
-    #     try:
-    #         resp = requests.get(url, timeout=30).json()
-    #     except Exception as exc:
-    #         print(f"[WARN] ChEMBL request failed: {exc}", file=sys.stderr)
-    #         continue
-
-    #     def _collect(resp_json: dict) -> None:
-    #         for mol in resp_json.get("molecules", []):
-    #             structs = mol.get("molecule_structures") or {}
-    #             can = structs.get("canonical_smiles", "")
-    #             if can:
-    #                 found[can] = {
-    #                     "chembl_id": mol.get("molecule_chembl_id", ""),
-    #                     "pref_name":  mol.get("pref_name", ""),
-    #                 }
-
-    #     _collect(resp)
-    #     while resp.get("page_meta", {}).get("next"):
-    #         try:
-    #             resp = requests.get(
-    #                 url_stem + resp["page_meta"]["next"], timeout=30
-    #             ).json()
-    #             _collect(resp)
-    #         except Exception as exc:
-    #             print(f"[WARN] ChEMBL pagination failed: {exc}", file=sys.stderr)
-    #             break
-
-    # return found
 
 
 # ---------------------------------------------------------------------------
@@ -158,31 +86,13 @@ def build_compound_records(
     df: pd.DataFrame,
     ridx: str,
     prefix: str,
-    #skip_chembl: bool = False,
 ) -> pd.DataFrame:
     """
-    Validate SMILES, assign CIDXs, and build the compound records table.
+    Assign CIDXs, and build the compound records table.
 
     The returned DataFrame carries private columns _smiles and _mol
     used by the SDF writer; these are dropped before TSV export.
     """
-    # Optional ChEMBL lookup for enrichment / validation
-    # chembl_map: dict = {}
-    # if not skip_chembl:
-    #     valid_smiles = [
-    #         s for s in df.get("SMILES", pd.Series(dtype=str)).tolist()
-    #         if isinstance(s, str) and s.strip()
-    #     ]
-    #     if valid_smiles:
-    #         chembl_map = _query_chembl(valid_smiles)
-    #         missing = [s for s in valid_smiles if s not in chembl_map]
-    #         if missing:
-    #             print(
-    #                 f"[WARN] {len(missing)} SMILES not found in ChEMBL:",
-    #                 file=sys.stderr,
-    #             )
-    #             for s in missing:
-    #                 print(f"       {s}", file=sys.stderr)
 
     records = []
     auto_n = 1
@@ -208,16 +118,16 @@ def build_compound_records(
             cidx = raw_cidx
         else:
             cidx = _make_cidx(auto_n, total, prefix)
-            auto_n += 1  # only advance counter when auto-generating
+            auto_n += 1  
 
-        # COMPOUND_NAME (mandatory — green field)
+        # COMPOUND_NAME 
         compound_name = str(row.get("Common_Name") or "").strip()
 
-        # COMPOUND_KEY (mandatory — green field)
+        # COMPOUND_KEY 
         # Local_Synonym used in the manuscript; fallback to Common_Name
         compound_key = str(row.get("Local_Synonym") or "").strip() or compound_name
 
-        # COMPOUND_SOURCE (optional — yellow field)
+        # COMPOUND_SOURCE 
         # Vendor preferred; fall back to database_ID
         vendor  = str(row.get("Vendor")      or "").strip()
         db_id   = str(row.get("database_ID") or "").strip()
@@ -244,7 +154,7 @@ def write_compound_ctab_sdf(record_df: pd.DataFrame, out_path: Path) -> None:
     Write COMPOUND_CTAB.sdf.
 
     Each entry has:
-      - Molecule name line (title): CIDX
+      - Molecule name line (title): COMPOUND_NAME
       - 2D coordinates generated by RDKit
       - SDF property: CIDX
     """
@@ -254,7 +164,7 @@ def write_compound_ctab_sdf(record_df: pd.DataFrame, out_path: Path) -> None:
     for _, row in record_df.iterrows():
         mol = row["_mol"]
         AllChem.Compute2DCoords(mol)
-        mol.SetProp("_Name", str(row["CIDX"]))  # title line = CIDX
+        mol.SetProp("_Name", str(row["COMPOUND_NAME"]))  
         mol.SetProp("CIDX",  str(row["CIDX"]))
         writer.write(mol)
 
@@ -286,7 +196,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
             "Generate COMPOUND_RECORD.tsv + COMPOUND_CTAB.sdf "
-            "from a MIX-MB Template_open.ods"
+            "from MIX-MB Template_open.ods"
         ),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
@@ -305,10 +215,6 @@ def main() -> None:
     parser.add_argument(
         "--outdir", default=".",
         help="Output directory",
-    )
-    parser.add_argument(
-        "--skip-chembl", action="store_true",
-        help="Skip ChEMBL API lookup (faster, works offline)",
     )
     parser.add_argument(
         "--strict", action="store_true",
@@ -334,7 +240,6 @@ def main() -> None:
         df,
         ridx=args.ridx,
         prefix=args.prefix,
-        #skip_chembl=args.skip_chembl,
     )
 
     if record_df.empty:
