@@ -1,67 +1,112 @@
 #!/usr/bin/env nextflow
-
 /*
- * ChEMBL Submission Pipeline
- * Author: Mahnoor Zulfiqar
- * Description: Automated pipeline to generate ChEMBL submission files from compound and activity data
+ * BioXend Pipeline — MIX-MB ChEMBL Submission Generator
+ *
+ * Reads a filled MIX-MB Template_open.ods and produces six ChEMBL-ready
+ * deposition files in parallel (all modules read the same template):
+ *
+ *   REFERENCE.tsv       — publication metadata
+ *   README.toml         — submission metadata
+ *   COMPOUND_RECORD.tsv — compound records (CIDX-indexed)
+ *   COMPOUND_CTAB.sdf   — 2D chemical structures (RDKit)
+ *   ASSAY.tsv           — assay descriptions per organism/condition
+ *   ASSAY_PARAM.tsv     — experimental parameters
+ *   ACTIVITY.tsv        — compound–assay activity links
+ *
+ * Usage:
+ *   nextflow run main.nf -profile conda \
+ *     --input  Standards/Templates/Template_open.ods \
+ *     --ridx   MyStudy_2024 \
+ *     --outdir results/
  */
 
-nextflow.enable.dsl=2
+nextflow.enable.dsl = 2
 
-// ========================
+// ─────────────────────────────────────────────────────────────────────────────
+// Imports
+// ─────────────────────────────────────────────────────────────────────────────
+
+include { GENERATE_REFERENCE   } from './modules/reference'
+include { GENERATE_CHEMICALS   } from './modules/chemicals'
+include { GENERATE_ASSAY       } from './modules/microbes'
+include { GENERATE_ASSAY_PARAM } from './modules/experiment'
+include { GENERATE_ACTIVITY    } from './modules/biotransformation'
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Parameters
-// ========================
+// ─────────────────────────────────────────────────────────────────────────────
 
-params.input_csv = "${projectDir}/bin/smiles_list.txt"
-params.strain_cond = "${projectDir}/bin/strain_cond.csv"
-params.outdir = "${projectDir}/results"
-params.help = false
+params.help   = false
 
-// Reference metadata parameters
-params.ridx = "HumanMicrobiome_DrugMetabolism"
-params.doi = "10.1038/s41586-019-1291-3"
-params.title = "Mapping human microbiome drug metabolism by gut bacteria and their genes"
-params.authors = "Michael Zimmermann, Maria Zimmermann-Kogadeeva, Rebekka Wegmann & Andrew L. Goodman"
-params.abstract = "Individuals vary widely in their responses to medicinal drugs..."
-params.year = 2019
-params.journal_name = "Nature"
-params.volume = "570"
-params.issue = "7762"
-params.first_page = "462"
-params.last_page = "467"
-params.ref_type = "Publication"
-params.data_licence = "CC0"
+// Required
+params.input  = null   // Path to Template_open.ods
+params.ridx   = null   // Reference identifier (matches Reference_identifier in template)
 
-// ========================
-// Help Message
-// ========================
+// Chemicals options
+params.prefix = "CIDX" // Prefix for auto-generated compound identifiers
+
+// Microbes / ASSAY options
+params.xenobiotic_class = "xenobiotic compound"  // e.g. 'drug', 'pesticide'
+
+// Experiment / ASSAY_PARAM options
+params.dose          = ""    // Compound dose value (omit to skip DOSE rows)
+params.dose_units    = "uM"  // Units for dose
+params.dose_comments = ""    // Optional comment for the DOSE row
+
+// Pipeline options
+params.outdir  = "${projectDir}/results"
+params.strict  = false   // Exit non-zero on validation warnings
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Help
+// ─────────────────────────────────────────────────────────────────────────────
 
 def helpMessage() {
-    log.info"""
-    ================================================================
-    ChEMBL Submission Pipeline
-    ================================================================
+    log.info """
+    BioXend — MIX-MB ChEMBL Pipeline
+
     Usage:
-      nextflow run main.nf [options]
-    
-    Required Parameters:
-      --input_csv       Input CSV with SMILES, Names, Study_ID
-      --strain_cond     CSV with strain conditions
-      --outdir          Output directory for results
-    
-    Reference Parameters:
-      --ridx            Reference index/ID
-      --doi             DOI of publication
-      --title           Publication title
-      --authors         Publication authors
-      --abstract        Publication abstract
-      --year            Publication year
-      --journal_name    Journal name (optional)
-      --ref_type        Reference type (Publication, Patent, etc.)
-    
-    Example:
-      nextflow run main.nf --input_csv data/compounds.csv --outdir results
-    ================================================================
+      nextflow run main.nf -profile conda \\
+        --input  Standards/Templates/Template_open.ods \\
+        --ridx   MyStudy_2024 \\
+        --outdir results/
+
+    Required:
+      --input   PATH    Filled MIX-MB Template_open.ods
+      --ridx    STRING  Reference identifier (must match the
+                        Reference_identifier column in the Reference sheet)
+
+    Compound options:
+      --prefix  STRING  Prefix for auto-generated CIDXs [default: CIDX]
+
+    Assay options:
+      --xenobiotic_class  STRING  Singular class name used in ASSAY_DESCRIPTION
+                                   e.g. 'drug', 'pesticide' [default: xenobiotic compound]
+
+    Experiment / ASSAY_PARAM options:
+      --dose           NUMBER  Compound dose value (omit to skip DOSE rows)
+      --dose_units     STRING  Units for dose [default: uM]
+      --dose_comments  STRING  Comment for the DOSE row
+
+    Pipeline options:
+      --outdir  PATH   Output directory [default: ./results]
+      --strict         Exit non-zero on any validation warning
+      --help           Show this message and exit
+
+    Profiles:
+      -profile conda        Use conda environments (recommended for local use)
+      -profile docker       Use Docker container
+      -profile singularity  Use Singularity container
+      -profile slurm        Submit jobs to a SLURM cluster
+
+    Output files written to --outdir:
+      REFERENCE.tsv       Publication / reference metadata
+      README.toml         ChEMBL submission metadata
+      COMPOUND_RECORD.tsv Compound records
+      COMPOUND_CTAB.sdf   2D chemical structures (RDKit)
+      ASSAY.tsv           Assay descriptions
+      ASSAY_PARAM.tsv     Experimental parameters
+      ACTIVITY.tsv        Compound-assay activity links
     """.stripIndent()
 }
 
@@ -70,249 +115,90 @@ if (params.help) {
     exit 0
 }
 
-// ========================
-// Process Definitions
-// ========================
+// ─────────────────────────────────────────────────────────────────────────────
+// Parameter checks
+// ─────────────────────────────────────────────────────────────────────────────
 
-process GENERATE_REFERENCE {
-    tag "Reference: ${params.ridx}"
-    publishDir "${params.outdir}", mode: 'copy'
-    conda "${projectDir}/envs/r_env.yml"
-    
-    input:
-    val ridx
-    val doi
-    val title
-    val authors
-    val abstract
-    val year
-    val ref_type
-    val journal_name
-    val volume
-    val issue
-    val first_page
-    val last_page
-    val data_licence
-    
-    output:
-    path "REFERENCE.tsv", emit: reference
-    
-    script:
-    """
-    generate_reference.R \\
-        --RIDX "${ridx}" \\
-        --DOI "${doi}" \\
-        --TITLE "${title}" \\
-        --AUTHORS "${authors}" \\
-        --ABSTRACT "${abstract}" \\
-        --YEAR ${year} \\
-        --REF_TYPE "${ref_type}" \\
-        --JOURNAL_NAME "${journal_name}" \\
-        --VOLUME "${volume}" \\
-        --ISSUE "${issue}" \\
-        --FIRST_PAGE "${first_page}" \\
-        --LAST_PAGE "${last_page}" \\
-        --DATA_LICENCE "${data_licence}"
-    """
+if (!params.input) {
+    log.error "ERROR: --input is required. Provide the path to Template_open.ods."
+    exit 1
+}
+if (!params.ridx) {
+    log.error "ERROR: --ridx is required. Provide the Reference_identifier value (e.g. 'MyStudy_2024')."
+    exit 1
 }
 
-process GENERATE_COMPOUNDS {
-    tag "Compounds from SMILES"
-    publishDir "${params.outdir}", mode: 'copy'
-    conda "${projectDir}/envs/py_env.yml"
-    
-    input:
-    path input_csv
-    
-    output:
-    path "COMPOUND_RECORD.tsv", emit: compound_record
-    path "COMPOUND_CTAB.sdf", emit: compound_sdf
-    path "chembl_mapping.tsv", emit: chembl_mapping
-    
-    script:
-    """
-    generate_compound_files.py \\
-        --input ${input_csv} \\
-        --output_dir .
-    """
-}
-
-process GENERATE_ASSAY {
-    tag "Assay: ${params.ridx}"
-    publishDir "${params.outdir}", mode: 'copy'
-    conda "${projectDir}/envs/r_env.yml"
-    
-    input:
-    path strain_cond
-    val ridx
-    
-    output:
-    path "ASSAY.tsv", emit: assay
-    path "ASSAY_PARAM.tsv", emit: assay_param
-    
-    script:
-    """
-    generate_assay.R \\
-        --strain_cond ${strain_cond} \\
-        --ridx ${ridx}
-    """
-}
-
-process GENERATE_ACTIVITY {
-    tag "Activity: ${params.ridx}"
-    publishDir "${params.outdir}", mode: 'copy'
-    conda "${projectDir}/envs/r_env.yml"
-    
-    input:
-    path compound_record
-    path assay
-    path activity_data
-    val ridx
-    
-    output:
-    path "ACTIVITY.tsv", emit: activity
-    
-    script:
-    """
-    write_activity_tsv.R \\
-        --compound_tsv ${compound_record} \\
-        --assay_tsv ${assay} \\
-        --input_csv ${activity_data} \\
-        --ridx ${ridx} \\
-        --output_dir .
-    """
-}
-
-process VALIDATE_SUBMISSION {
-    tag "Validation"
-    publishDir "${params.outdir}", mode: 'copy'
-    
-    input:
-    path reference
-    path compound_record
-    path compound_sdf
-    path assay
-    path assay_param
-    path activity
-    
-    output:
-    path "validation_report.txt", emit: report
-    
-    script:
-    """
-    echo "ChEMBL Submission Files Validation Report" > validation_report.txt
-    echo "=========================================" >> validation_report.txt
-    echo "" >> validation_report.txt
-    echo "Generated Files:" >> validation_report.txt
-    echo "  - REFERENCE.tsv: \$(wc -l < ${reference}) lines" >> validation_report.txt
-    echo "  - COMPOUND_RECORD.tsv: \$(wc -l < ${compound_record}) lines" >> validation_report.txt
-    echo "  - COMPOUND_CTAB.sdf: Present" >> validation_report.txt
-    echo "  - ASSAY.tsv: \$(wc -l < ${assay}) lines" >> validation_report.txt
-    echo "  - ASSAY_PARAM.tsv: \$(wc -l < ${assay_param}) lines" >> validation_report.txt
-    echo "  - ACTIVITY.tsv: \$(wc -l < ${activity}) lines" >> validation_report.txt
-    echo "" >> validation_report.txt
-    echo "Validation Status: SUCCESS" >> validation_report.txt
-    echo "Date: \$(date)" >> validation_report.txt
-    """
-}
-
-// ========================
+// ─────────────────────────────────────────────────────────────────────────────
 // Workflow
-// ========================
+// ─────────────────────────────────────────────────────────────────────────────
 
 workflow {
-    
-    // Print pipeline info
+
     log.info """
-    ================================================================
-    ChEMBL Submission Pipeline
-    ================================================================
-    Input CSV        : ${params.input_csv}
-    Strain Conditions: ${params.strain_cond}
-    Output Directory : ${params.outdir}
+    BioXend — MIX-MB ChEMBL Pipeline
+    Input template   : ${params.input}
     Reference ID     : ${params.ridx}
-    ================================================================
+    Output directory : ${params.outdir}
+    Strict mode      : ${params.strict}
     """.stripIndent()
-    
-    // Create input channels
-    input_csv_ch = Channel.fromPath(params.input_csv, checkIfExists: true)
-    strain_cond_ch = Channel.fromPath(params.strain_cond, checkIfExists: true)
-    
-    // Step 1: Generate Reference file
+
+    // Single channel — all modules read the same template file
+    template_ch = Channel.fromPath(params.input, checkIfExists: true)
+
+    // All five steps are independent and run in parallel
     GENERATE_REFERENCE(
+        template_ch
+    )
+
+    GENERATE_CHEMICALS(
+        template_ch,
         params.ridx,
-        params.doi,
-        params.title,
-        params.authors,
-        params.abstract,
-        params.year,
-        params.ref_type,
-        params.journal_name,
-        params.volume,
-        params.issue,
-        params.first_page,
-        params.last_page,
-        params.data_licence
+        params.prefix
     )
-    
-    // Step 2: Generate Compound files from SMILES
-    GENERATE_COMPOUNDS(input_csv_ch)
-    
-    // Step 3: Generate Assay files
+
     GENERATE_ASSAY(
-        strain_cond_ch,
-        params.ridx
+        template_ch,
+        params.ridx,
+        params.xenobiotic_class
     )
-    
-    // Step 4: Generate Activity file
+
+    // GENERATE_ASSAY_PARAM depends on GENERATE_ASSAY for ASSAY_MAPPING.tsv
+    // so it can replace user keys (assay1, assay2…) with generated ChEMBL AIDXs.
+    // DOSE is read from the Experiment sheet; --dose/--dose_units are fallbacks.
+    GENERATE_ASSAY_PARAM(
+        template_ch,
+        params.dose,
+        params.dose_units,
+        params.dose_comments,
+        GENERATE_ASSAY.out.assay_mapping
+    )
+
+    // GENERATE_ACTIVITY depends on both upstream steps:
+    //   - GENERATE_CHEMICALS: COMPOUND_RECORD.tsv for CIDX lookup by Common_Name
+    //   - GENERATE_ASSAY:     ASSAY_MAPPING.tsv for AIDX lookup by user key
+    //     (ASSAY_MAPPING.tsv is an intermediate file, not published to outdir)
     GENERATE_ACTIVITY(
-        GENERATE_COMPOUNDS.out.compound_record,
-        GENERATE_ASSAY.out.assay,
-        input_csv_ch,
-        params.ridx
+        template_ch,
+        params.ridx,
+        GENERATE_CHEMICALS.out.compound_record,
+        GENERATE_ASSAY.out.assay_mapping
     )
-    
-    // Step 5: Validate all generated files
-    VALIDATE_SUBMISSION(
-        GENERATE_REFERENCE.out.reference,
-        GENERATE_COMPOUNDS.out.compound_record,
-        GENERATE_COMPOUNDS.out.compound_sdf,
-        GENERATE_ASSAY.out.assay,
-        GENERATE_ASSAY.out.assay_param,
-        GENERATE_ACTIVITY.out.activity
-    )
-    
-    // Emit completion message
-    VALIDATE_SUBMISSION.out.report.view { 
-        log.info """
-        ================================================================
-        Pipeline Completed Successfully!
-        ================================================================
-        Results available in: ${params.outdir}
-        ================================================================
-        """
-    }
 }
 
-// ========================
-// Workflow Completion
-// ========================
+// ─────────────────────────────────────────────────────────────────────────────
+// Completion hooks
+// ─────────────────────────────────────────────────────────────────────────────
 
 workflow.onComplete {
+    def status = workflow.success ? "SUCCESS" : "FAILED"
     log.info """
-    ================================================================
-    Pipeline execution summary
-    ================================================================
-    Completed at : ${workflow.complete}
-    Duration     : ${workflow.duration}
-    Success      : ${workflow.success}
-    Work Dir     : ${workflow.workDir}
-    Exit status  : ${workflow.exitStatus}
-    ================================================================
+    Pipeline ${status}
+    Duration   : ${workflow.duration}
+    Output dir : ${params.outdir}
+    Exit status: ${workflow.exitStatus}
     """.stripIndent()
 }
 
 workflow.onError {
-    log.error "Pipeline execution failed!"
-    log.error "Error message: ${workflow.errorMessage}"
+    log.error "Pipeline failed: ${workflow.errorMessage}"
 }
