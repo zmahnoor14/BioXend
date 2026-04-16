@@ -2,14 +2,18 @@
 """
 experiment.py — Module: ASSAY_PARAM generator (BioXend / MIX-MB)
 
-Reads the Experiment sheet from a MIX-MB Template_open_MB.ods and
+Reads the Experiment sheet from a MIX-MB Template_open.ods and
 produces ASSAY_PARAM.tsv in ChEMBL deposition format.
 
 The AIDX list is derived from the first column ('identifier') of the
-Experiment sheet.  Comma-separated values are expanded; rows whose
-identifier is 'all' or 'most' apply to all discovered AIDXs.
-An optional --assay ASSAY.tsv argument can override the AIDX list
-(backward-compatible with earlier pipeline versions).
+Experiment sheet.  These are the user's short keys (e.g. 'assay1') that
+match what was filled in the Microbes sheet AIDX column.  The dataframe
+is built using these keys, then the AIDX column is replaced with the
+pipeline-generated ChEMBL AIDXs via --assays ASSAY_MAPPING.tsv (produced
+by microbes.py) — the same post-processing pattern used in biotransformation.py.
+
+Comma-separated identifiers are expanded; rows whose identifier is 'all'
+or 'most' apply to all discovered AIDXs.
 
 Each row in ASSAY_PARAM.tsv is one parameter entry for one assay.
 Parameters are only emitted when the source field is non-empty
@@ -26,15 +30,16 @@ Experiment sheet column → ASSAY_PARAM TYPE mapping:
   Negative controls                       → CONTROL                   (TEXT_VALUE)
   Antibiotic pre-treatment                → ANTIBIOTICS               (TEXT_VALUE)
   Sample storage                          → STORAGE                   (TEXT_VALUE)
-  Biomass/inoculum density at the start   → BIOMASS                   (TEXT_VALUE — emitted only when non-empty)
-  Biomass/inoculum density at the end     → BIOMASS                   (COMMENTS — appended to start row, or separate)
-  --dose / --dose_units CLI args          → DOSE                      (VALUE, UNITS, RELATION==)
+  Biomass/inoculum density at the start   → BIOMASS                   (TEXT_VALUE)
+  Biomass/inoculum density at the end     → BIOMASS                   (COMMENTS)
+  --dose / --dose_units CLI args          → DOSE                      (VALUE, RELATION==, UNITS)
 
 Usage:
     python bin/experiment.py \\
-        --input   Standards/Templates/Template_open_MB.ods \\
+        --input   Standards/Templates/Template_open.ods \\
+        --assays  results/ASSAY_MAPPING.tsv \\
         --outdir  results/ \\
-        [--dose 5] [--dose_units uM] [--dose_comments "tested drug concentration"] \\
+        [--dose 5 --dose_units uM] \\
         [--strict]
 """
 
@@ -90,11 +95,14 @@ _COL_MAP = [
     ("Sample storage",                                  "STORAGE",                  "text"),
 ]
 
-# Biomass columns — combined into a single BIOMASS row
+# Multi-column fields handled specially in build_assay_param
 _COL_BIOMASS_START = "Biomass/inoculum density at the start"
 _COL_BIOMASS_END   = "Biomass/inoculum density at the end"
 _COL_TIMEPOINTS    = "Time-course information (i.e., number of timepoints)"
 _COL_TIME_UNIT     = "Time_unit"
+# DOSE lives in the template; --dose CLI arg is a fallback when the cell is blank
+_COL_DOSE          = "DOSE"
+_COL_DOSE_UNIT     = "DOSE_unit"
 
 
 # ---------------------------------------------------------------------------
@@ -184,6 +192,65 @@ def _extract_aidx_from_experiment(exp_df: pd.DataFrame) -> list[str]:
 
 
 # ---------------------------------------------------------------------------
+# AIDX mapping helpers
+# ---------------------------------------------------------------------------
+
+def _build_aidx_map(assay_mapping_tsv: "Path | None") -> "dict[str, str]":
+    """
+    Load ASSAY_MAPPING.tsv produced by microbes.py.
+
+    Returns {user_key: generated_aidx}, e.g. {'assay1': 'Zimmermann_gut_metagenome_community_Biotransformation'}.
+    Returns an empty dict when the path is None or the file does not exist.
+    """
+    aidx_map: "dict[str, str]" = {}
+    if assay_mapping_tsv is None or not Path(assay_mapping_tsv).exists():
+        return aidx_map
+    try:
+        df = pd.read_csv(assay_mapping_tsv, sep="\t", dtype=str).fillna("")
+        for _, row in df.iterrows():
+            user_key = str(row.get("USER_AIDX") or "").strip()
+            aidx     = str(row.get("AIDX")      or "").strip()
+            if user_key and aidx:
+                aidx_map[user_key] = aidx
+    except Exception as exc:
+        print(f"[WARN] Could not read ASSAY_MAPPING.tsv: {exc}", file=sys.stderr)
+    if aidx_map:
+        print(f"[INFO] AIDX map loaded: {len(aidx_map)} assay(s).", file=sys.stderr)
+    return aidx_map
+
+
+def _apply_aidx_mapping(param_df: pd.DataFrame, aidx_map: "dict[str, str]") -> pd.DataFrame:
+    """
+    Replace user-key values in the AIDX column with pipeline-generated ChEMBL AIDXs.
+
+    The dataframe is built using the user's short keys (e.g. 'assay1') so
+    that Experiment-sheet lookup logic stays simple.  This function is the
+    final post-processing step that swaps those keys for the proper AIDXs
+    before the file is written — identical to how biotransformation.py resolves
+    ASSAY_Identifier → AIDX.
+
+    Keys with no mapping entry are kept as-is with a warning.
+    """
+    if not aidx_map or param_df.empty:
+        return param_df
+
+    def _resolve(user_key: str) -> str:
+        mapped = aidx_map.get(user_key, "")
+        if mapped:
+            return mapped
+        print(
+            f"[WARN] No AIDX mapping for '{user_key}' — keeping user key as AIDX. "
+            "Verify it matches an entry in ASSAY.tsv.",
+            file=sys.stderr,
+        )
+        return user_key
+
+    param_df = param_df.copy()
+    param_df["AIDX"] = param_df["AIDX"].apply(_resolve)
+    return param_df
+
+
+# ---------------------------------------------------------------------------
 # Builder
 # ---------------------------------------------------------------------------
 
@@ -211,11 +278,15 @@ def build_assay_param(
                   file=sys.stderr)
             continue
 
-        # --- DOSE (from CLI, not from template sheet) ---
-        if dose:
+        # --- DOSE (template columns take precedence; --dose CLI is a fallback) ---
+        template_dose  = _clean(exp_row.get(_COL_DOSE,      ""))
+        template_unit  = _clean(exp_row.get(_COL_DOSE_UNIT, ""))
+        dose_val = template_dose  or dose
+        dose_u   = template_unit  or dose_units
+        if dose_val:
             records.append(_make_row(
                 aidx, "DOSE",
-                relation="=", value=dose, units=dose_units,
+                relation="=", value=dose_val, units=dose_u,
                 comments=dose_comments,
             ))
 
@@ -333,16 +404,26 @@ def validate(param_df: pd.DataFrame, expected_aidx: list[str]) -> list[str]:
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Generate ASSAY_PARAM.tsv from a MIX-MB Template_open_MB.ods. "
-            "AIDXs are read from the first column ('identifier') of the "
-            "Experiment sheet. Optionally supply --assay ASSAY.tsv to override "
-            "the AIDX list (backward-compatible)."
+            "Generate ASSAY_PARAM.tsv from a MIX-MB Template_open.ods. "
+            "AIDXs are read from the identifier column of the Experiment sheet "
+            "(user short keys, e.g. 'assay1'). Supply --assays ASSAY_MAPPING.tsv "
+            "(produced by microbes.py) to replace those keys with the "
+            "pipeline-generated ChEMBL AIDXs before writing the output file."
         ),
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
         "--input", required=True,
-        help="Path to Template_open_MB.ods",
+        help="Path to Template_open.ods",
+    )
+    parser.add_argument(
+        "--assays", default=None,
+        help=(
+            "Path to ASSAY_MAPPING.tsv generated by the microbes step. "
+            "Maps each user key (e.g. 'assay1') to the pipeline-generated "
+            "ChEMBL AIDX. Omit only if Experiment-sheet identifiers are "
+            "already full ChEMBL AIDXs."
+        ),
     )
     parser.add_argument(
         "--outdir", default=".",
@@ -350,7 +431,7 @@ def main() -> None:
     )
     parser.add_argument(
         "--dose", default="",
-        help="Drug/compound dose value (e.g. '5'). Omit to skip DOSE rows.",
+        help="Compound dose value (e.g. '5'). Omit to skip DOSE rows.",
     )
     parser.add_argument(
         "--dose_units", default="uM",
@@ -366,11 +447,14 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    ods_path = Path(args.input)
-    outdir   = Path(args.outdir)
+    ods_path        = Path(args.input)
+    outdir          = Path(args.outdir)
+    assay_mapping   = Path(args.assays) if args.assays else None
 
     if not ods_path.exists():
         sys.exit(f"ERROR: input file not found: {ods_path}")
+    if assay_mapping is not None and not assay_mapping.exists():
+        sys.exit(f"ERROR: ASSAY_MAPPING.tsv not found: {assay_mapping}")
 
     outdir.mkdir(parents=True, exist_ok=True)
 
@@ -379,27 +463,16 @@ def main() -> None:
     if exp_df.empty:
         sys.exit("ERROR: no data rows found in the Experiment sheet.")
 
-    # --- Resolve AIDX list ---
-    if args.assay:
-        assay_path = Path(args.assay)
-        if not assay_path.exists():
-            sys.exit(f"ERROR: ASSAY.tsv not found: {assay_path}")
-        assay_df = pd.read_csv(assay_path, sep="\t", dtype=str).fillna("")
-        if "AIDX" not in assay_df.columns:
-            sys.exit(f"ERROR: 'AIDX' column not found in {assay_path}")
-        aidx_list = [a for a in assay_df["AIDX"].dropna().str.strip().tolist() if a]
-        if not aidx_list:
-            sys.exit("ERROR: no AIDXs found in ASSAY.tsv.")
-    else:
-        aidx_list = _extract_aidx_from_experiment(exp_df)
-        if not aidx_list:
-            sys.exit(
-                "ERROR: no specific AIDXs found in the Experiment sheet identifier "
-                "column. Either add explicit AIDX values to the identifier column, "
-                "or supply --assay ASSAY.tsv."
-            )
+    # --- Resolve AIDX list from identifier column (user short keys) ---
+    aidx_list = _extract_aidx_from_experiment(exp_df)
+    if not aidx_list:
+        sys.exit(
+            "ERROR: no specific AIDXs found in the Experiment sheet identifier "
+            "column. Add explicit identifiers (e.g. 'assay1') that match the "
+            "AIDX column of the Microbes sheet."
+        )
 
-    # --- Build ---
+    # --- Build param df using user keys ---
     param_df = build_assay_param(
         exp_df,
         aidx_list,
@@ -412,8 +485,15 @@ def main() -> None:
         print("[WARN] No ASSAY_PARAM rows were generated — "
               "check that Experiment sheet fields are filled.", file=sys.stderr)
 
+    # --- Replace user keys with pipeline-generated ChEMBL AIDXs ---
+    aidx_map = _build_aidx_map(assay_mapping)
+    param_df = _apply_aidx_mapping(param_df, aidx_map)
+
+    # Validation uses the final (mapped) AIDXs so error messages show real IDs
+    final_aidx_list = [aidx_map.get(k, k) for k in aidx_list]
+
     # --- Validate ---
-    errors = validate(param_df, aidx_list)
+    errors = validate(param_df, final_aidx_list)
     if errors:
         for msg in errors:
             print(f"WARNING: {msg}", file=sys.stderr)

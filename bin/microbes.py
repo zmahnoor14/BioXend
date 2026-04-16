@@ -8,34 +8,26 @@ Template_open.ods and produces:
 
 Each row in the Microbes sheet = one assay entry.
 ASSAY_DESCRIPTION is auto-built using the following rules:
-  - If "metagenome" appears in Bacteria_scientific_name → community template
+  - If "metagenome" appears in ASSAY_ORGANISM → community template
   - Otherwise → single-bacteria template
 Experimental context (instrument, time course, oxygen) is joined from the
-Experiment sheet via the 'identifier' column ('all' or comma-separated
-assay_identifiers).
+Experiment sheet via the 'identifier' column ('all' or comma-separated AIDXs).
 
 Column mappings  (template column → ChEMBL field):
-  assay_identifier             → AIDX 
-  Bacteria_scientific_name     → ASSAY_ORGANISM
-  Strain                       → ASSAY_STRAIN
-  NCBI Tax ID                  → ASSAY_TAX_ID
-  Sample_isolation_source      → ASSAY_SOURCE
-  Tissue                       → ASSAY_TISSUE
-  Cell type                    → ASSAY_CELL_TYPE
-  SUBCELLULAR_FRACTION         → ASSAY_SUBCELLULAR_FRACTION
-  Protein name (or Gene name)  → TARGET_NAME
-  UniProt ID                   → TARGET_ACCESSION
-  TARGET_TYPE, TARGET_ORGANISM, TARGET_TAX_ID, ASSAY_GROUP, ASSAY_TYPE
-                               → same name in both sheets
+  AIDX                → AIDX (auto-generated if blank)
+  ASSAY_ORGANISM      → ASSAY_ORGANISM
+  ASSAY_STRAIN        → ASSAY_STRAIN
+  ASSAY_TAX_ID        → ASSAY_TAX_ID
+  ASSAY_SOURCE        → ASSAY_SOURCE
+  ASSAY_TISSUE        → ASSAY_TISSUE
+  ASSAY_CELL_TYPE     → ASSAY_CELL_TYPE
+  ASSAY_SUBCELLULAR_FRACTION → ASSAY_SUBCELLULAR_FRACTION
+  TARGET_NAME         → TARGET_NAME
+  TARGET_ACCESSION    → TARGET_ACCESSION
+  Gene_name           → used as fallback for TARGET_NAME
 
-Template colour coding:
-  Green  = Mandatory   → AIDX, RIDX, ASSAY_DESCRIPTION, ASSAY_TYPE,
-                         ASSAY_ORGANISM, ASSAY_TAX_ID
-  Blue   = Recommended → ASSAY_STRAIN, ENAorSRA accessions,
-                         UniProt ID (when Protein name given)
-  Yellow = Optional    → ASSAY_SOURCE, ASSAY_TISSUE, ASSAY_CELL_TYPE,
-                         ASSAY_SUBCELLULAR_FRACTION, TARGET_* columns,
-                         ASSAY_GROUP
+Auto-generated AIDX naming convention:
+  [ASSAY_SOURCE_]ORGANISM[_STRAIN|_community]_Biotransformation[_ACCESSION|_TARGET_NAME]
 
 Usage:
     python bin/microbes.py \\
@@ -60,22 +52,21 @@ import pandas as pd
 # ChEMBL ASSAY.tsv columns (in deposition order)
 CHEMBL_COLS = [
     "AIDX",                        # assay_identifier
-    "RIDX",
+    "RIDX",                       # from REFERENCE.tsv OR user provided (must match REFERENCE.tsv)
     "ASSAY_DESCRIPTION",           # auto-built
-    "ASSAY_TYPE",                  # same name
-    "ASSAY_GROUP",                 # same name
-    "ASSAY_ORGANISM",              # Bacteria_scientific_name
-    "ASSAY_STRAIN",                # Strain
-    "ASSAY_TAX_ID",                # NCBI Tax ID
-    "ASSAY_SOURCE",                # Sample_isolation_source
-    "ASSAY_TISSUE",                # Tissue
-    "ASSAY_CELL_TYPE",             # Cell type
-    "ASSAY_SUBCELLULAR_FRACTION",  # SUBCELLULAR_FRACTION
-    "TARGET_TYPE",                 # same name
-    "TARGET_NAME",                 # Protein name (fallback: Gene name)
-    "TARGET_ACCESSION",            # UniProt ID
-    "TARGET_ORGANISM",             # same name
-    "TARGET_TAX_ID",               # same name
+    "ASSAY_TYPE",                  
+    "ASSAY_GROUP",                 
+    "ASSAY_ORGANISM",              
+    "ASSAY_STRAIN",                
+    "ASSAY_TAX_ID",               # of no taxid present, then use StrainInfo to fetch the taxid from assay organism name
+    "ASSAY_SOURCE",                
+    "ASSAY_TISSUE",                
+    "ASSAY_CELL_TYPE",             
+    "ASSAY_SUBCELLULAR_FRACTION",  
+    "TARGET_TYPE",                 
+    "TARGET_NAME",                 
+    "TARGET_ACCESSION",            
+    "TARGET_TAX_ID",               # of no taxid present, then use StrainInfo to fetch the taxid from target organism name
 ]
 
 MANDATORY_FIELDS = [
@@ -88,6 +79,11 @@ MANDATORY_FIELDS = [
 ]
 
 VALID_ASSAY_TYPES = {"A", "F", "B", "U", "P", "T"}
+VALID_TARGET_TYPES = {"3D CELL CULTURE", "ADMET", "CELL-LINE","CHIMERIC PROTEIN"
+"LIPID","MACROMOLECULE", "METAL","MOLECULAR", "NO TARGET", "NON-MOLECULAR", "NUCLEIC-ACID",
+"OLIGOSACCHARIDE", "ORGANISM","PHENOTYPE", "PROTEIN","PROTEIN COMPLEX","PROTEIN COMPLEX GROUP",
+"PROTEIN FAMILY","PROTEIN NUCLEIC-ACID COMPLEX","PROTEIN-PROTEIN INTERACTION",
+"SELECTIVITY GROUP","SINGLE PROTEIN","SMALL MOLECULE","SUBCELLULAR","TISSUE","UNCHECKED","UNDEFINED","UNKNOWN"}
 
 # Template sheet row offsets (0-based, read with header=None)
 #   row 0 — section group headers  (skip)
@@ -225,8 +221,8 @@ def _build_description(
     Fields that are empty are omitted gracefully.
     """
     xeno     = xenobiotic_class.strip() if xenobiotic_class else "xenobiotic compound"
-    organism = str(microbe_row.get("Bacteria_scientific_name") or "").strip()
-    strain   = str(microbe_row.get("Strain") or "").strip()
+    organism = str(microbe_row.get("ASSAY_ORGANISM") or "").strip()
+    strain   = str(microbe_row.get("ASSAY_STRAIN") or "").strip()
     ena_proj = str(microbe_row.get("ENAorSRA_project_Accession_number") or "").strip()
     ena_samp = str(microbe_row.get("ENAorSRA_sample_Accession_number") or "").strip()
 
@@ -287,22 +283,47 @@ def _slugify(text: str) -> str:
     return text
 
 
-def _make_aidx(organism: str, strain: str, ridx: str, n: int) -> str:
+def _make_aidx(
+    organism: str,
+    strain: str,
+    assay_source: str,
+    target_name: str,
+    target_accession: str,
+) -> str:
     """
-    Build a meaningful AIDX from organism, strain, and RIDX.
+    Build an AIDX using the ChEMBL naming convention:
+
+      [ASSAY_SOURCE_]ORGANISM[_STRAIN | _community]_Biotransformation[_ACCESSION | _TARGET_NAME]
+
+    Rules:
+      - ASSAY_SOURCE is prepended if available.
+      - If 'metagenome' is in the organism name, 'community' is appended
+        instead of the strain.
+      - 'Biotransformation' is always added.
+      - If TARGET_NAME is filled: append TARGET_ACCESSION if available,
+        otherwise append TARGET_NAME.
 
     Examples:
-      GutMeta_Salmonella_typhimurium_LT2_biotransformation
-      GutMeta_gut_metagenome_biotransformation
+      Zimmermann_gut_metagenome_community_Biotransformation
+      Zimmermann_Salmonella_typhimurium_LT2_Biotransformation
+      Zimmermann_Salmonella_typhimurium_LT2_Biotransformation_P12345
     """
-    parts = [ridx]
+    parts = []
+    if assay_source:
+        parts.append(_slugify(assay_source))
     if organism:
         parts.append(_slugify(organism))
-    if strain:
+    is_community = "metagenome" in organism.lower()
+    if is_community:
+        parts.append("community")
+    elif strain:
         parts.append(_slugify(strain))
-    if n > 1:
-        parts.append(str(n))
-    parts.append("biotransformation")
+    parts.append("Biotransformation")
+    if target_name:
+        if target_accession:
+            parts.append(_slugify(target_accession))
+        else:
+            parts.append(_slugify(target_name))
     return "_".join(filter(None, parts))
 
 
@@ -315,37 +336,81 @@ def build_assay_tsv(
     ridx: str,
     exp_df: pd.DataFrame,
     xenobiotic_class: str,
-) -> pd.DataFrame:
+) -> "tuple[pd.DataFrame, dict[str, str]]":
     """
     Build the ASSAY.tsv records from the Microbes sheet DataFrame.
 
-    One row per Microbes sheet entry. AIDX is used as-is from
-    assay_identifier; if blank it is auto-generated from organism + RIDX.
-    ASSAY_DESCRIPTION is built from Microbes + joined Experiment data.
+    Returns (assay_df, aidx_map).
+
+    aidx_map maps each user-provided AIDX key (from the template AIDX column,
+    e.g. 'assay1') to the pipeline-generated ChEMBL AIDX (e.g.
+    'Zimmermann_gut_metagenome_community_Biotransformation').  This map is
+    written to ASSAY_MAPPING.tsv so that biotransformation.py can resolve
+    Biotransformation-sheet ASSAY_Identifier values to the proper AIDX —
+    exactly as COMPOUND_RECORD.tsv lets biotransformation.py resolve
+    Common_Name to CIDX.
+
+    The AIDX column in the template is the user's short cross-reference key.
+    The pipeline ALWAYS derives the ChEMBL AIDX from organism / strain /
+    source / target metadata using _make_aidx, regardless of the user key.
     """
     records = []
+    aidx_map: "dict[str, str]" = {}   # user_key → generated AIDX
     aidx_counter: dict = {}
 
     for _, row in df.iterrows():
-        organism = str(row.get("Bacteria_scientific_name") or "").strip()
-        strain   = str(row.get("Strain") or "").strip()
+        organism = str(row.get("ASSAY_ORGANISM") or "").strip()
+        strain   = str(row.get("ASSAY_STRAIN") or "").strip()
+
+        # --- Optional Microbes fields (needed early for AIDX generation) ---
+        assay_source    = str(row.get("ASSAY_SOURCE") or "").strip()
+        assay_tissue    = str(row.get("ASSAY_TISSUE") or "").strip()
+        assay_cell_type = str(row.get("ASSAY_CELL_TYPE") or "").strip()
+        assay_subcell   = str(row.get("ASSAY_SUBCELLULAR_FRACTION") or "").strip()
+        assay_group     = str(row.get("ASSAY_GROUP") or "").strip()
+
+        # --- Target fields (needed early for AIDX generation) ---
+        target_type      = str(row.get("TARGET_TYPE") or "").strip()
+        target_name      = (
+            str(row.get("TARGET_NAME") or "").strip()
+            or str(row.get("Gene_name") or "").strip()
+        )
+        target_accession = str(row.get("TARGET_ACCESSION") or "").strip()
+        target_organism  = str(row.get("TARGET_ORGANISM") or "").strip()
+
+        raw_ttax = row.get("TARGET_TAX_ID")
+        if raw_ttax == "" or raw_ttax is None:
+            target_tax_id = ""
+        else:
+            try:
+                target_tax_id = str(int(float(str(raw_ttax))))
+            except (ValueError, TypeError):
+                target_tax_id = str(raw_ttax).strip()
 
         # --- AIDX ---
-        raw_aidx = str(row.get("assay_identifier") or "").strip()
-        if raw_aidx:
-            aidx = raw_aidx
-        else:
-            base  = _make_aidx(organism, strain, ridx, 1)
-            count = aidx_counter.get(base, 0) + 1
-            aidx_counter[base] = count
-            aidx = base if count == 1 else f"{base}_{count}"
+        # user_key is what the user wrote in the template AIDX column (e.g.
+        # 'assay1').  It is the cross-reference key used in the Biotransformation
+        # sheet's ASSAY_Identifier column.  The pipeline ALWAYS generates the
+        # proper ChEMBL AIDX from metadata — the user key is never used as-is.
+        user_key = str(row.get("AIDX") or "").strip()
+        if not user_key:
+            # Fallback key so Biotransformation sheet rows can still reference
+            # this assay even when the template AIDX column was left blank.
+            user_key = f"assay{len(aidx_map) + 1}"
+
+        base  = _make_aidx(organism, strain, assay_source, target_name, target_accession)
+        count = aidx_counter.get(base, 0) + 1
+        aidx_counter[base] = count
+        aidx = base if count == 1 else f"{base}_{count}"
+
+        aidx_map[user_key] = aidx
 
         # --- ASSAY_TYPE: normalise to single uppercase letter ---
         raw_type   = str(row.get("ASSAY_TYPE") or "").strip().upper()
         assay_type = raw_type[0] if raw_type else ""
 
         # --- ASSAY_TAX_ID: coerce float cells (e.g. 1348.0) to int string ---
-        raw_tax = row.get("NCBI Tax ID")
+        raw_tax = row.get("ASSAY_TAX_ID")
         if raw_tax == "" or raw_tax is None:
             assay_tax_id = ""
         else:
@@ -359,31 +424,6 @@ def build_assay_tsv(
 
         # --- ASSAY_DESCRIPTION ---
         description = _build_description(row, exp_row, xenobiotic_class)
-
-        # --- Optional Microbes fields ---
-        assay_source    = str(row.get("Sample_isolation_source") or "").strip()
-        assay_tissue    = str(row.get("Tissue") or "").strip()
-        assay_cell_type = str(row.get("Cell type") or "").strip()
-        assay_subcell   = str(row.get("SUBCELLULAR_FRACTION") or "").strip()
-        assay_group     = str(row.get("ASSAY_GROUP") or "").strip()
-
-        # --- Target fields ---
-        target_type      = str(row.get("TARGET_TYPE") or "").strip()
-        target_name      = (
-            str(row.get("Protein name") or "").strip()
-            or str(row.get("Gene name") or "").strip()
-        )
-        target_accession = str(row.get("UniProt ID") or "").strip()
-        target_organism  = str(row.get("TARGET_ORGANISM") or "").strip()
-
-        raw_ttax = row.get("TARGET_TAX_ID")
-        if raw_ttax == "" or raw_ttax is None:
-            target_tax_id = ""
-        else:
-            try:
-                target_tax_id = str(int(float(str(raw_ttax))))
-            except (ValueError, TypeError):
-                target_tax_id = str(raw_ttax).strip()
 
         records.append({
             "AIDX":                       aidx,
@@ -405,7 +445,7 @@ def build_assay_tsv(
             "TARGET_TAX_ID":              target_tax_id,
         })
 
-    return pd.DataFrame(records, columns=CHEMBL_COLS)
+    return pd.DataFrame(records, columns=CHEMBL_COLS), aidx_map
 
 
 # ---------------------------------------------------------------------------
@@ -505,7 +545,7 @@ def main() -> None:
               "ASSAY_DESCRIPTION will omit measurement context.", file=sys.stderr)
 
     # --- Build ---
-    assay_df = build_assay_tsv(
+    assay_df, aidx_map = build_assay_tsv(
         microbes_df,
         ridx=args.ridx,
         exp_df=exp_df,
@@ -520,10 +560,22 @@ def main() -> None:
         if args.strict:
             sys.exit(1)
 
-    # --- Write ---
+    # --- Write ASSAY.tsv ---
     out_path = outdir / "ASSAY.tsv"
     assay_df.to_csv(out_path, sep="\t", index=False)
     print(f"Written: {out_path}")
+
+    # --- Write ASSAY_MAPPING.tsv ---
+    # Maps the user's short identifier (template AIDX column) to the
+    # pipeline-generated ChEMBL AIDX.  Pass this file to biotransformation.py
+    # via --assays so that ASSAY_Identifier values in the Biotransformation
+    # sheet are correctly resolved — identical to how --compounds works for CIDX.
+    mapping_path = outdir / "ASSAY_MAPPING.tsv"
+    pd.DataFrame(
+        list(aidx_map.items()), columns=["USER_AIDX", "AIDX"]
+    ).to_csv(mapping_path, sep="\t", index=False)
+    print(f"Written: {mapping_path}")
+
     print(f"[SUCCESS] {len(assay_df)} assay(s) written.")
 
 

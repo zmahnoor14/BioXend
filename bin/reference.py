@@ -3,8 +3,8 @@
 reference.py — Module 1 (BioXend / MIX-MB)
 
 Reads the Reference sheet from a MIX-MB Template_open.ods and produces:
-  - REFERENCE.tsv   ChEMBL deposition format
-  - README.toml     submission / dataset metadata
+  - REFERENCE.tsv   
+  - README.toml     
 
 Usage:
     python reference.py --input Standards/Templates/Template_open.ods --outdir results/
@@ -22,6 +22,8 @@ import odf
 # Column mappings
 # ---------------------------------------------------------------------------
 
+## README.toml
+
 # README.toml section → template column mappings
 _DEPOSITION_COLS  = ["Chembl_version", "Names", "Institutions", "Links"]
 _DATASET_COLS     = ["Description", "Recent_changes", "Goal_of_submission"]
@@ -31,6 +33,8 @@ _SUMMARY_COLS     = ["Compounds", "Assays", "Endpoints", "Multiplexed"]
 _INT_FIELDS  = {"Chembl_version", "Compounds", "Assays"}
 _BOOL_FIELDS = {"Multiplexed"}
 _LIST_FIELDS = {"Names", "Institutions", "Links", "Endpoints"}
+
+## REFERENCE.tsv
 
 # Columns emitted in REFERENCE.tsv (ChEMBL deposition order)
 CHEMBL_COLS = [
@@ -55,7 +59,7 @@ CHEMBL_COLS = [
 
 
 # Mandatory fields checked during validation
-MANDATORY_FIELDS = ["DATA_LICENCE", "CONTACT", "YEAR", "REF_TYPE", "TITLE", "DOI", "ABSTRACT", "AUTHORS"]
+MANDATORY_FIELDS = ["RIDX", "DATA_LICENCE", "CONTACT", "YEAR", "REF_TYPE", "TITLE", "DOI", "ABSTRACT", "AUTHORS"]
 CONDITIONAL_MANDATORY_FIELDS = ["PUBMED_ID"]  # Mandatory (if the REF_TYPE is "Publication")
 # Template sheet row indices (0-based)
 _ROW_COLNAMES = 1
@@ -70,12 +74,7 @@ def read_reference_sheet(ods_path: Path) -> pd.DataFrame:
     """
     Parse the Reference sheet from Template_open.ods.
 
-    Template layout:
-      row 0 — section headers  (skip)
-      row 1 — column names     (use as header)
-      row 2 — data types       (skip)
-      row 3 — field descriptions (skip)
-      row 4+ — data rows
+    Returns a clean DataFrame with one row per reference entry.
     """
     raw = pd.read_excel(ods_path, sheet_name="Reference", header=None, engine="odf")
 
@@ -89,12 +88,14 @@ def read_reference_sheet(ods_path: Path) -> pd.DataFrame:
     # Normalise: strip whitespace from strings, replace NaN-like strings
     def _clean(v):
         if not isinstance(v, str):
-            return v
+            try:
+                return "" if pd.isna(v) else v
+            except (TypeError, ValueError):
+                return v
         v = v.strip()
         return "" if v in ("nan", "None", "NaN") else v
 
     return df.map(_clean)
-
 
 
 # ---------------------------------------------------------------------------
@@ -207,7 +208,7 @@ def validate(df: pd.DataFrame) -> list[str]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description="Generate REFERENCE.tsv + README.toml from a MIX-MB Template_open.ods",
+        description="Generate REFERENCE.tsv + README.toml from MIX-MB Template_open.ods",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
