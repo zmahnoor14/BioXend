@@ -39,7 +39,6 @@ Usage:
         --input   Standards/Templates/Template_open.ods \\
         --assays  results/ASSAY_MAPPING.tsv \\
         --outdir  results/ \\
-        [--dose 5 --dose_units uM] \\
         [--strict]
 """
 
@@ -172,7 +171,7 @@ def _extract_aidx_from_experiment(exp_df: pd.DataFrame) -> list[str]:
 
     Rows whose identifier is 'all' or 'most' are skipped (they are catch-all
     rows that apply to every AIDX but do not define new ones).
-    Comma-separated identifiers are expanded, so "AIDX001, AIDX002" yields
+    Comma-separated identifiers are expanded, so "assay1, assay2" yields
     two entries.
 
     Returns an ordered list with duplicates removed.
@@ -208,7 +207,7 @@ def _build_aidx_map(assay_mapping_tsv: "Path | None") -> "dict[str, str]":
     try:
         df = pd.read_csv(assay_mapping_tsv, sep="\t", dtype=str).fillna("")
         for _, row in df.iterrows():
-            user_key = str(row.get("USER_AIDX") or "").strip()
+            user_key = str(row.get("assay_identifier") or "").strip()
             aidx     = str(row.get("AIDX")      or "").strip()
             if user_key and aidx:
                 aidx_map[user_key] = aidx
@@ -217,6 +216,28 @@ def _build_aidx_map(assay_mapping_tsv: "Path | None") -> "dict[str, str]":
     if aidx_map:
         print(f"[INFO] AIDX map loaded: {len(aidx_map)} assay(s).", file=sys.stderr)
     return aidx_map
+
+
+def _extract_aidx_from_mapping(assay_mapping_tsv: "Path | None") -> "list[str]":
+    """
+    Return the ordered list of user keys (assay_identifier column) from ASSAY_MAPPING.tsv.
+
+    When --assays is supplied, this is used as the authoritative AIDX list for
+    ASSAY_PARAM instead of the Experiment sheet identifier column — every assay
+    in the mapping gets params, which is simpler and avoids identifier mismatches.
+    """
+    user_keys: list[str] = []
+    if assay_mapping_tsv is None or not Path(assay_mapping_tsv).exists():
+        return user_keys
+    try:
+        df = pd.read_csv(assay_mapping_tsv, sep="\t", dtype=str).fillna("")
+        for _, row in df.iterrows():
+            key = str(row.get("assay_identifier") or "").strip()
+            if key and key not in user_keys:
+                user_keys.append(key)
+    except Exception as exc:
+        print(f"[WARN] Could not read ASSAY_MAPPING.tsv for AIDX list: {exc}", file=sys.stderr)
+    return user_keys
 
 
 def _apply_aidx_mapping(param_df: pd.DataFrame, aidx_map: "dict[str, str]") -> pd.DataFrame:
@@ -463,13 +484,18 @@ def main() -> None:
     if exp_df.empty:
         sys.exit("ERROR: no data rows found in the Experiment sheet.")
 
-    # --- Resolve AIDX list from identifier column (user short keys) ---
-    aidx_list = _extract_aidx_from_experiment(exp_df)
+    # --- Resolve AIDX list ---
+    # When ASSAY_MAPPING.tsv is supplied, use its assay_identifier column as the
+    # authoritative list so every assay in the mapping gets params.
+    # Fall back to the Experiment sheet identifier column when no mapping is given.
+    if assay_mapping is not None:
+        aidx_list = _extract_aidx_from_mapping(assay_mapping)
+    else:
+        aidx_list = _extract_aidx_from_experiment(exp_df)
     if not aidx_list:
         sys.exit(
-            "ERROR: no specific AIDXs found in the Experiment sheet identifier "
-            "column. Add explicit identifiers (e.g. 'assay1') that match the "
-            "AIDX column of the Microbes sheet."
+            "ERROR: no AIDXs found. Supply --assays ASSAY_MAPPING.tsv or add "
+            "explicit identifiers (e.g. 'assay1') to the Experiment sheet."
         )
 
     # --- Build param df using user keys ---

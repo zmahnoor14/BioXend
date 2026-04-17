@@ -15,7 +15,7 @@ Column mappings (template column → ChEMBL ACTIVITY.tsv field):
   Chemical_identifier / Common_Name  → CIDX  (via --compounds COMPOUND_RECORD.tsv)
   [--ridx CLI arg]                   → RIDX  (ChEMBL reference column)
   ASSAY_Identifier                   → AIDX  (via --assays ASSAY_MAPPING.tsv)
-  Activity type                      → TYPE
+  Activity_type                      → TYPE
   TEXT_VALUE                         → TEXT_VALUE
   RELATION                           → RELATION
   VALUE                              → VALUE
@@ -25,11 +25,11 @@ Column mappings (template column → ChEMBL ACTIVITY.tsv field):
   ACTION_TYPE                        → ACTION_TYPE
 
 Extension columns appended to ACTIVITY_COMMENT (if filled):
-  Reaction type           → "The reaction is <val>"
-  Metabolite m/z          → "The Metabolite m/z is <val>"
-  Metabolite retention time → "with retention time <val>."  (joined with m/z line)
-  Metabolite annotation   → "The annotated metabolite is <val> with annotation level of <level>"
-  Metabolite annotation level → (combined with annotation line above)
+  Reaction_type           → "The reaction is <val>"
+  Metabolite_mz          → "The Metabolite m/z is <val>"
+  Metabolite_rt → "with retention time <val>."  (joined with m/z line)
+  Metabolite_annotation   → "The annotated metabolite is <val> with annotation level of <level>"
+  Metabolite_annotation_level → (combined with annotation line above)
 
 Ignored template columns (not mapped):
   Common_Name, SMILES           — used only to look up CIDX from Chemicals sheet
@@ -37,22 +37,16 @@ Ignored template columns (not mapped):
   Kinetic_parameter_value       — not deposited to ChEMBL
   Classify_activity             — ML classification only
 
-Template colour coding:
-  Green  = Mandatory   → CIDX, AIDX, RIDX, ACTIVITY_COMMENT, TYPE
-  Blue   = Recommended → TEXT_VALUE or VALUE (at least one required)
-  Yellow = Optional    → UPPER_VALUE, ACTION_TYPE, metabolite/kinetic cols
-
 Usage:
     # Recommended — run chemicals and microbes steps first:
     python bin/biotransformation.py \\
-        --input     Standards/Templates/Template_open.ods \\
-        --ridx      GutMeta \\
-        --compounds results/COMPOUND_RECORD.tsv \\
-        --assays    results/ASSAY_MAPPING.tsv \\
-        --outdir    results/
+        --input            Standards/Templates/Template_open.ods \\
+        --ridx             GutMeta \\
+        --compounds results/COMPOUND_MAPPING.tsv \\
+        --assays           results/ASSAY_MAPPING.tsv \\
+        --outdir           results/
 
-    # Without mapping files (requires Chemical_identifier and AIDX to be
-    # pre-filled in the template, or falls back to raw user values):
+    # Without mapping files (falls back to Chemical_identifier / raw ASSAY_Identifier):
     python bin/biotransformation.py \\
         --input   Standards/Templates/Template_open.ods \\
         --ridx    GutMeta \\
@@ -85,21 +79,22 @@ CHEMBL_COLS = [
     "ACTION_TYPE",
 ]
 
-MANDATORY_FIELDS = ["CIDX", "RIDX", "AIDX", "ACTIVITY_COMMENT", "TYPE"]
+MANDATORY_FIELDS = ["CIDX", "CRIDX", "RIDX", "AIDX", "ACTIVITY_COMMENT", "TYPE"] #CRIDX is same as RIDX
 
-VALID_TEXT_VALUES = {
-    "Compound metabolized",
-    "Compound NOT metabolized",
-    "Product detected",
-    "Partial transformation",
-    "Complete transformation",
-}
-
-VALID_ACTION_TYPES = {"SUBSTRATE", "PRODUCT", "No Activity", "INHIBITION", "STIMULATION"}
+VALID_ACTION_TYPES = {"ACTIVATOR", "ALLOSTERIC ANTAGONIST","ANTAGONIST",
+"ANTISENSE INHIBITOR","BINDING AGENT", "BLOCKER",
+"CHELATING AGENT","CROSS-LINKING AGENT","DEGRADER",
+"DISRUPTING AGENT","EXOGENOUS GENE","EXOGENOUS PROTEIN",
+"GENE EDITING NEGATIVE MODULATOR","HYDROLYTIC ENZYME","INHIBITOR",
+"INVERSE AGONIST","METHYLATING AGENT","MODULATOR",
+"NEGATIVE ALLOSTERIC MODULATOR","NEGATIVE MODULATOR","OPENER",
+"POSITIVE MODULATOR","OTHER","OXIDATIVE ENZYME",
+"PARTIAL AGONIST","POSITIVE ALLOSTERIC MODULATOR","POSITIVE MODULATOR",
+"PROTEOLYTIC ENZYME","REDUCING AGENT","RELEASING AGENT",
+"RNAI INHIBITOR","SEQUESTERING AGENT","STABILISER","SUBSTRATE",
+"VACCINE ANTIGEN"}
 
 VALID_RELATIONS = {"=", "<", ">", "~", "<=", ">="}
-
-VALID_UNITS = {"%"}
 
 # Template sheet row offsets (0-based, read with header=None)
 #   row 0 — section group headers  (skip)
@@ -113,11 +108,11 @@ _ROW_DATA_START = 4
 # Template column names for MIX-MB extension fields appended to ACTIVITY_COMMENT.
 # Kinetic_parameter_type, Kinetic_parameter_value, and Classify_activity are
 # intentionally excluded — they are not deposited to ChEMBL.
-_COL_REACTION_TYPE  = "Reaction type"
-_COL_METABOLITE_MZ  = "Metabolite m/z"
-_COL_METABOLITE_RT  = "Metabolite retention time"
-_COL_METABOLITE_ANN = "Metabolite annotation"
-_COL_METABOLITE_LVL = "Metabolite annotation level"
+_COL_REACTION_TYPE  = "Reaction_type"
+_COL_METABOLITE_MZ  = "Metabolite_mz"
+_COL_METABOLITE_RT  = "Metabolite_rt"
+_COL_METABOLITE_ANN = "Metabolite_annotation"
+_COL_METABOLITE_LVL = "Metabolite_annotation_level"
 
 
 # ---------------------------------------------------------------------------
@@ -162,54 +157,37 @@ def read_biotransformation_sheet(ods_path: Path) -> pd.DataFrame:
 # ---------------------------------------------------------------------------
 
 def _build_cidx_map(
-    ods_path: Path,
-    compounds_tsv: "Path | None" = None,
+    compound_mapping_tsv: "Path | None" = None,
 ) -> "dict[str, str]":
     """
-    Build a {common_name_lower: cidx} lookup map from two sources.
+    Build a {compound_name_lower: cidx} lookup map from COMPOUND_MAPPING.tsv.
 
-    Source 1 — Chemicals sheet in the same template:
-        Common_Name → Chemical_identifier
-    Source 2 — COMPOUND_RECORD.tsv from the workflow (if provided):
-        COMPOUND_NAME → CIDX  (overrides source 1; workflow CIDXs are authoritative
-        when Chemical_identifier was auto-generated rather than pre-filled)
+    COMPOUND_MAPPING.tsv is written by chemicals.py alongside COMPOUND_RECORD.tsv.
+    It maps COMPOUND_NAME (Common_Name from the Chemicals sheet) to the
+    pipeline-generated CIDX — the exact analogue of ASSAY_MAPPING.tsv for assays.
     """
     cidx_map: "dict[str, str]" = {}
 
-    # Source 1: Chemicals sheet
+    if compound_mapping_tsv is None or not Path(compound_mapping_tsv).exists():
+        return cidx_map
+
     try:
-        chem_df = _read_sheet(ods_path, "Chemicals")
-        for _, row in chem_df.iterrows():
+        mapping_df = pd.read_csv(compound_mapping_tsv, sep="\t", dtype=str).fillna("")
+        for _, row in mapping_df.iterrows():
             name = str(row.get("Common_Name") or "").strip()
-            cidx = str(row.get("Chemical_identifier") or "").strip()
+            cidx = str(row.get("CIDX") or "").strip()
             if name and cidx:
                 cidx_map[name.lower()] = cidx
     except Exception as exc:
         print(
-            f"[WARN] Could not read Chemicals sheet for CIDX lookup: {exc}",
+            f"[WARN] Could not read COMPOUND_MAPPING.tsv for CIDX lookup: {exc}",
             file=sys.stderr,
         )
 
-    # Source 2: COMPOUND_RECORD.tsv (overrides Chemicals sheet)
-    if compounds_tsv is not None and Path(compounds_tsv).exists():
-        try:
-            rec_df = pd.read_csv(compounds_tsv, sep="\t", dtype=str).fillna("")
-            for _, row in rec_df.iterrows():
-                name = str(row.get("COMPOUND_NAME") or "").strip()
-                cidx = str(row.get("CIDX") or "").strip()
-                if name and cidx:
-                    cidx_map[name.lower()] = cidx
-        except Exception as exc:
-            print(
-                f"[WARN] Could not read COMPOUND_RECORD.tsv for CIDX lookup: {exc}",
-                file=sys.stderr,
-            )
-
     if not cidx_map:
         print(
-            "[WARN] CIDX map is empty — Chemical_identifier column may be blank in "
-            "the Chemicals sheet. Supply --compounds COMPOUND_RECORD.tsv so that "
-            "workflow-generated CIDXs can be used for lookup.",
+            "[WARN] CIDX map is empty — supply --compound-mapping COMPOUND_MAPPING.tsv "
+            "(generated by chemicals.py) so that Common_Name values are resolved to CIDXs.",
             file=sys.stderr,
         )
     else:
@@ -243,7 +221,7 @@ def _build_aidx_map(
     try:
         mapping_df = pd.read_csv(assay_mapping_tsv, sep="\t", dtype=str).fillna("")
         for _, row in mapping_df.iterrows():
-            user_aidx = str(row.get("USER_AIDX") or "").strip()
+            user_aidx = str(row.get("assay_identifier") or "").strip()
             aidx      = str(row.get("AIDX") or "").strip()
             if user_aidx and aidx:
                 aidx_map[user_aidx] = aidx
@@ -275,8 +253,15 @@ def _resolve_aidx(row: pd.Series, aidx_map: "dict[str, str]") -> str:
          This converts the user's short key to the pipeline-generated AIDX.
       2. ASSAY_Identifier used as-is when no mapping is available (fallback
          for cases where the user pre-filled a full ChEMBL AIDX directly).
+
+    Column lookup is case-insensitive to handle template variants where the
+    column is named 'assay_identifier' vs 'ASSAY_Identifier'.
     """
-    user_aidx = str(row.get("ASSAY_Identifier") or "").strip()
+    user_aidx = ""
+    for key in row.index:
+        if key.lower() == "assay_identifier":
+            user_aidx = str(row[key] or "").strip()
+            break
     if not user_aidx:
         return ""
 
@@ -297,25 +282,26 @@ def _resolve_cidx(row: pd.Series, cidx_map: "dict[str, str]") -> str:
     """
     Return CIDX for a Biotransformation sheet row.
 
-    Priority:
-      1. Chemical_identifier column (pre-filled by the user in the template).
-      2. Common_Name looked up in cidx_map (from Chemicals sheet /
-         COMPOUND_RECORD.tsv).  Emits a warning when unresolved.
+    Looks up Common_Name in cidx_map (built from COMPOUND_MAPPING.tsv produced
+    by chemicals.py).  Falls back to Chemical_identifier when not found so the
+    script still works without --compound-mapping.
     """
+    common_name = str(row.get("Common_Name") or "").strip()
+    if common_name:
+        resolved = cidx_map.get(common_name.lower(), "")
+        if resolved:
+            return resolved
+
     direct = str(row.get("Chemical_identifier") or "").strip()
     if direct:
         return direct
 
-    common_name = str(row.get("Common_Name") or "").strip()
     if common_name:
-        resolved = cidx_map.get(common_name.lower(), "")
-        if not resolved:
-            print(
-                f"[WARN] No CIDX found for Common_Name '{common_name}'. "
-                "Fill Chemical_identifier in the template, or supply --compounds.",
-                file=sys.stderr,
-            )
-        return resolved
+        print(
+            f"[WARN] No CIDX found for Common_Name '{common_name}'. "
+            "Supply --compound-mapping COMPOUND_MAPPING.tsv (from chemicals.py).",
+            file=sys.stderr,
+        )
 
     return ""
 
@@ -405,14 +391,17 @@ def build_activity_tsv(
     for _, row in df.iterrows():
         activity_comment = _build_activity_comment(row)
 
+        value = _coerce_numeric(row.get("VALUE"))
+        text_value = "" if value else str(row.get("TEXT_VALUE") or "").strip()
+
         records.append({
             "CIDX":             _resolve_cidx(row, cidx_map),
             "RIDX":             ridx,
             "AIDX":             _resolve_aidx(row, aidx_map),
             "TYPE":             "Biotransformation",
-            "TEXT_VALUE":       str(row.get("TEXT_VALUE") or "").strip(),
+            "TEXT_VALUE":       text_value,
             "RELATION":         str(row.get("RELATION") or "").strip(),
-            "VALUE":            _coerce_numeric(row.get("VALUE")),
+            "VALUE":            value,
             "UPPER_VALUE":      _coerce_numeric(row.get("UPPER_VALUE")),
             "UNITS":            str(row.get("UNITS") or "").strip(),
             "ACTIVITY_COMMENT": activity_comment,
@@ -451,15 +440,10 @@ def validate(activity_df: pd.DataFrame) -> list:
                 "at least one must be provided."
             )
 
-        # TEXT_VALUE controlled vocabulary check
-        if text_val and text_val not in VALID_TEXT_VALUES:
-            errors.append(
-                f"{label}: TEXT_VALUE '{text_val}' not in controlled vocabulary "
-                f"{sorted(VALID_TEXT_VALUES)}."
-            )
-
         # VALUE requires RELATION and UNITS
         if value:
+            # no TEXT_VALUE required so skip it
+            text_val = ""
             if not relation:
                 errors.append(f"{label}: RELATION is required when VALUE is set.")
             if not units:
@@ -468,11 +452,6 @@ def validate(activity_df: pd.DataFrame) -> list:
         if relation and relation not in VALID_RELATIONS:
             errors.append(
                 f"{label}: RELATION '{relation}' not in {sorted(VALID_RELATIONS)}."
-            )
-
-        if units and units not in VALID_UNITS:
-            errors.append(
-                f"{label}: UNITS '{units}' not valid — must be '%'."
             )
 
         # ACTION_TYPE controlled vocabulary check
@@ -507,11 +486,11 @@ def main() -> None:
     )
     parser.add_argument(
         "--compounds", default=None,
+        dest="compound_mapping",
         help=(
-            "Path to COMPOUND_RECORD.tsv generated by the chemicals step. "
-            "When supplied, workflow-generated CIDXs (COMPOUND_NAME → CIDX) "
-            "override the Chemicals sheet lookup. Omit to rely on the "
-            "Chemicals sheet alone."
+            "Path to COMPOUND_MAPPING.tsv generated by the chemicals step. "
+            "Maps COMPOUND_NAME (Common_Name) → CIDX. Omit to fall back to "
+            "Chemical_identifier values in the template."
         ),
     )
     parser.add_argument(
@@ -533,15 +512,15 @@ def main() -> None:
     )
     args = parser.parse_args()
 
-    ods_path        = Path(args.input)
-    outdir          = Path(args.outdir)
-    compounds_tsv   = Path(args.compounds) if args.compounds else None
-    assay_mapping   = Path(args.assays)    if args.assays    else None
+    ods_path         = Path(args.input)
+    outdir           = Path(args.outdir)
+    compound_mapping = Path(args.compound_mapping) if args.compound_mapping else None
+    assay_mapping    = Path(args.assays)            if args.assays           else None
 
     if not ods_path.exists():
         sys.exit(f"ERROR: input file not found: {ods_path}")
-    if compounds_tsv is not None and not compounds_tsv.exists():
-        sys.exit(f"ERROR: COMPOUND_RECORD.tsv not found: {compounds_tsv}")
+    if compound_mapping is not None and not compound_mapping.exists():
+        sys.exit(f"ERROR: COMPOUND_MAPPING.tsv not found: {compound_mapping}")
     if assay_mapping is not None and not assay_mapping.exists():
         sys.exit(f"ERROR: ASSAY_MAPPING.tsv not found: {assay_mapping}")
 
@@ -552,8 +531,8 @@ def main() -> None:
     if df.empty:
         sys.exit("ERROR: no data rows found in the Biotransformation sheet.")
 
-    # --- Build CIDX map (Chemicals sheet + optional COMPOUND_RECORD.tsv) ---
-    cidx_map = _build_cidx_map(ods_path, compounds_tsv)
+    # --- Build CIDX map from COMPOUND_MAPPING.tsv (produced by chemicals.py) ---
+    cidx_map = _build_cidx_map(compound_mapping)
 
     # --- Build AIDX map (optional ASSAY_MAPPING.tsv from microbes step) ---
     aidx_map = _build_aidx_map(assay_mapping)

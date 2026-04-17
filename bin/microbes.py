@@ -24,7 +24,6 @@ Column mappings  (template column → ChEMBL field):
   ASSAY_SUBCELLULAR_FRACTION → ASSAY_SUBCELLULAR_FRACTION
   TARGET_NAME         → TARGET_NAME
   TARGET_ACCESSION    → TARGET_ACCESSION
-  Gene_name           → used as fallback for TARGET_NAME
 
 Auto-generated AIDX naming convention:
   [ASSAY_SOURCE_]ORGANISM[_STRAIN|_community]_Biotransformation[_ACCESSION|_TARGET_NAME]
@@ -342,15 +341,15 @@ def build_assay_tsv(
 
     Returns (assay_df, aidx_map).
 
-    aidx_map maps each user-provided AIDX key (from the template AIDX column,
+    aidx_map maps each user-provided AIDX key (from the template assay_identifier column,
     e.g. 'assay1') to the pipeline-generated ChEMBL AIDX (e.g.
     'Zimmermann_gut_metagenome_community_Biotransformation').  This map is
-    written to ASSAY_MAPPING.tsv so that biotransformation.py can resolve
+    written to ASSAY_MAPPING.tsv so that experiment.py and biotransformation.py can resolve
     Biotransformation-sheet ASSAY_Identifier values to the proper AIDX —
     exactly as COMPOUND_RECORD.tsv lets biotransformation.py resolve
     Common_Name to CIDX.
 
-    The AIDX column in the template is the user's short cross-reference key.
+    The assay_identifier column in the template is the user's short cross-reference key.
     The pipeline ALWAYS derives the ChEMBL AIDX from organism / strain /
     source / target metadata using _make_aidx, regardless of the user key.
     """
@@ -388,14 +387,14 @@ def build_assay_tsv(
                 target_tax_id = str(raw_ttax).strip()
 
         # --- AIDX ---
-        # user_key is what the user wrote in the template AIDX column (e.g.
+        # user_key is what the user wrote in the template assay_identifier column (e.g.
         # 'assay1').  It is the cross-reference key used in the Biotransformation
         # sheet's ASSAY_Identifier column.  The pipeline ALWAYS generates the
         # proper ChEMBL AIDX from metadata — the user key is never used as-is.
-        user_key = str(row.get("AIDX") or "").strip()
+        user_key = str(row.get("assay_identifier") or "").strip()
         if not user_key:
             # Fallback key so Biotransformation sheet rows can still reference
-            # this assay even when the template AIDX column was left blank.
+            # this assay even when the template assay_identifier column was left blank.
             user_key = f"assay{len(aidx_map) + 1}"
 
         base  = _make_aidx(organism, strain, assay_source, target_name, target_accession)
@@ -420,7 +419,9 @@ def build_assay_tsv(
                 assay_tax_id = str(raw_tax).strip()
 
         # --- Join Experiment row for this assay ---
-        exp_row = _get_experiment_for_assay(exp_df, aidx)
+        # Experiment sheet identifiers are user short keys (e.g. 'assay1'),
+        # not the generated ChEMBL AIDXs, so look up by user_key.
+        exp_row = _get_experiment_for_assay(exp_df, user_key)
 
         # --- ASSAY_DESCRIPTION ---
         description = _build_description(row, exp_row, xenobiotic_class)
@@ -566,13 +567,11 @@ def main() -> None:
     print(f"Written: {out_path}")
 
     # --- Write ASSAY_MAPPING.tsv ---
-    # Maps the user's short identifier (template AIDX column) to the
-    # pipeline-generated ChEMBL AIDX.  Pass this file to biotransformation.py
-    # via --assays so that ASSAY_Identifier values in the Biotransformation
-    # sheet are correctly resolved — identical to how --compounds works for CIDX.
+    # Maps the user's short identifier (template assay_identifier column) to the
+    # pipeline-generated ChEMBL AIDX. 
     mapping_path = outdir / "ASSAY_MAPPING.tsv"
     pd.DataFrame(
-        list(aidx_map.items()), columns=["USER_AIDX", "AIDX"]
+        list(aidx_map.items()), columns=["assay_identifier", "AIDX"]
     ).to_csv(mapping_path, sep="\t", index=False)
     print(f"Written: {mapping_path}")
 

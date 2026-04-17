@@ -258,6 +258,23 @@ def main() -> None:
     record_df[CHEMBL_COLS].to_csv(record_path, sep="\t", index=False)
     print(f"Written: {record_path}")
 
+    # --- Write COMPOUND_MAPPING.tsv (name → CIDX lookup for downstream steps) ---
+    # Include COMPOUND_NAME as lookup entries so that
+    # Common_Name values in the Biotransformation sheet resolve
+    mapping_rows = []
+    seen_names: set = set()
+    for _, row in record_df.iterrows():
+        cidx = str(row.get("CIDX") or "").strip()
+        for name_col in ("COMPOUND_NAME",):
+            name = str(row.get(name_col) or "").strip()
+            if name and name not in seen_names:
+                mapping_rows.append({"Common_Name": name, "CIDX": cidx})
+                seen_names.add(name)
+    mapping_df = pd.DataFrame(mapping_rows, columns=["Common_Name", "CIDX"])
+    mapping_path = outdir / "COMPOUND_MAPPING.tsv"
+    mapping_df.to_csv(mapping_path, sep="\t", index=False)
+    print(f"Written: {mapping_path}")
+
     # --- Write COMPOUND_CTAB.sdf ---
     sdf_path = outdir / "COMPOUND_CTAB.sdf"
     write_compound_ctab_sdf(record_df, sdf_path)
