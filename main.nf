@@ -48,11 +48,6 @@ params.prefix = "CIDX" // Prefix for auto-generated compound identifiers
 // Microbes / ASSAY options
 params.xenobiotic_class = "xenobiotic compound"  // e.g. 'drug', 'pesticide'
 
-// Experiment / ASSAY_PARAM options
-params.dose          = ""    // Compound dose value (omit to skip DOSE rows)
-params.dose_units    = "uM"  // Units for dose
-params.dose_comments = ""    // Optional comment for the DOSE row
-
 // Pipeline options
 params.outdir  = "${projectDir}/results"
 params.strict  = false   // Exit non-zero on validation warnings
@@ -82,11 +77,6 @@ def helpMessage() {
     Assay options:
       --xenobiotic_class  STRING  Singular class name used in ASSAY_DESCRIPTION
                                    e.g. 'drug', 'pesticide' [default: xenobiotic compound]
-
-    Experiment / ASSAY_PARAM options:
-      --dose           NUMBER  Compound dose value (omit to skip DOSE rows)
-      --dose_units     STRING  Units for dose [default: uM]
-      --dose_comments  STRING  Comment for the DOSE row
 
     Pipeline options:
       --outdir  PATH   Output directory [default: ./results]
@@ -174,13 +164,13 @@ workflow {
     )
 
     // GENERATE_ACTIVITY depends on both upstream steps:
-    //   - GENERATE_CHEMICALS: COMPOUND_RECORD.tsv for CIDX lookup by Common_Name
+    //   - GENERATE_CHEMICALS: COMPOUND_MAPPING.tsv for CIDX lookup by Common_Name
     //   - GENERATE_ASSAY:     ASSAY_MAPPING.tsv for AIDX lookup by user key
-    //     (ASSAY_MAPPING.tsv is an intermediate file, not published to outdir)
+    //     (both mapping files are intermediates, not published to outdir)
     GENERATE_ACTIVITY(
         template_ch,
         params.ridx,
-        GENERATE_CHEMICALS.out.compound_record,
+        GENERATE_CHEMICALS.out.compound_mapping,
         GENERATE_ASSAY.out.assay_mapping
     )
 }

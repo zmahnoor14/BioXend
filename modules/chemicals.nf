@@ -16,8 +16,9 @@ process GENERATE_CHEMICALS {
     val  prefix
 
     output:
-    path "COMPOUND_RECORD.tsv", emit: compound_record
-    path "COMPOUND_CTAB.sdf",   emit: compound_sdf
+    path "COMPOUND_RECORD.tsv",  emit: compound_record
+    path "COMPOUND_MAPPING.tsv", emit: compound_mapping
+    path "COMPOUND_CTAB.sdf",    emit: compound_sdf
 
     script:
     def strict_flag = params.strict ? "--strict" : ""
