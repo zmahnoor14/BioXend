@@ -9,13 +9,13 @@
  */
 
 process GENERATE_ASSAY_PARAM {
-    tag "experiment → ASSAY_PARAM"
+    tag "experiment"
     label 'process_single'
-    conda "${projectDir}/envs/environment.yml"
+    container 'bioxend:0.1.0'
 
     input:
     path ods
-    path assay_mapping   // ASSAY_MAPPING.tsv from GENERATE_ASSAY (intermediate)
+    path assay_mapping  
 
     output:
     path "ASSAY_PARAM.tsv", emit: assay_param

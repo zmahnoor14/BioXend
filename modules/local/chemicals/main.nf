@@ -3,12 +3,13 @@
  * Reads the Chemicals sheet from Template_open.ods and produces:
  *   - COMPOUND_RECORD.tsv  (ChEMBL deposition format)
  *   - COMPOUND_CTAB.sdf    (2D structures via RDKit)
+ *   - COMPOUND_MAPPING.tsv (mapping between COMPOUND_RECORD and chemicals sheet names)
  */
 
 process GENERATE_CHEMICALS {
     tag "chemicals"
     label 'process_low'
-    conda "${projectDir}/envs/environment.yml"
+    container 'bioxend:0.1.0'
 
     input:
     path ods
