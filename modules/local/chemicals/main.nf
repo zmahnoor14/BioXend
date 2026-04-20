@@ -7,8 +7,8 @@
 
 process GENERATE_CHEMICALS {
     tag "chemicals"
-    publishDir "${params.outdir}", mode: 'copy'
-    conda "${projectDir}/envs/py_env.yml"
+    label 'process_low'
+    conda "${projectDir}/envs/environment.yml"
 
     input:
     path ods
@@ -21,13 +21,13 @@ process GENERATE_CHEMICALS {
     path "COMPOUND_CTAB.sdf",    emit: compound_sdf
 
     script:
-    def strict_flag = params.strict ? "--strict" : ""
+    def args = task.ext.args ?: ''
     """
-    python ${projectDir}/bin/chemicals.py \\
+    chemicals.py \\
         --input ${ods} \\
         --ridx  "${ridx}" \\
         --prefix "${prefix}" \\
         --outdir . \\
-        ${strict_flag}
+        ${args}
     """
 }
