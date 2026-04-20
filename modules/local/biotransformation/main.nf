@@ -20,8 +20,8 @@
 
 process GENERATE_ACTIVITY {
     tag "biotransformation → ACTIVITY"
-    publishDir "${params.outdir}", mode: 'copy'
-    conda "${projectDir}/envs/py_env.yml"
+    label 'process_single'
+    conda "${projectDir}/envs/environment.yml"
 
     input:
     path ods
@@ -33,14 +33,14 @@ process GENERATE_ACTIVITY {
     path "ACTIVITY.tsv", emit: activity
 
     script:
-    def strict_flag = params.strict ? "--strict" : ""
+    def args = task.ext.args ?: ''
     """
-    python ${projectDir}/bin/biotransformation.py \\
+    biotransformation.py \\
         --input             "${ods}" \\
         --ridx              "${ridx}" \\
         --compound-mapping  "${compound_mapping}" \\
         --assays            "${assay_mapping}" \\
         --outdir            . \\
-        ${strict_flag}
+        ${args}
     """
 }

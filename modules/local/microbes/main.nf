@@ -8,12 +8,10 @@
 
 process GENERATE_ASSAY {
     tag "microbes → ASSAY"
-    // Publish only ASSAY.tsv; ASSAY_MAPPING.tsv stays in the work directory
-    // and is passed to GENERATE_ACTIVITY as an intermediate channel input.
-    publishDir "${params.outdir}", mode: 'copy', saveAs: { fn ->
-        fn == "ASSAY_MAPPING.tsv" ? null : fn
-    }
-    conda "${projectDir}/envs/py_env.yml"
+    label 'process_single'
+    // publishDir is defined in conf/modules.config
+    // ASSAY_MAPPING.tsv is excluded there via saveAs; it stays as an intermediate channel input.
+    conda "${projectDir}/envs/environment.yml"
 
     input:
     path ods
@@ -25,13 +23,13 @@ process GENERATE_ASSAY {
     path "ASSAY_MAPPING.tsv", emit: assay_mapping
 
     script:
-    def strict_flag = params.strict ? "--strict" : ""
+    def args = task.ext.args ?: ''
     """
-    python ${projectDir}/bin/microbes.py \\
+    microbes.py \\
         --input "${ods}" \\
         --ridx  "${ridx}" \\
         --xenobiotic_class "${xenobiotic_class}" \\
         --outdir . \\
-        ${strict_flag}
+        ${args}
     """
 }

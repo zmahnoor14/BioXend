@@ -7,8 +7,8 @@
 
 process GENERATE_REFERENCE {
     tag "reference"
-    publishDir "${params.outdir}", mode: 'copy'
-    conda "${projectDir}/envs/py_env.yml"
+    label 'process_single'
+    conda "${projectDir}/envs/environment.yml"
 
     input:
     path ods
@@ -16,13 +16,14 @@ process GENERATE_REFERENCE {
     output:
     path "REFERENCE.tsv", emit: reference
     path "README.toml",   emit: readme
+    path "RIDX.txt",      emit: ridx_txt
 
     script:
-    def strict_flag = params.strict ? "--strict" : ""
+    def args = task.ext.args ?: ''
     """
-    python ${projectDir}/bin/reference.py \\
+    reference.py \\
         --input ${ods} \\
         --outdir . \\
-        ${strict_flag}
+        ${args}
     """
 }
