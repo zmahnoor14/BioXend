@@ -2,16 +2,13 @@
  * MODULE: microbes
  * Reads the Microbes + Experiment sheets from Template_open.ods and produces:
  *   - ASSAY.tsv          (ChEMBL deposition format — published to outdir)
- *   - ASSAY_MAPPING.tsv  (intermediate only — maps user keys to generated AIDXs;
- *                         passed to GENERATE_ACTIVITY via channel, NOT published)
+ *   - ASSAY_MAPPING.tsv  (intermediate only — maps user keys to generated AIDXs)
  */
 
 process GENERATE_ASSAY {
-    tag "microbes → ASSAY"
+    tag "microbes"
     label 'process_single'
-    // publishDir is defined in conf/modules.config
-    // ASSAY_MAPPING.tsv is excluded there via saveAs; it stays as an intermediate channel input.
-    conda "${projectDir}/envs/environment.yml"
+    container 'bioxend:0.1.0'
 
     input:
     path ods

@@ -8,7 +8,7 @@
 process GENERATE_REFERENCE {
     tag "reference"
     label 'process_single'
-    conda "${projectDir}/envs/environment.yml"
+    container 'bioxend:0.1.0'
 
     input:
     path ods

@@ -1,0 +1,32 @@
+name: generate_assay_param
+description: Reads the Experiment sheet from Template_open.ods and generates ASSAY_PARAM.tsv in ChEMBL deposition format. Resolves user-defined assay short keys to pipeline-generated AIDXs via ASSAY_MAPPING.tsv.
+
+keywords:
+  - chembl
+  - assay
+  - parameters
+  - experiment
+
+tools:
+  - python:
+      description: Python 3.10 runtime
+      homepage: https://www.python.org
+
+input:
+  - ods:
+      type: file
+      description: Template_open.ods containing the Experiment sheet
+      pattern: "*.ods"
+  - assay_mapping:
+      type: file
+      description: ASSAY_MAPPING.tsv mapping user short keys to pipeline-generated AIDXs
+      pattern: "ASSAY_MAPPING.tsv"
+
+output:
+  - assay_param:
+      type: file
+      description: ASSAY_PARAM.tsv with experimental parameters in ChEMBL deposition format
+      pattern: "ASSAY_PARAM.tsv"
+
+authors:
+  - "@zulfiqar"

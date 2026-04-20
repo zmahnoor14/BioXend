@@ -1,0 +1,39 @@
+name: generate_assay
+description: Reads the Microbes and Experiment sheets from Template_open.ods and generates ASSAY.tsv in ChEMBL deposition format. Also produces ASSAY_MAPPING.tsv mapping user-defined assay keys to pipeline-generated AIDXs for use by downstream modules.
+
+keywords:
+  - chembl
+  - assay
+  - microbes
+  - taxonomy
+  - bacteria
+
+tools:
+  - python:
+      description: Python 3.10 runtime
+      homepage: https://www.python.org
+
+input:
+  - ods:
+      type: file
+      description: Template_open.ods containing the Microbes and Experiment sheets
+      pattern: "*.ods"
+  - ridx:
+      type: value
+      description: Reference index string from GENERATE_REFERENCE (e.g. GutMicrobiota_BiotransformationAtlas)
+  - xenobiotic_class:
+      type: value
+      description: Controlled vocabulary term for the xenobiotic class (e.g. xenobiotic compound)
+
+output:
+  - assay:
+      type: file
+      description: ASSAY.tsv with assay descriptions per strain in ChEMBL deposition format
+      pattern: "ASSAY.tsv"
+  - assay_mapping:
+      type: file
+      description: ASSAY_MAPPING.tsv mapping user short keys to pipeline-generated AIDXs
+      pattern: "ASSAY_MAPPING.tsv"
+
+authors:
+  - "@zulfiqar"

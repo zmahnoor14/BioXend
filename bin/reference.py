@@ -247,9 +247,18 @@ def main() -> None:
             sys.exit(1)
 
     # --- Write REFERENCE.tsv ---
+    ref_df = build_reference_tsv(df)
     ref_path = outdir / "REFERENCE.tsv"
-    build_reference_tsv(df).to_csv(ref_path, sep="\t", index=False)
+    ref_df.to_csv(ref_path, sep="\t", index=False)
     print(f"Written: {ref_path}")
+
+    # --- Write RIDX.txt (first RIDX — consumed by downstream pipeline modules) ---
+    ridx_value = str(ref_df["RIDX"].iloc[0]).strip() if not ref_df.empty else ""
+    if not ridx_value:
+        sys.exit("ERROR: Reference_identifier is empty in the Reference sheet.")
+    ridx_path = outdir / "RIDX.txt"
+    ridx_path.write_text(ridx_value + "\n")
+    print(f"Written: {ridx_path}")
 
     # --- Write README.toml ---
     readme_path = outdir / "README.toml"

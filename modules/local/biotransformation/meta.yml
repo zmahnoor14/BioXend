@@ -1,0 +1,31 @@
+name: generate_biotransformation
+description: Links compound CIDXs and assay AIDXs and writes ACTIVITY.tsv according to ChEMBL deposition format.
+
+keywords:
+  - biotransformation
+  - chembl
+  - activity
+
+tools:
+  - python:
+      description: Python 3.10 runtime
+      homepage: https://www.python.org
+
+input:
+  - cidx_map_file:
+      type: file
+      description: COMPOUND_MAPPING.tsv with CIDX identifiers
+      pattern: "*.tsv"
+  - aidx_map_file:
+      type: file
+      description: ASSAY_MAPPING.tsv with AIDX identifiers
+      pattern: "*.tsv"
+
+output:
+  - activity:
+      type: file
+      description: generate ACTIVITY.tsv with linked CIDXs to AIDXs, suitable for ChEMBL deposition.
+      pattern: "ACTIVITY.tsv"
+
+authors:
+  - "@zulfiqar"
