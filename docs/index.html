@@ -621,12 +621,10 @@
     </p>
     <div class="code-block">
 <span class="comment"># 1. Build the Docker image (once)</span>
-docker build -t <span class="val">bioxend:latest</span> .
+$ docker build -t bioxend:latest .
 
 <span class="comment"># 2. Run the pipeline</span>
-nextflow run main.nf <span class="flag">-profile</span> docker \
-  <span class="flag">--input</span>  <span class="val">Standards/Templates/Template_open.ods</span> \
-  <span class="flag">--outdir</span> <span class="val">results/</span>
+$ nextflow run main.nf -profile docker --input Standards/Templates/Template_open.ods --outdir results/ --prefix HMDM --xenobiotic_class drug
     </div>
 
     <div style="margin-top:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;">
