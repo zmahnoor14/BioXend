@@ -1,19 +1,83 @@
 ## Usage
 
-### Prerequisites
+### Installation
 
-- [Nextflow](https://www.nextflow.io/) >= 22.10.0
-- [Docker](https://www.docker.com/) 
+You need two tools installed: **Nextflow** and **Docker**. Follow the steps for your operating system below.
+
+#### 1. Install Java (required by Nextflow)
+
+Nextflow runs on Java. Check if you already have it:
+
+```bash
+java -version
+```
+
+If not installed, use [SDKMAN](https://sdkman.io/):
+
+```bash
+curl -s https://get.sdkman.io | bash
+```
+
+On new terminal: 
+
+```bash
+sdk install java 17.0.10-tem
+java -version
+```
+
+#### 2. Install Nextflow
+
+```bash
+curl -s https://get.nextflow.io | bash
+```
+
+This downloads a `nextflow` file to your current directory. Move it somewhere on your PATH so you can use it from anywhere. <BR>
+Make nextflow executable and move it to executable path: 
+
+```bash
+chmod +x nextflow
+mkdir -p $HOME/.local/bin/
+mv nextflow $HOME/.local/bin/
+```
+
+Verify the installation:
+
+```bash
+nextflow -version
+```
+
+#### 3. Install Docker
+
+Download and install [Docker Desktop](https://www.docker.com/products/docker-desktop/) for your operating system (macOS or Windows). On Linux, follow the [Docker Engine install guide](https://docs.docker.com/engine/install/).
+
+After installation, start Docker Desktop and verify it is running:
+
+```bash
+docker --version
+```
+
+#### 4. Get BioXend
+
+Clone the repository:
+
+```bash
+git clone https://github.com/zmahnoor14/BioXend.git
+cd BioXend
+```
+
+That's it — no conda environments or manual dependency installs are needed. All software runs inside Docker.
 
 ---
 
 ### Quickstart
 
+The Docker image is hosted on [Docker Hub](https://hub.docker.com/r/zmahnoor/bioxend) and pulled automatically.
+
 ```bash
 nextflow run main.nf -profile docker \
   --input  path/to/Template_open.ods \
   --outdir results/ \
-  --prefix HMDM
+  --prefix HMDM \
   --xenobiotic_class drug
 ```
 
@@ -53,36 +117,30 @@ An example template is provided at `Standards/Templates/Template_open.ods`.
 
 ---
 
-### Profiles
+### Docker (recommended)
 
-Run with `-profile <name>` to select the execution environment:
-
-| Profile | Description |
-|---------|-------------|
-| `docker` | Run processes inside the `bioxend:latest` Docker container (recommended) |
-| `singularity` | Use Singularity instead of Docker (for HPC environments) |
-| `slurm` | Submit jobs to a SLURM cluster |
-
-**Build the Docker image before first use:**
-
-```bash
-docker build -t bioxend:latest .
-```
-
-The image only needs to be rebuilt when the pipeline code in `bin/` changes. The `latest` tag always points to the current version — you do not need to specify a version number.
-
-**For developers — tag with both version and latest on each release:**
-
-```bash
-docker build \
-  -t bioxend:$(cat versions/workflow.txt) \
-  -t bioxend:latest \
-  .
-```
+The image `zmahnoor/bioxend:latest` is hosted on [Docker Hub](https://hub.docker.com/r/zmahnoor/bioxend) and pulled automatically by Nextflow when you use `-profile docker`. No manual build step is required.
 
 **Run the container interactively (optional):**
 ```bash
-docker run -it bioxend:latest bash
+docker run -it zmahnoor/bioxend:latest bash
+```
+
+---
+
+### Singularity (HPC environments)
+
+Singularity is not a built-in profile. Pull the image directly from Docker Hub and run with `-with-singularity`:
+
+```bash
+singularity pull bioxend.sif docker://zmahnoor/bioxend:latest
+
+nextflow run main.nf \
+  -with-singularity bioxend.sif \
+  --input  path/to/Template_open.ods \
+  --outdir results/ \
+  --prefix HMDM \
+  --xenobiotic_class drug
 ```
 
 ---
