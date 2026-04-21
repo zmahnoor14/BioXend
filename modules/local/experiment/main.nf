@@ -11,7 +11,6 @@
 process GENERATE_ASSAY_PARAM {
     tag "experiment"
     label 'process_single'
-    container 'bioxend:0.1.0'
 
     input:
     path ods

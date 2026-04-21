@@ -9,7 +9,6 @@
 process GENERATE_CHEMICALS {
     tag "chemicals"
     label 'process_low'
-    container 'bioxend:0.1.0'
 
     input:
     path ods
