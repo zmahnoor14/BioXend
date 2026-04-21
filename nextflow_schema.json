@@ -1,14 +1,15 @@
 {
     "$schema": "https://json-schema.org/draft/2020-12/schema",
-    "$id": "https://raw.githubusercontent.com/bioxend/bioxend/main/nextflow_schema.json",
+    "$id": "https://raw.githubusercontent.com/zmahnoor14/BioXend/main/nextflow_schema.json",
     "title": "BioXend pipeline parameters",
-    "description": "MIX-MB ChEMBL submission file generator",
+    "description": "MIX-MB ChEMBL submission file generator — converts a filled MIX-MB template into six ChEMBL-ready deposition files.",
     "type": "object",
     "definitions": {
         "input_output_options": {
-            "title": "Input/output options",
+            "title": "Input / output",
             "type": "object",
-            "description": "Define where the pipeline should find input data and save output.",
+            "fa_icon": "fas fa-terminal",
+            "description": "Where to find the input template and where to write the output files.",
             "required": ["input"],
             "properties": {
                 "input": {
@@ -16,13 +17,17 @@
                     "format": "file-path",
                     "exists": true,
                     "pattern": "^\\S+\\.ods$",
-                    "description": "Path to filled MIX-MB Template_open.ods file.",
-                    "help_text": "Must be a filled MIX-MB ODS template. The Reference_identifier column in the Reference sheet is used as RIDX throughout the pipeline."
+                    "mimetype": "application/vnd.oasis.opendocument.spreadsheet",
+                    "fa_icon": "fas fa-file-alt",
+                    "description": "Path to your filled MIX-MB submission template (.ods).",
+                    "help_text": "Download the blank template from `Standards/Templates/Template_open.ods`, fill in all five sheets (Reference, Chemicals, Microbes, Experiment, Biotransformation), and provide the path here. The file must have the `.ods` extension."
                 },
                 "outdir": {
                     "type": "string",
                     "format": "directory-path",
-                    "description": "Output directory where ChEMBL deposition files will be written.",
+                    "fa_icon": "fas fa-folder-open",
+                    "description": "Directory where the six ChEMBL deposition files will be written.",
+                    "help_text": "The pipeline writes REFERENCE.tsv, COMPOUND_RECORD.tsv, COMPOUND_CTAB.sdf, ASSAY.tsv, ASSAY_PARAM.tsv, and ACTIVITY.tsv into this directory. The directory is created automatically if it does not exist.",
                     "default": "./results"
                 }
             }
@@ -30,50 +35,57 @@
         "compound_options": {
             "title": "Compound options",
             "type": "object",
-            "description": "Options controlling compound record generation.",
+            "fa_icon": "fas fa-flask",
+            "description": "Options that control how compound identifiers are generated.",
+            "required": ["prefix", "xenobiotic_class"],
             "properties": {
                 "prefix": {
                     "type": "string",
                     "default": "HMDM",
-                    "description": "Prefix for auto-generated compound identifiers (CIDXs).",
-                    "help_text": "Example: HMDM → HMDM0001, HMDM0002, …"
-                }
-            }
-        },
-        "assay_options": {
-            "title": "Assay options",
-            "type": "object",
-            "description": "Options controlling assay and experimental parameter generation.",
-            "properties": {
+                    "pattern": "^[A-Za-z][A-Za-z0-9]{1,15}$",
+                    "minLength": 2,
+                    "maxLength": 16,
+                    "fa_icon": "fas fa-tag",
+                    "description": "Short alphanumeric prefix for auto-generated compound IDs (CIDXs).",
+                    "help_text": "Compounds are numbered sequentially from this prefix, e.g. `HMDM` produces `HMDM0001`, `HMDM0002`, etc. Choose a prefix that reflects your study — typically derived from your Reference Identifier (RIDX). Must start with a letter and contain only letters and numbers (2–16 characters)."
+                },
                 "xenobiotic_class": {
                     "type": "string",
                     "default": "xenobiotic compound",
-                    "description": "Singular class name used in ASSAY_DESCRIPTION.",
-                    "help_text": "Examples: drug, pesticide, xenobiotic compound"
+                    "minLength": 2,
+                    "fa_icon": "fas fa-atom",
+                    "description": "Singular class name for the compounds in this study, used in ASSAY_DESCRIPTION.",
+                    "help_text": "This term appears in the generated assay description text, e.g. 'Biotransformation of [xenobiotic_class] by ...'. Use a singular noun that best describes your compound class. Common values: `drug`, `pesticide`, `food additive`, `environmental contaminant`, `xenobiotic compound`."
                 }
             }
         },
         "pipeline_options": {
             "title": "Pipeline options",
             "type": "object",
-            "description": "General pipeline behaviour options.",
+            "fa_icon": "fas fa-cogs",
+            "description": "General options that control pipeline behaviour.",
             "properties": {
                 "strict": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Exit non-zero on any validation warning."
+                    "fa_icon": "fas fa-exclamation-triangle",
+                    "description": "Fail the pipeline on any validation warning.",
+                    "help_text": "By default the pipeline logs validation warnings and continues. Set `--strict` to treat any warning as a fatal error — recommended before final ChEMBL submission to ensure clean output files."
                 },
                 "publish_dir_mode": {
                     "type": "string",
                     "default": "copy",
-                    "description": "Method for publishing output files (copy, symlink, link, move).",
+                    "fa_icon": "fas fa-copy",
+                    "description": "Method used to publish output files to `--outdir`.",
+                    "help_text": "`copy` (default) writes independent copies of output files. `symlink` creates symbolic links (faster but fragile if the work directory is cleaned). `move` relocates files from the work directory. `link` creates hard links.",
                     "enum": ["copy", "symlink", "link", "move"],
                     "hidden": true
                 },
                 "help": {
                     "type": "boolean",
                     "default": false,
-                    "description": "Display this help message and exit.",
+                    "fa_icon": "fas fa-question-circle",
+                    "description": "Display help text and exit.",
                     "hidden": true
                 }
             }
@@ -82,7 +94,6 @@
     "allOf": [
         { "$ref": "#/definitions/input_output_options" },
         { "$ref": "#/definitions/compound_options" },
-        { "$ref": "#/definitions/assay_options" },
         { "$ref": "#/definitions/pipeline_options" }
     ]
 }
