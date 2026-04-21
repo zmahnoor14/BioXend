@@ -1,0 +1,88 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://raw.githubusercontent.com/bioxend/bioxend/main/nextflow_schema.json",
+    "title": "BioXend pipeline parameters",
+    "description": "MIX-MB ChEMBL submission file generator",
+    "type": "object",
+    "definitions": {
+        "input_output_options": {
+            "title": "Input/output options",
+            "type": "object",
+            "description": "Define where the pipeline should find input data and save output.",
+            "required": ["input"],
+            "properties": {
+                "input": {
+                    "type": "string",
+                    "format": "file-path",
+                    "exists": true,
+                    "pattern": "^\\S+\\.ods$",
+                    "description": "Path to filled MIX-MB Template_open.ods file.",
+                    "help_text": "Must be a filled MIX-MB ODS template. The Reference_identifier column in the Reference sheet is used as RIDX throughout the pipeline."
+                },
+                "outdir": {
+                    "type": "string",
+                    "format": "directory-path",
+                    "description": "Output directory where ChEMBL deposition files will be written.",
+                    "default": "./results"
+                }
+            }
+        },
+        "compound_options": {
+            "title": "Compound options",
+            "type": "object",
+            "description": "Options controlling compound record generation.",
+            "properties": {
+                "prefix": {
+                    "type": "string",
+                    "default": "HMDM",
+                    "description": "Prefix for auto-generated compound identifiers (CIDXs).",
+                    "help_text": "Example: HMDM → HMDM0001, HMDM0002, …"
+                }
+            }
+        },
+        "assay_options": {
+            "title": "Assay options",
+            "type": "object",
+            "description": "Options controlling assay and experimental parameter generation.",
+            "properties": {
+                "xenobiotic_class": {
+                    "type": "string",
+                    "default": "xenobiotic compound",
+                    "description": "Singular class name used in ASSAY_DESCRIPTION.",
+                    "help_text": "Examples: drug, pesticide, xenobiotic compound"
+                }
+            }
+        },
+        "pipeline_options": {
+            "title": "Pipeline options",
+            "type": "object",
+            "description": "General pipeline behaviour options.",
+            "properties": {
+                "strict": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Exit non-zero on any validation warning."
+                },
+                "publish_dir_mode": {
+                    "type": "string",
+                    "default": "copy",
+                    "description": "Method for publishing output files (copy, symlink, link, move).",
+                    "enum": ["copy", "symlink", "link", "move"],
+                    "hidden": true
+                },
+                "help": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Display this help message and exit.",
+                    "hidden": true
+                }
+            }
+        }
+    },
+    "allOf": [
+        { "$ref": "#/definitions/input_output_options" },
+        { "$ref": "#/definitions/compound_options" },
+        { "$ref": "#/definitions/assay_options" },
+        { "$ref": "#/definitions/pipeline_options" }
+    ]
+}

@@ -5,10 +5,10 @@
  * Usage:
  *   nextflow run main.nf -profile docker \
  *     --input  Standards/Templates/Template_open.ods \
- *     --outdir results/
+ *     --outdir results/ \
+ *     --prefix HMDM
+ *     --xenobiotic_class drug
  */
-
-nextflow.enable.dsl = 2
 
 include { BIOXEND } from './workflows/bioxend'
 
@@ -18,6 +18,16 @@ include { BIOXEND } from './workflows/bioxend'
 
 if (!params.input) {
     log.error "ERROR: --input is required. Provide the path to Template_open.ods."
+    exit 1
+}
+
+if (!params.prefix) {
+    log.error "ERROR: --prefix is required. Provide a prefix for the output files."
+    exit 1
+}
+
+if (!params.xenobiotic_class) {
+    log.error "ERROR: --xenobiotic_class is required. Provide the xenobiotic class."
     exit 1
 }
 
