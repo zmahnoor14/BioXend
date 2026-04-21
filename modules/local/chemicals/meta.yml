@@ -1,0 +1,46 @@
+name: generate_chemicals
+description: Reads the Chemicals sheet from Template_open.ods and generates ChEMBL-ready compound files with 2D structures via RDKit.
+
+keywords:
+  - chembl
+  - compounds
+  - smiles
+  - rdkit
+  - xenobiotics
+
+tools:
+  - python:
+      description: Python 3.10 runtime
+      homepage: https://www.python.org
+  - rdkit:
+      description: Cheminformatics library for 2D structure generation
+      homepage: https://www.rdkit.org
+
+input:
+  - ods:
+      type: file
+      description: Template_open.ods containing the Chemicals sheet
+      pattern: "*.ods"
+  - ridx:
+      type: value
+      description: Reference index string (e.g. GutMicrobiota_BiotransformationAtlas)
+  - prefix:
+      type: value
+      description: Compound index prefix (e.g. CIDX)
+
+output:
+  - compound_record:
+      type: file
+      description: COMPOUND_RECORD.tsv in ChEMBL deposition format
+      pattern: "COMPOUND_RECORD.tsv"
+  - compound_mapping:
+      type: file
+      description: intermediate file COMPOUND_MAPPING.tsv mapping compound names to CIDXs
+      pattern: "COMPOUND_MAPPING.tsv"
+  - compound_sdf:
+      type: file
+      description: COMPOUND_CTAB.sdf with RDKit-generated 2D structures
+      pattern: "COMPOUND_CTAB.sdf"
+
+authors:
+  - "@zulfiqar"

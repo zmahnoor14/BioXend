@@ -1,0 +1,37 @@
+name: generate_reference
+description: Reads the Reference sheet from Template_open.ods and generates REFERENCE.tsv in ChEMBL deposition format, a README.toml submission metadata file, and a RIDX.txt identifier passed to downstream modules.
+
+keywords:
+  - chembl
+  - reference
+  - publication
+  - metadata
+  - dataset
+
+tools:
+  - python:
+      description: Python 3.10 runtime
+      homepage: https://www.python.org
+
+input:
+  - ods:
+      type: file
+      description: Template_open.ods containing the Reference sheet
+      pattern: "*.ods"
+
+output:
+  - reference:
+      type: file
+      description: REFERENCE.tsv with publication metadata in ChEMBL deposition format
+      pattern: "REFERENCE.tsv"
+  - readme:
+      type: file
+      description: README.toml with submission metadata
+      pattern: "README.toml"
+  - ridx_txt:
+      type: file
+      description: RIDX.txt containing the reference index string passed to downstream modules
+      pattern: "RIDX.txt"
+
+authors:
+  - "@zulfiqar"
