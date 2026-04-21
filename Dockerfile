@@ -1,14 +1,8 @@
-# -----------------------------------------------------------------------
-# BioXend — Docker image
-# Base: python:3.10-slim + pip
-#
-# Build (use version from versions/workflow.txt):
-#   docker build -t bioxend:$(cat versions/workflow.txt) .
-#
-# Use with Nextflow:
-#   nextflow run main.nf -profile docker --input ...
-# -----------------------------------------------------------------------
-FROM python:3.10-slim
+FROM python:3.12-slim
+
+RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
+    procps \
+ && rm -rf /var/lib/apt/lists/*
 
 RUN pip install --no-cache-dir \
     rdkit \
@@ -18,7 +12,7 @@ RUN pip install --no-cache-dir \
     tomli-w
 
 COPY bin/ /usr/local/bin/
-RUN chmod +x /usr/local/bin/*.py
+RUN chmod a+rx /usr/local/bin/*.py
 
 WORKDIR /data
 CMD ["reference.py", "--help"]
