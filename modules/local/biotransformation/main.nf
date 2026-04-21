@@ -19,7 +19,6 @@
 process GENERATE_ACTIVITY {
     tag "biotransformation"
     label 'process_single'
-    container 'bioxend:0.1.0'
 
     input:
     path ods

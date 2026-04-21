@@ -222,31 +222,53 @@
     }
     .contrib-card a:hover { text-decoration: underline; }
 
-    /* ── WORKFLOW — COMING SOON ───────────────────── */
+    /* ── WORKFLOW ────────────────────────────────── */
     #workflow { background: var(--surface); }
-    .coming-soon-box {
-      margin-top: 2.5rem;
-      border: 2px dashed var(--border); border-radius: var(--radius);
-      padding: 3rem 2rem; text-align: center;
-      background: var(--bg);
+    .pipeline-steps {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 1rem; margin-top: 2rem; position: relative;
     }
-    .coming-soon-badge {
-      display: inline-block;
-      font-family: 'JetBrains Mono', monospace; font-size: .75rem;
-      font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
-      background: #fef3cd; color: #92630a;
-      padding: .3rem .8rem; border-radius: 99px; margin-bottom: 1rem;
+    .step-card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.4rem 1.2rem;
+      text-align: center; position: relative;
     }
-    .coming-soon-box h3 {
-      font-size: 1.2rem; font-weight: 700; margin-bottom: .6rem;
+    .step-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 32px; height: 32px; border-radius: 50%;
+      background: var(--teal); color: #fff;
+      font-size: .8rem; font-weight: 700; margin-bottom: .75rem;
+      font-family: 'JetBrains Mono', monospace;
     }
-    .coming-soon-box p {
-      font-size: .95rem; color: var(--muted); max-width: 520px; margin: 0 auto 1.5rem;
+    .step-card h4 { font-size: .9rem; font-weight: 700; margin-bottom: .35rem; }
+    .step-card p  { font-size: .8rem; color: var(--muted); }
+    .step-card .step-out {
+      display: inline-block; margin-top: .6rem;
+      font-family: 'JetBrains Mono', monospace; font-size: .7rem;
+      background: var(--code-bg); color: var(--teal-dark);
+      padding: .15rem .45rem; border-radius: 4px;
     }
-    .coming-soon-box a {
-      font-size: .875rem; font-weight: 600; color: var(--teal); text-decoration: none;
+    .output-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem; margin-top: 1.5rem;
     }
-    .coming-soon-box a:hover { text-decoration: underline; }
+    .out-card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 1.2rem 1.4rem;
+    }
+    .out-card .out-file {
+      font-family: 'JetBrains Mono', monospace; font-size: .8rem;
+      font-weight: 700; color: var(--teal-dark); margin-bottom: .4rem;
+    }
+    .out-card p { font-size: .825rem; color: var(--muted); }
+    .code-block {
+      background: #0f172a; color: #e2e8f0; border-radius: var(--radius);
+      padding: 1.4rem 1.6rem; font-family: 'JetBrains Mono', monospace;
+      font-size: .82rem; line-height: 1.7; overflow-x: auto; margin-top: 1.5rem;
+    }
+    .code-block .comment { color: #64748b; }
+    .code-block .flag    { color: #7dd3fc; }
+    .code-block .val     { color: #86efac; }
 
     /* ── TEAM ────────────────────────────────────── */
     #team { background: var(--bg); }
@@ -388,7 +410,7 @@
       <div class="ov-card">
         <div class="ov-icon">WP3</div>
         <h3>ChEMBL Submission Workflow</h3>
-        <p>Nextflow DSL2 pipeline that generates six ChEMBL-ready submission files from simple tabular inputs — no manual formatting.</p>
+        <p>Nextflow DSL2 pipeline that generates seven ChEMBL-ready submission files from simple tabular inputs..</p>
       </div>
       <div class="ov-card">
         <div class="ov-icon">WP4</div>
@@ -469,11 +491,11 @@
       <div style="background:var(--teal); padding:1rem 1.75rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
         <div>
           <p style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.2rem;">Submission Template</p>
-          <p style="font-size:1rem;font-weight:700;color:#fff;">Template.xlsx — 5 sheets covering all three standards</p>
+          <p style="font-size:1rem;font-weight:700;color:#fff;">Template_open.ods — 5 sheets covering all three standards</p>
         </div>
-        <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template.xlsx"
+        <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template_open.ods"
            style="background:#fff;color:var(--teal);font-weight:700;font-size:.875rem;padding:.55rem 1.3rem;border-radius:7px;text-decoration:none;white-space:nowrap;flex-shrink:0;">
-          Download Template.xlsx ↓
+          Download Template_open.ods ↓
         </a>
       </div>
       <div style="padding:1rem 1.75rem; display:flex; gap:2rem; flex-wrap:wrap;">
@@ -543,25 +565,79 @@
   </div>
 </section>
 
-<!-- WORKFLOW — COMING SOON -->
+<!-- WORKFLOW -->
 <section id="workflow">
   <div class="container">
     <p class="section-label">Nextflow Pipeline</p>
     <h2 class="section-title">Automated ChEMBL Submission Workflow</h2>
     <p class="section-intro">
-      BioXend will provide a Nextflow DSL2 pipeline to generate ChEMBL-ready submission
-      files directly from tabular inputs — no manual formatting required.
+      A Nextflow pipeline that generates seven ChEMBL-ready submission files
+      from a single filled-out <code style="font-family:'JetBrains Mono',monospace;font-size:.9em;background:var(--code-bg);padding:.1rem .35rem;border-radius:4px;">Template_open.ods</code>.
     </p>
 
-    <div class="coming-soon-box">
-      <div class="coming-soon-badge">Under Construction</div>
-      <h3>Nextflow workflow coming soon</h3>
-      <p>
-        The automated submission pipeline is currently in active development as part of WP3.
-        Follow the repository to be notified when it is released.
-      </p>
-      <a href="https://github.com/zmahnoor14/BioXend">Watch the repository on GitHub →</a>
+    <!-- Pipeline steps -->
+    <hr class="section-divider" />
+    <p class="sub-heading">Pipeline Steps</p>
+    <div class="pipeline-steps">
+      <div class="step-card">
+        <div class="step-num">1</div>
+        <h4>Reference</h4>
+        <p>Reads publication metadata from the Reference sheet</p>
+        <span class="step-out">REFERENCE.tsv</span>
+        <span class="step-out">README.toml</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num">2</div>
+        <h4>Chemicals</h4>
+        <p>Validates SMILES and generates 2D structures via RDKit</p>
+        <span class="step-out">COMPOUND_RECORD.tsv</span>
+        <span class="step-out">COMPOUND_CTAB.sdf</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num">3</div>
+        <h4>Microbes</h4>
+        <p>Builds assay entries per organism and condition</p>
+        <span class="step-out">ASSAY.tsv</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num">4</div>
+        <h4>Experiment</h4>
+        <p>Links experimental parameters to each assay by AIDX</p>
+        <span class="step-out">ASSAY_PARAM.tsv</span>
+      </div>
+      <div class="step-card">
+        <div class="step-num">5</div>
+        <h4>Biotransformation</h4>
+        <p>Links compounds to assays and writes activity records</p>
+        <span class="step-out">ACTIVITY.tsv</span>
+      </div>
     </div>
+
+    <!-- Quickstart -->
+    <hr class="section-divider" />
+    <p class="sub-heading">Quickstart</p>
+    <p style="color:var(--muted);font-size:.95rem;margin-bottom:.5rem;">
+      Requires <a href="https://www.nextflow.io/" style="color:var(--teal);text-decoration:none;font-weight:500;">Nextflow</a> ≥ 22.10.0 and <a href="https://www.docker.com/" style="color:var(--teal);text-decoration:none;font-weight:500;">Docker</a>.
+    </p>
+    <div class="code-block">
+<span class="comment"># 1. Build the Docker image (once)</span>
+$ docker build -t bioxend:latest .
+
+<span class="comment"># 2. Run the pipeline</span>
+$ nextflow run main.nf -profile docker --input Standards/Templates/Template_open.ods --outdir results/ --prefix HMDM --xenobiotic_class drug
+    </div>
+
+    <div style="margin-top:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;">
+      <a class="btn btn-white" style="background:var(--teal);color:#fff;font-size:.875rem;padding:.55rem 1.2rem;"
+         href="https://github.com/zmahnoor14/BioXend/blob/main/docs/usage.md">
+        Full Usage Docs →
+      </a>
+      <a class="btn btn-white" style="border:1px solid var(--border);font-size:.875rem;padding:.55rem 1.2rem;color:var(--text);"
+         href="https://github.com/zmahnoor14/BioXend/blob/main/docs/output.md">
+        Output Reference →
+      </a>
+    </div>
+
   </div>
 </section>
 

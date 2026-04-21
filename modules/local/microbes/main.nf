@@ -8,7 +8,6 @@
 process GENERATE_ASSAY {
     tag "microbes"
     label 'process_single'
-    container 'bioxend:0.1.0'
 
     input:
     path ods
