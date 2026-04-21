@@ -209,7 +209,7 @@ def main() -> None:
         help="RIDX identifier for this submission (must match REFERENCE.tsv)",
     )
     parser.add_argument(
-        "--prefix", default="CIDX",
+        "--prefix", default="HMDM",
         help="Prefix for auto-generated CIDX values (e.g. HMDM -> HMDM0001)",
     )
     parser.add_argument(
