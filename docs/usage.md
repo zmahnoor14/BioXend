@@ -1,77 +1,58 @@
 ## Usage
 
-### Prerequisites
+### Requirements
 
+- [Java](https://sdkman.io/) >= 17
 - [Nextflow](https://www.nextflow.io/) >= 22.10.0
-- [Docker](https://www.docker.com/) 
+- [Docker](https://www.docker.com/products/docker-desktop/)
 
 ---
 
-### Quickstart
+### Installation
 
 ```bash
-nextflow run main.nf -profile docker \
+# Java (if not already installed)
+curl -s "https://get.sdkman.io" | bash
+sdk install java
+
+# Nextflow
+curl -s https://get.nextflow.io | bash
+chmod +x nextflow && mv nextflow $HOME/.local/bin/
+```
+
+---
+
+### Run
+
+```bash
+nextflow run zmahnoor14/BioXend -latest -profile docker \
   --input  path/to/Template_open.ods \
-  --outdir results/ \
-  --prefix HMDM
+  --prefix HMDM \
   --xenobiotic_class drug
 ```
 
----
+| Parameter | Required | Description |
+|-----------|----------|-------------|
+| `--input` | yes | Path to your filled `Template_open.ods` |
+| `--prefix` | yes | Short prefix for compound IDs (e.g. `HMDM`) |
+| `--xenobiotic_class` | yes | Class of compound (e.g. `drug`, `pesticide`) |
+| `--outdir` | no | Output directory (default: `./results`) |
+| `--strict` | no | Exit on validation warnings (default: `false`) |
 
-### Input
-
-The pipeline takes a single input: a filled-out `Template_open.ods` MIX-MB submission template.
-
-```
---input  path/to/Template_open.ods
-```
-
-The template has five sheets that the pipeline reads:
-
-| Sheet | Used by |
-|-------|---------|
-| Reference | GENERATE_REFERENCE |
-| Chemicals | GENERATE_CHEMICALS |
-| Microbes | GENERATE_ASSAY |
-| Experiment | GENERATE_ASSAY_PARAM, GENERATE_ACTIVITY |
-| Biotransformation | GENERATE_ACTIVITY |
-
-An example template is provided at `Standards/Templates/Template_open.ods`.
+An example template is at `Standards/Templates/Template_open.ods`.
 
 ---
 
-### Parameters
-
-| Parameter | Default | Description |
-|-----------|---------|-------------|
-| `--input` | required | Path to filled `Template_open.ods` |
-| `--outdir` | `./results` | Directory where output files are written |
-| `--prefix` | `HMDM` | Prefix for auto-generated compound IDs (e.g. `HMDM0001`, where HMDM is based on the user RIDX `HumanMicrobiomeDrugMetabolism`) |
-| `--xenobiotic_class` | `xenobiotic compound` | Class name (singular form) used in assay descriptions (e.g. `drug`, `pesticide`) |
-| `--strict` | `false` | Exit with error on any validation warning |
-
----
-
-### Profiles
-
-Run with `-profile <name>` to select the execution environment:
-
-| Profile | Description |
-|---------|-------------|
-| `docker` | Run processes inside the `bioxend:0.1.0` Docker container (recommended) |
-| `singularity` | Use Singularity instead of Docker (for HPC environments) |
-| `slurm` | Submit jobs to a SLURM cluster |
-
-**Build the Docker image before first use:**
+### HPC (Singularity)
 
 ```bash
-docker build -t bioxend:0.1.0 .
-```
+singularity pull bioxend.sif docker://zmahnoor/bioxend:latest
 
-**Run the container interactively:**
-```bash
-docker run -it bioxend:0.1.0 bash
+nextflow run zmahnoor14/BioXend \
+  -with-singularity bioxend.sif \
+  --input  path/to/Template_open.ods \
+  --prefix HMDM \
+  --xenobiotic_class drug
 ```
 
 ---
