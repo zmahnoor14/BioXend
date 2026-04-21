@@ -7,11 +7,7 @@
 ![Contributors](https://img.shields.io/github/contributors/zmahnoor14/BioXend)
 
 # BioXend 
-BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. You can checkout the webpage for BioXend project here: https://zmahnoor14.github.io/BioXend/
-- WP1: is to develop minimum reporting standards based on community consensus
-- WP2: is to automate the metadata collection
-- WP3: is to develop a submission workflow to [ChEMBL](https://www.ebi.ac.uk/chembl/)
-- WP4: is to release this framework as part of NFDI4Micropbiota workflow
+BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. You can check the webpage for BioXend project here: https://zmahnoor14.github.io/BioXend/
 <br>
 
 <p align="center">
@@ -21,7 +17,20 @@ BioXend is a new computational framework for submitting Microbial Biotransformat
 <br>
 We welcome community participation especially for developing the minimum standards called Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB).
 
-## MIX-MB Standards
+## 1. Submission Workflow
+
+### 1.1 For workflow users
+
+For details of usage, check the [docs/usage.md](/docs/usage.md) file. This workflow takes the filled out [`Template_open.ods`](/Standards/Templates/Template_open.ods) and converts it into chembl submission ready files described in [docs/output.md](/docs/output.md). 
+
+### 1.2 For data submitters
+
+1. Download the latest [`Template_open.ods`](/Standards/Templates/Template_open.ods)
+2. Read the `Template_Description` sheet for instructions. This template defines mandatory, recommended and optional fields based on ChEMBL submission guidelines and also the current version of MIX-MB.
+3. Fill in your data — green columns are mandatory, blue are recommended, yellow are optional
+4. Submit feedback on ease of use via [issues](https://github.com/zmahnoor14/BioXend/issues/new/choose) or [discussion](https://github.com/zmahnoor14/BioXend/discussions) -- This template will be used as input to generate ready to submit ChEMBL files.
+
+## 2. MIX-MB Standards
 
 **Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)**
 
@@ -34,35 +43,11 @@ We would like to invite you to participate in this community driven project. The
 
 Please view the current results from the survey in [Standards/MIX-MB_Survey_Analysis.ipynb](Standards/MIX-MB_Survey_Analysis.ipynb) notebook.
 
-### Repository Structure for files important for contributors
 
-```
-BioXend/
-├── .github/                          # GitHub Actions workflows, PR and issue templates
-├── Standards/                        # MIX-MB standards documents and templates
-│   ├── Templates/                    # Submission templates (Excel, CSV, JSON-LD)
-│   ├── MIX-MB_Survey_Analysis.ipynb  # Community survey results and analysis
-│   ├── MIXMB_Biotransformation.md    # MIX-MB(B): Biotransformation process standards
-│   ├── MIXMB_Microbes.md             # MIX-MB(M): Microorganism standards
-│   ├── MIXMB_Standards_main.md       # Top-level MIX-MB standards overview
-│   ├── MIXMB_Xenobiotics.md          # MIX-MB(X): Chemical substrate standards
-│   └── Versioning.md                 # Versioning policy for standards
-├── bin/                              # Executable scripts and generated ChEMBL output files
-├── modules/                          # Nextflow DSL2 process modules
-├── notebooks/                        # Development notebooks (Jupyter + R)
-├── versions/                         # Independent version tracking per component
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md
-├── README.md
-└── VERSION.md
-```
-
-### How to participate:
+### How to participate as contributor:
 
 All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md). Also check thelink to the current project board: [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6)
-
-#### For contributors
-
+<br>
 We welcome contributions to the standards, template, and nf workflow for submission! See our [Contributing Guide](CONTRIBUTING.md) for details. There are different ways to contribute, either via an issue, via dicussions, via Pull Requests (PR) or via endorsement of the already submitted changes that you can easily view in the [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6).
 <br>
 
@@ -76,12 +61,36 @@ We welcome contributions to the standards, template, and nf workflow for submiss
 **Requires git knowledge:**
 - **Submit a pull request (PR)** targeting the `devel` branch
 
-### For future data submitters
+## Repository Structure for files important for contributors
 
-1. Download the latest [`Template.xlsx`](/Standards/Templates/Template.xlsx)
-2. Read the `Template_Description` sheet for instructions. This template defines mandatory, recommended and optional fields based on ChEMBL submission guidelines and also the current version of MIX-MB.
-3. Fill in your data — green columns are mandatory, blue are recommended, purple are optional
-4. Submit feedback on ease of use via [issues](https://github.com/zmahnoor14/BioXend/issues/new/choose) or [discussion](https://github.com/zmahnoor14/BioXend/discussions) -- This template will be used as input to generate ready to submit ChEMBL files.
+```
+BioXend/
+├── .github/                          # GitHub Actions workflows, PR and issue templates
+├── Standards/                        # MIX-MB standards documents and templates
+│   ├── Templates/                    # Submission template (ODS)
+│   ├── MIX-MB_Survey_Analysis.ipynb  # Community survey results and analysis
+│   ├── MIXMB_Biotransformation.md    # MIX-MB(B): Biotransformation process standards
+│   ├── MIXMB_Microbes.md             # MIX-MB(M): Microorganism standards
+│   ├── MIXMB_Standards_main.md       # Top-level MIX-MB standards overview
+│   ├── MIXMB_Xenobiotics.md          # MIX-MB(X): Chemical substrate standards
+│   └── Versioning.md                 # Versioning policy for standards
+├── bin/                              # Executable scripts and generated ChEMBL output files
+├── modules/                          # Nextflow DSL2 process modules
+├── versions/                         # Independent version tracking per component
+├── workflows/                        # bioxend workflow with all 5 processes
+├── docs/                             # index.html for webpage and usage.md + output.md
+├── conf/                             # config files for modules and base processes
+├── CODE_OF_CONDUCT.md
+├── CONTRIBUTING.md
+├── CHANGELOG.md
+├── nextflow.config
+├── nextflow_schema.json
+├── main.nf
+├── Dockerfile
+├── LICENSE
+├── README.md
+└── VERSION.md
+```
 
 ## Versioning
 
