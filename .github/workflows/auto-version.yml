@@ -199,8 +199,12 @@ jobs:
           [[ "$TEMPLATE"          == "true" ]] && bump_component \
             versions/template.txt                 "Submission Template"
 
-          [[ "$WORKFLOW"          == "true" ]] && bump_component \
-            versions/workflow.txt                 "Nextflow Workflow"
+          if [[ "$WORKFLOW" == "true" ]]; then
+            bump_component versions/workflow.txt "Nextflow Workflow"
+            NEW_WF=$(tr -d '[:space:]' < versions/workflow.txt)
+            sed -i "s/version\s*=\s*'[0-9][0-9.]*'/version         = '${NEW_WF}'/" nextflow.config
+            echo "  Synced nextflow.config manifest version to ${NEW_WF}"
+          fi
 
           # ---- bump framework ----
           OLD_FW=$(tr -d '[:space:]' < versions/framework.txt)
@@ -225,7 +229,7 @@ jobs:
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add versions/
+          git add versions/ nextflow.config
           git commit -m "chore: release v${{ steps.bump.outputs.framework_new }} [skip ci]"
           git push
 
