@@ -2,8 +2,8 @@
 # BioXend — Docker image
 # Base: python:3.10-slim + pip
 #
-# Build:
-#   docker build -t bioxend:0.1.0 .
+# Build (use version from versions/workflow.txt):
+#   docker build -t bioxend:$(cat versions/workflow.txt) .
 #
 # Use with Nextflow:
 #   nextflow run main.nf -profile docker --input ...

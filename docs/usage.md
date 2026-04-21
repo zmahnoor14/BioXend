@@ -59,19 +59,30 @@ Run with `-profile <name>` to select the execution environment:
 
 | Profile | Description |
 |---------|-------------|
-| `docker` | Run processes inside the `bioxend:0.1.0` Docker container (recommended) |
+| `docker` | Run processes inside the `bioxend:latest` Docker container (recommended) |
 | `singularity` | Use Singularity instead of Docker (for HPC environments) |
 | `slurm` | Submit jobs to a SLURM cluster |
 
 **Build the Docker image before first use:**
 
 ```bash
-docker build -t bioxend:0.1.0 .
+docker build -t bioxend:latest .
 ```
 
-**Run the container interactively:**
+The image only needs to be rebuilt when the pipeline code in `bin/` changes. The `latest` tag always points to the current version — you do not need to specify a version number.
+
+**For developers — tag with both version and latest on each release:**
+
 ```bash
-docker run -it bioxend:0.1.0 bash
+docker build \
+  -t bioxend:$(cat versions/workflow.txt) \
+  -t bioxend:latest \
+  .
+```
+
+**Run the container interactively (optional):**
+```bash
+docker run -it bioxend:latest bash
 ```
 
 ---
