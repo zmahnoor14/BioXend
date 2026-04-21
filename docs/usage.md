@@ -12,7 +12,9 @@
 ```bash
 nextflow run main.nf -profile docker \
   --input  path/to/Template_open.ods \
-  --outdir results/
+  --outdir results/ \
+  --prefix HMDM
+  --xenobiotic_class drug
 ```
 
 ---
@@ -67,36 +69,9 @@ Run with `-profile <name>` to select the execution environment:
 docker build -t bioxend:0.1.0 .
 ```
 
----
-
-### Examples
-
-**Minimal run:**
+**Run the container interactively:**
 ```bash
-nextflow run main.nf -profile docker \
-  --input Standards/Templates/Template_open.ods
-```
-
-**Custom output directory and compound prefix:**
-```bash
-nextflow run main.nf -profile docker \
-  --input Standards/Templates/Template_open.ods \
-  --outdir my_results/ \
-  --prefix COMPOUND
-```
-
-**Strict validation mode:**
-```bash
-nextflow run main.nf -profile docker \
-  --input Standards/Templates/Template_open.ods \
-  --strict
-```
-
-**On a SLURM cluster:**
-```bash
-nextflow run main.nf -profile slurm \
-  --input Standards/Templates/Template_open.ods \
-  --outdir results/
+docker run -it bioxend:0.1.0 bash
 ```
 
 ---
