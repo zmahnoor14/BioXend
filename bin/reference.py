@@ -108,7 +108,7 @@ def build_reference_tsv(df: pd.DataFrame) -> pd.DataFrame:
     for _, row in df.iterrows():
         rec: dict = {}
 
-        # RIDX — user-defined (e.g. GutMicrobiomeBiotransformation, Immunosuppressants_Microbes)
+        # RIDX user-defined (e.g. GutMicrobiomeBiotransformation, Immunosuppressants_Microbes)
         rec["RIDX"] = str(row.get("Reference_identifier") or "").strip()
 
         for col in CHEMBL_COLS:

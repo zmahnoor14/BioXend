@@ -17,7 +17,6 @@ or 'most' apply to all discovered AIDXs.
 
 Each row in ASSAY_PARAM.tsv is one parameter entry for one assay.
 Parameters are only emitted when the source field is non-empty
-(except DOSE, which is emitted only when --dose is supplied).
 
 Experiment sheet column → ASSAY_PARAM TYPE mapping:
   Pre-culture preparation and conditions  → PRE-CULTURE PREPARATION  (TEXT_VALUE)
@@ -32,7 +31,7 @@ Experiment sheet column → ASSAY_PARAM TYPE mapping:
   Sample storage                          → STORAGE                   (TEXT_VALUE)
   Biomass/inoculum density at the start   → BIOMASS                   (TEXT_VALUE)
   Biomass/inoculum density at the end     → BIOMASS                   (COMMENTS)
-  --dose / --dose_units CLI args          → DOSE                      (VALUE, RELATION==, UNITS)
+  DOSE                                    → DOSE                      (VALUE, RELATION==, UNITS)
 
 Usage:
     python bin/experiment.py \\
@@ -46,12 +45,11 @@ import argparse
 import sys
 from pathlib import Path
 
-import odf  # noqa: F401 — required by pandas odf engine
+import odf 
 import pandas as pd
 
-# ---------------------------------------------------------------------------
+
 # Constants
-# ---------------------------------------------------------------------------
 
 # ChEMBL ASSAY_PARAM.tsv columns (in deposition order)
 ASSAY_PARAM_COLS = ["AIDX", "TYPE", "RELATION", "VALUE", "UNITS", "TEXT_VALUE", "COMMENTS"]
@@ -99,7 +97,6 @@ _COL_BIOMASS_START = "Biomass/inoculum density at the start"
 _COL_BIOMASS_END   = "Biomass/inoculum density at the end"
 _COL_TIMEPOINTS    = "Time-course information (i.e., number of timepoints)"
 _COL_TIME_UNIT     = "Time_unit"
-# DOSE lives in the template; --dose CLI arg is a fallback when the cell is blank
 _COL_DOSE          = "DOSE"
 _COL_DOSE_UNIT     = "DOSE_unit"
 
@@ -278,15 +275,12 @@ def _apply_aidx_mapping(param_df: pd.DataFrame, aidx_map: "dict[str, str]") -> p
 def build_assay_param(
     exp_df: pd.DataFrame,
     aidx_list: list[str],
-    dose: str,
-    dose_units: str,
-    dose_comments: str,
 ) -> pd.DataFrame:
     """
     Build ASSAY_PARAM rows for every AIDX in *aidx_list*.
 
     For each AIDX, look up its Experiment row and emit one row per
-    non-empty parameter.  DOSE is emitted when --dose is supplied.
+    non-empty parameter. 
     BIOMASS is emitted only when at least one biomass field is non-empty.
     """
     records = []
@@ -299,16 +293,12 @@ def build_assay_param(
                   file=sys.stderr)
             continue
 
-        # --- DOSE (template columns take precedence; --dose CLI is a fallback) ---
         template_dose  = _clean(exp_row.get(_COL_DOSE,      ""))
         template_unit  = _clean(exp_row.get(_COL_DOSE_UNIT, ""))
-        dose_val = template_dose  or dose
-        dose_u   = template_unit  or dose_units
-        if dose_val:
+        if template_dose:
             records.append(_make_row(
                 aidx, "DOSE",
-                relation="=", value=dose_val, units=dose_u,
-                comments=dose_comments,
+                relation="=", value=template_dose, units=template_unit
             ))
 
         # --- Mapped text / numeric columns ---
@@ -451,18 +441,6 @@ def main() -> None:
         help="Output directory",
     )
     parser.add_argument(
-        "--dose", default="",
-        help="Compound dose value (e.g. '5'). Omit to skip DOSE rows.",
-    )
-    parser.add_argument(
-        "--dose_units", default="uM",
-        help="Units for --dose (default: uM)",
-    )
-    parser.add_argument(
-        "--dose_comments", default="",
-        help="Optional COMMENTS text for the DOSE row",
-    )
-    parser.add_argument(
         "--strict", action="store_true",
         help="Exit non-zero if any validation warnings are raised",
     )
@@ -484,7 +462,6 @@ def main() -> None:
     if exp_df.empty:
         sys.exit("ERROR: no data rows found in the Experiment sheet.")
 
-    # --- Resolve AIDX list ---
     # When ASSAY_MAPPING.tsv is supplied, use its assay_identifier column as the
     # authoritative list so every assay in the mapping gets params.
     # Fall back to the Experiment sheet identifier column when no mapping is given.
@@ -502,9 +479,6 @@ def main() -> None:
     param_df = build_assay_param(
         exp_df,
         aidx_list,
-        dose=args.dose.strip(),
-        dose_units=args.dose_units.strip(),
-        dose_comments=args.dose_comments.strip(),
     )
 
     if param_df.empty:

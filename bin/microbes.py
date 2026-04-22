@@ -32,7 +32,7 @@ Usage:
     python bin/microbes.py \\
         --input   Standards/Templates/Template_open.ods \\
         --ridx    GutMeta \\
-        --xenobiotic_class drug \\   # singular form: 'drug' not 'drugs'
+        --xenobiotic_class drug \\   # singular form: 'drug' not 'drugs', this will be used in ASSAY_DESCRIPTION sentences.
         --outdir  results/
 """
 
@@ -41,7 +41,7 @@ import re
 import sys
 from pathlib import Path
 
-import odf  # noqa: F401 — required by pandas odf engine
+import odf  
 import pandas as pd
 
 # ---------------------------------------------------------------------------
@@ -239,7 +239,7 @@ def _build_description(
 
     is_community = "metagenome" in organism.lower()
 
-    # --- Sentence 1: who/what is tested ---
+    # Sentence 1: 
     if is_community:
         s1 = f"The {xeno} is tested on {organism} community"
         if ena_proj:
@@ -253,7 +253,7 @@ def _build_description(
             s1 += f" strain {strain}"
         s1 += " for biotransformation."
 
-    # --- Sentence 2: measurement context ---
+    # Sentence 2:
     parts2 = [f"The {xeno} is measured"]
     if instrument:
         parts2.append(f"with {instrument}")
@@ -386,11 +386,7 @@ def build_assay_tsv(
             except (ValueError, TypeError):
                 target_tax_id = str(raw_ttax).strip()
 
-        # --- AIDX ---
-        # user_key is what the user wrote in the template assay_identifier column (e.g.
-        # 'assay1').  It is the cross-reference key used in the Biotransformation
-        # sheet's ASSAY_Identifier column.  The pipeline ALWAYS generates the
-        # proper ChEMBL AIDX from metadata — the user key is never used as-is.
+        # AIDX 
         user_key = str(row.get("assay_identifier") or "").strip()
         if not user_key:
             # Fallback key so Biotransformation sheet rows can still reference
@@ -404,11 +400,11 @@ def build_assay_tsv(
 
         aidx_map[user_key] = aidx
 
-        # --- ASSAY_TYPE: normalise to single uppercase letter ---
+        # ASSAY_TYPE
         raw_type   = str(row.get("ASSAY_TYPE") or "").strip().upper()
         assay_type = raw_type[0] if raw_type else ""
 
-        # --- ASSAY_TAX_ID: coerce float cells (e.g. 1348.0) to int string ---
+        # ASSAY_TAX_ID
         raw_tax = row.get("ASSAY_TAX_ID")
         if raw_tax == "" or raw_tax is None:
             assay_tax_id = ""
@@ -567,8 +563,7 @@ def main() -> None:
     print(f"Written: {out_path}")
 
     # --- Write ASSAY_MAPPING.tsv ---
-    # Maps the user's short identifier (template assay_identifier column) to the
-    # pipeline-generated ChEMBL AIDX. 
+ 
     mapping_path = outdir / "ASSAY_MAPPING.tsv"
     pd.DataFrame(
         list(aidx_map.items()), columns=["assay_identifier", "AIDX"]
