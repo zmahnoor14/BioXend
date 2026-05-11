@@ -107,7 +107,7 @@ Wilkinson MD, Dumontier M, Aalbersberg IJJ, Appleton G, Axton M, Baak A, Blomber
 
 **Recent applications:**
 
-1. Rocca-Serra P, et al. (Implementation of FAIR Practices in Computational Metabolomics Workflows — A Case Study). *Metabolites* 2024; 14(2): 118. https://doi.org/10.3390/metabo14020118
+1. Zulfiqar M, Crusoe MR, König-Ries B, Steinbeck C, Peters K, Gadelha L. (Implementation of FAIR Practices in Computational Metabolomics Workflows — A Case Study). *Metabolites* 2024; 14(2): 118. https://doi.org/10.3390/metabo14020118
    — Demonstrates how FAIR principles can be applied to metabolomics data analysis workflows using the Common Workflow Language, WorkflowHub, and RO-Crate packaging.
 
 2. Goble C, Cohen-Boulakia S, Soiland-Reyes S, Garijo D, Gil Y, Crusoe MR, Peters K, Schober D. FAIR Computational Workflows. *Data Intelligence* 2020; 2(1–2): 108–121. https://doi.org/10.1162/dint_a_00033
