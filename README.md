@@ -4,6 +4,7 @@
 ![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)
 [![Bioschemas](https://img.shields.io/badge/Bioschemas-aligned-e87722)](https://bioschemas.org/)
 [![ChEMBL](https://img.shields.io/badge/ChEMBL-submission--ready-e8003d)](https://www.ebi.ac.uk/chembl/)
+[![GitBook](https://img.shields.io/badge/Standards-GitBook-3884FF?logo=gitbook&logoColor=white)](https://embl.gitbook.io/embl-docs)
 ![Contributors](https://img.shields.io/github/contributors/zmahnoor14/BioXend)
 
 # BioXend 
@@ -33,6 +34,8 @@ For details of usage, check the [docs/usage.md](/docs/usage.md) file. This workf
 ## 2. MIX-MB Standards
 
 **Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)**
+
+📖 Full standards documentation: **[embl.gitbook.io/embl-docs](https://embl.gitbook.io/embl-docs)**
 
 BioXend framework defines community-driven minimum reporting standards for xenobiotic microbial biotransformation data, enabling consistent data deposition to databases such as ChEMBL. <br>
 We would like to invite you to participate in this community driven project. The standards are informed by 
