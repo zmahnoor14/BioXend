@@ -14,28 +14,6 @@ This document identifies the Minimum Information (MI) required to report xenobio
 
 ---
 
-## Table of Contents
-
-- [1. Overview](#1-overview)
-  - [1.4 Identifiers and Cross-Referencing](#14-identifiers-and-cross-referencing)
-- [2. Bioschemas](#2-bioschemas)
-  - [2.1 Xenobiotics — ChemicalSubstance Profile with Concentration](#21-xenobiotics----chemicalsubstance-profile-with-concentration)
-  - [2.2 Products and Metabolites with MSI Levels](#22-products-and-metabolites-with-msi-levels)
-  - [2.3 Concentration Documentation](#23-concentration-documentation)
-- [3. Ontologies](#3-ontologies)
-  - [3.1 ChEBI (Chemical Entities of Biological Interest)](#31-chebi-chemical-entities-of-biological-interest)
-  - [3.2 ChemOnt (Chemical Ontology)](#32-chemont-chemical-ontology)
-  - [3.3 Unit Ontology (UO)](#33-unit-ontology-uo)
-  - [3.4 Gene Ontology (GO) — Biotransformation Processes](#34-gene-ontology-go---biotransformation-processes)
-  - [3.5 MIX-MB Controlled Vocabularies](#35-mix-mb-controlled-vocabularies)
-- [4. Data Validation Rules](#4-data-validation-rules)
-- [5. Data Quality Tiers](#5-data-quality-tiers)
-- [8. Data Access and Repository Guidance](#8-data-access-and-repository-guidance)
-- [9. Licence and Reuse](#9-licence-and-reuse)
-- [10. Provenance](#10-provenance)
-- [11. References](#11-references)
-- [12. Contact and Contributions](#12-contact-and-contributions)
-
 ---
 
 ## 1. Overview

@@ -14,38 +14,6 @@ This document identifies Minimum Information (MI) required to report microbial o
 
 ---
 
-## Table of Contents
-
-- [1. Overview](#1-overview)
-  - [1.4 Identifiers and Cross-Referencing](#14-identifiers-and-cross-referencing)
-- [2. Bioschemas](#2-bioschemas)
-  - [2.1 Taxon Profile](#21-taxon-profile)
-  - [2.2 TaxonName Profile](#22-taxonname-profile)
-  - [2.3 Sample Profile](#23-sample-profile)
-  - [2.4 Gene Profile](#24-gene-profile)
-  - [2.5 Protein Profile](#25-protein-profile)
-  - [2.6 ProteinAnnotation Profile](#26-proteinannotation-profile)
-- [3. Ontologies and Standards](#3-ontologies-and-standards)
-  - [3.1 NCBI Taxonomy](#31-ncbi-taxonomy)
-  - [3.2 Additional Ontology Requirements](#32-additional-ontology-requirements)
-  - [3.3 MIxS (Minimum Information about any Sequence)](#33-mixs-minimum-information-about-any-sequence)
-  - [3.4 Environment Ontology (ENVO)](#34-environment-ontology-envo)
-  - [3.5 Phenotype Ontology (PATO/OMP)](#35-phenotype-ontology-patoomp)
-  - [3.6 Gene Ontology (GO) & Enzyme Commission (EC)](#36-gene-ontology-go--enzyme-commission-ec)
-  - [3.7 Antibiotic Resistance Ontology (ARO)](#37-antibiotic-resistance-ontology-aro)
-- [7. Controlled Vocabularies](#7-controlled-vocabularies)
-  - [7.1 Oxygen Requirements](#71-oxygen-requirements)
-  - [7.2 Cell Morphology](#72-cell-morphology)
-  - [7.3 Sample Types](#73-sample-types)
-  - [7.4 Growth Phases](#74-growth-phases)
-- [4. Data Validation Rules](#4-data-validation-rules)
-- [5. Data Quality Tiers](#5-data-quality-tiers)
-- [8. Data Access and Repository Guidance](#8-data-access-and-repository-guidance)
-- [9. Licence and Reuse](#9-licence-and-reuse)
-- [10. Provenance](#10-provenance)
-- [11. References](#11-references)
-- [12. Contact and Contributions](#12-contact-and-contributions)
-
 ---
 
 ## 1. Overview
