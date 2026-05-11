@@ -81,10 +81,22 @@ MetaboLights submissions do not require or standardise: (i) microbial organism i
 **Primary citation:**
 Haug K, Salek RM, Conesa P, Hastings J, de Matos P, Rijnbeek M, Mahendraker T, Williams M, Neumann S, Rocca-Serra P, Maguire E, González-Beltrán A, Sansone SA, Griffin JL, Steinbeck C. MetaboLights — an open-access general-purpose repository for metabolomics studies and associated meta-data. *Nucleic Acids Research* 2013; 41(D1): D781–D786. https://doi.org/10.1093/nar/gks1004
 
+### 3c. MIAPE (Taylor et al. 2007)
+
+**Covers:**
+The Minimum Information About a Proteomics Experiment (MIAPE), developed by the HUPO Proteomics Standards Initiative (PSI), defines minimum reporting requirements for proteomics experiments. The standard specifies guidance modules covering sample preparation, separation techniques (gel electrophoresis, column chromatography), mass spectrometry instrument settings, and data analysis workflows. MIAPE is structured as a modular framework: individual modules address specific analytical techniques, allowing the standard to evolve as new methods emerge. It addresses principles for what constitutes a fully documented proteomics experiment sufficient for independent reproduction and critical evaluation.
+
+**Does NOT cover:**
+MIAPE is scoped exclusively to proteomics experiments. It does not define any metadata requirements for: (i) microbial organism identity or taxonomy (no TaxID fields), (ii) chemical substrate characterisation (no SMILES, InChIKey, or chemical structure requirements), (iii) biotransformation outcomes or activity classification (no action type, no substrate/product designation), or (iv) linkage to chemical bioactivity databases such as ChEMBL. Although MIAPE established the modular minimum-information framework concept that influenced later standards (including MSI and elements of MIxS), it provides no coverage of the chemistry-microbiology interface relevant to xenobiotic biotransformation reporting.
+
+**Primary citation:**
+Taylor CF, Paton NW, Lilley KS, Binz PA, Julian RK Jr, Jones AR, Zhu W, Apweiler R, Aebersold R, Deutsch EW, Dunn MJ, Heck AJR, Leitner A, Macht M, Mann M, Martens L, Neubert TA, Patterson SD, Ping P, Seymour SL, Souda P, Tsugita A, Vandekerckhove J, Vondriska TM, Whitelegge JP, Wilkins MR, Xenarios I, Yates JR III, Hermjakob H. The minimum information about a proteomics experiment (MIAPE). *Nature Biotechnology* 2007; 25(8): 887–893. https://doi.org/10.1038/nbt1329
+
 **Key facts for manuscript (both standards):**
 - MSI annotation levels are directly relevant to the chemical identification confidence of xenobiotic substrates and biotransformation products; MIX-MB(X) can be framed as extending MSI Level 1 requirements with additional biotransformation-specific fields.
 - MetaboLights enforces MSI-compliance but has no mechanism for recording microbial biotransformation activity; this is a complementary rather than competing resource.
-- Neither MSI annotation levels nor MetaboLights address the bioactivity recording dimension that ChEMBL requires — reinforcing the need for a cross-domain standard.
+- MIAPE illustrates that the modular minimum-information standard model (pioneered in proteomics) is transferable to new domains; MIX-MB follows the same modular philosophy applied to the xenobiotics-microbiome interface.
+- Neither MSI annotation levels, MIAPE, nor MetaboLights address the bioactivity recording dimension that ChEMBL requires — reinforcing the need for a cross-domain standard.
 
 ---
 
@@ -98,7 +110,8 @@ Wilkinson MD, Dumontier M, Aalbersberg IJJ, Appleton G, Axton M, Baak A, Blomber
 1. Rocca-Serra P, et al. (Implementation of FAIR Practices in Computational Metabolomics Workflows — A Case Study). *Metabolites* 2024; 14(2): 118. https://doi.org/10.3390/metabo14020118
    — Demonstrates how FAIR principles can be applied to metabolomics data analysis workflows using the Common Workflow Language, WorkflowHub, and RO-Crate packaging.
 
-2. The Chemistry Implementation Network (ChIN) under the GO FAIR initiative has formalised FAIRification approaches for chemical data, including defining persistent identifiers (InChIKey, SMILES) and semantic data models for chemical substance representation.
+2. Goble C, Cohen-Boulakia S, Soiland-Reyes S, Garijo D, Gil Y, Crusoe MR, Peters K, Schober D. FAIR Computational Workflows. *Data Intelligence* 2020; 2(1–2): 108–121. https://doi.org/10.1162/dint_a_00033
+   — Argues that computational workflows themselves must be FAIR objects, not merely the data they process; proposes workflow-level metadata requirements (persistent identifiers, provenance records, semantic annotations, containerisation) and demonstrates implementation using Common Workflow Language, WorkflowHub, and RO-Crate. Directly relevant to BioXend: the Nextflow pipeline constitutes a FAIR computational workflow under these criteria.
 
 **Key facts for manuscript:**
 - **Findable:** MIX-MB mandates globally unique compound identifiers (CIDX linked to ChEMBL, InChIKey, SMILES) and NCBI TaxIDs for microbial organisms, directly implementing the F1 and F2 FAIR sub-principles.
@@ -143,9 +156,14 @@ As of May 2026, no dedicated minimum information standard exists for reporting x
    Rekdal VM, Bess EN, Bisanz JE, Turnbaugh PJ, Balskus EP. Discovery and inhibition of an interspecies gut bacterial pathway for Levodopa metabolism. *Science* 2019; 364(6445): eaau6323. https://doi.org/10.1126/science.aau6323
    — This study identified and mechanistically characterised a two-step interspecies gut bacterial pathway (Enterococcus faecalis PLP-dependent decarboxylase followed by Eggerthella lenta molybdenum-dependent dehydroxylase) that deactivates the Parkinson's disease drug levodopa, providing a causal molecular mechanism linking gut microbiota composition to drug efficacy.
 
-4. **Koppel, Maini Rekdal, and Balskus 2017 (Science):**
+4. **Culp et al. 2024 (Cell):**
+   Culp EJ, Nelson NT, Verdegaal AA, Goodman AL. Microbial transformation of dietary xenobiotics shapes gut microbiome composition. *Cell* 2024; 187(22): 6327–6345.e20. https://doi.org/10.1016/j.cell.2024.08.038
+   — By systematically mapping interactions between approximately 150 dietary small-molecule xenobiotics and the human gut microbiome, this study demonstrated that gut microbes can convert some dietary compounds into antibiotics and detoxify others, and uncovered mechanisms explaining why the same dietary compound produces different microbiome effects across individuals — establishing a causal, bidirectional link between xenobiotic biotransformation and gut microbiome community composition.
+
+**Additional reference (2017):**
+
    Koppel N, Maini Rekdal V, Balskus EP. Chemical transformation of xenobiotics by the human gut microbiota. *Science* 2017; 356(6344): eaag2770. https://doi.org/10.1126/science.aag2770
-   — This landmark review synthesised the state of knowledge on direct microbial chemical modification of xenobiotics in the human gut, cataloguing the types of reactions performed, the microbial enzymes involved, and the consequences for drug efficacy and toxicity, and highlighted the profound gap in systematic characterisation of these activities.
+   — Landmark review synthesising the state of knowledge on direct microbial chemical modification of xenobiotics in the human gut, cataloguing reaction types, microbial enzymes involved, and consequences for drug efficacy and toxicity.
 
 5. **Roje, Zhang, Mastrorilli et al. 2024 (Nature):**
    Roje B, Zhang B, Mastrorilli E, Kovačić A, Sušak L, Ljubenkov I, Ćosić E, Vilović K, Meštrović A, Lozo Vukovac E, Bučević-Popović V, Puljiz Ž, Karaman I, Terzić J, Zimmermann M. Gut microbiota carcinogen metabolism causes distal tissue tumours. *Nature* 2024; 632(8027): 1137–1144. https://doi.org/10.1038/s41586-024-07754-w
