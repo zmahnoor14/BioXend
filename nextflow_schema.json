@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$schema": "https://json-schema.org/draft-07/hyper-schema",
     "$id": "https://raw.githubusercontent.com/zmahnoor14/BioXend/main/nextflow_schema.json",
     "title": "BioXend pipeline parameters",
     "description": "MIX-MB ChEMBL submission file generator — converts a filled MIX-MB template into six ChEMBL-ready deposition files.",
