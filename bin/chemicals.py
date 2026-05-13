@@ -89,9 +89,6 @@ def build_compound_records(
 ) -> pd.DataFrame:
     """
     Assign CIDXs, and build the compound records table.
-
-    The returned DataFrame carries private columns _smiles and _mol
-    used by the SDF writer; these are dropped before TSV export.
     """
 
     records = []

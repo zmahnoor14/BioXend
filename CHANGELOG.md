@@ -7,6 +7,13 @@ Versions follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
 ## [Unreleased]
 
+### Added
+- Example input data files
+
+### Fixed
+- `nextflow_schema.json`: updated `$schema` to draft-07 for nf-core launch compatibility
+- `main.nf`: updated pipeline components
+
 ---
 
 ## [0.1.1] - 2026-03-16

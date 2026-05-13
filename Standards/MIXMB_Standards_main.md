@@ -15,26 +15,6 @@
 </p>
 
 
-## Table of Contents
-
-- [Abstract](#abstract)
-- [Scope and Applicability](#scope-and-applicability)
-  - [In Scope](#in-scope)
-  - [Out of Scope](#out-of-scope)
-- [Component Standards](#component-standards)
-- [Template](#template)
-  - [1. Study Metadata Files](#1-study-metadata-files)
-    - [How are study data files integrated into the Template.xlsx](#how-are-study-data-files-are-integrated-into-the-templatexlsx)
-  - [2. Xenobiotics Metadata Files](#2-xenobiotics-metadata-files)
-    - [How are xenobiotics data files integrated into the Template.xlsx](#how-are-xenobiotics-data-files-are-integrated-into-the-templatexlsx)
-  - [3. Microbe / Assay Metadata Files](#3-microbe-assay-metadata-files)
-    - [How are assay/microbe data files integrated into the Template.xlsx](#how-are-assaymicrobe-data-files-are-integrated-into-the-templatexlsx)
-  - [4. Biotransformation Metadata File(s)](#4-biotransformation-metadata-files)
-    - [How are biotransformation data files integrated into the Template.xlsx](#how-are-biotransformation-data-files-are-integrated-into-the-templatexlsx)
-- [Identifiers and Cross-Referencing](#naming-convention-for-identifiers-and-cross-referencing-in-ChEMBL)
-  - [Minting Scheme for Unknowns](#minting-scheme-for-unknowns)
-- [ChEMBL Links and FAQs](#chembl-links-and-faqs)
-
 ---
 
 ## Abstract

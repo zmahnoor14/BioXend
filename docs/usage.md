@@ -4,7 +4,7 @@
 
 - [Java](https://sdkman.io/) >= 17
 - [Nextflow](https://www.nextflow.io/) >= 22.10.0
-- [Docker](https://www.docker.com/products/docker-desktop/)
+- One of: [Docker](https://www.docker.com/products/docker-desktop/), [Singularity](https://docs.sylabs.io/guides/latest/user-guide/), or [Apptainer](https://apptainer.org/)
 
 ---
 
@@ -22,14 +22,7 @@ chmod +x nextflow && mv nextflow $HOME/.local/bin/
 
 ---
 
-### Run
-
-```bash
-nextflow run zmahnoor14/BioXend -latest -profile docker \
-  --input  path/to/Template_open.ods \
-  --prefix HMDM \
-  --xenobiotic_class drug
-```
+### Parameters
 
 | Parameter | Required | Description |
 |-----------|----------|-------------|
@@ -39,18 +32,79 @@ nextflow run zmahnoor14/BioXend -latest -profile docker \
 | `--outdir` | no | Output directory (default: `./results`) |
 | `--strict` | no | Exit on validation warnings (default: `false`) |
 
-An example template is at `Standards/Templates/Template_open.ods`.
+An example template is at `exampledata/template_filled.ods`.
 
 ---
 
-### HPC (Singularity)
+### Run with Docker (local / laptop)
+
+Docker Desktop must be running. Build the image once:
 
 ```bash
-singularity pull bioxend.sif docker://zmahnoor/bioxend:latest
+docker build -t zmahnoor/bioxend:latest .
+```
 
-nextflow run zmahnoor14/BioXend \
+Then run the pipeline — Docker is enabled by default, no profile flag needed:
+
+```bash
+nextflow run main.nf \
+  --input  path/to/template_filled.ods \
+  --prefix HMDM \
+  --xenobiotic_class drug
+```
+
+Or run directly from GitHub (uses the `devel` branch):
+
+```bash
+nextflow run zmahnoor14/BioXend -r devel \
+  --input  path/to/template_filled.ods \
+  --prefix HMDM \
+  --xenobiotic_class drug
+```
+
+---
+
+### Run with Singularity (HPC)
+
+Singularity pulls the Docker image from Docker Hub automatically. No manual image build needed.
+
+```bash
+nextflow run main.nf -profile singularity \
+  --input  path/to/template_filled.ods \
+  --prefix HMDM \
+  --xenobiotic_class drug
+```
+
+To run on a SLURM cluster, combine profiles:
+
+```bash
+nextflow run main.nf -profile singularity,slurm \
+  --input  path/to/template_filled.ods \
+  --prefix HMDM \
+  --xenobiotic_class drug
+```
+
+---
+
+### Run with Apptainer (HPC)
+
+Apptainer is a drop-in replacement for Singularity on newer HPC systems. Use the same `singularity` profile — Nextflow handles Apptainer transparently:
+
+```bash
+nextflow run main.nf -profile singularity \
+  --input  path/to/template_filled.ods \
+  --prefix HMDM \
+  --xenobiotic_class drug
+```
+
+If your HPC requires pulling the image manually first:
+
+```bash
+apptainer pull bioxend.sif docker://zmahnoor/bioxend:latest
+
+nextflow run main.nf -profile singularity \
   -with-singularity bioxend.sif \
-  --input  path/to/Template_open.ods \
+  --input  path/to/template_filled.ods \
   --prefix HMDM \
   --xenobiotic_class drug
 ```

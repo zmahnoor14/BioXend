@@ -1,0 +1,24 @@
+.DS_Store
+.nextflow/
+results/
+dag.html
+result_cp.zip
+*.xlsx~
+Standards/.DS_Store
+R/
+python/
+nextflow
+git_commands.txt
+dag.html
+notebooks/
+.venv/
+*.ipynb_checkpoints
+.planning/
+CLAUDE.md
+.claude/
+Standards/MIX-MB Survey (Responses).xlsx
+Standards/README_Templates.md
+Standards/Templates/Template_open_MB.ods
+Standards/Templates/~$Template.xlsx
+docs/manuscript
+docs/superpowers
