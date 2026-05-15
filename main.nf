@@ -20,12 +20,6 @@ workflow {
     if (!params.input) {
         error "ERROR: --input is required. Provide the path to Template_open.ods."
     }
-    if (!params.prefix) {
-        error "ERROR: --prefix is required. Provide a prefix for the output files."
-    }
-    if (!params.xenobiotic_class) {
-        error "ERROR: --xenobiotic_class is required. Provide the xenobiotic class."
-    }
 
     BIOXEND()
 }

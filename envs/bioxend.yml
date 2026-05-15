@@ -1,0 +1,13 @@
+name: bioxend
+channels:
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.12
+  - rdkit>=2023.9
+  - pandas>=2.0
+  - odfpy>=1.4
+  - requests>=2.28
+  - pip
+  - pip:
+    - tomli-w>=1.0

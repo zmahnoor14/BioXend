@@ -1,5 +1,5 @@
 {
-    "$schema": "https://json-schema.org/draft-07/hyper-schema",
+    "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/zmahnoor14/BioXend/main/nextflow_schema.json",
     "title": "BioXend pipeline parameters",
     "description": "MIX-MB ChEMBL submission file generator — converts a filled MIX-MB template into six ChEMBL-ready deposition files.",
@@ -37,7 +37,7 @@
             "type": "object",
             "fa_icon": "fas fa-flask",
             "description": "Options that control how compound identifiers are generated.",
-            "required": ["prefix", "xenobiotic_class"],
+            "required": [],
             "properties": {
                 "prefix": {
                     "type": "string",
