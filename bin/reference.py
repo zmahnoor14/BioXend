@@ -59,7 +59,7 @@ CHEMBL_COLS = [
 
 
 # Mandatory fields checked during validation
-MANDATORY_FIELDS = ["RIDX", "DATA_LICENCE", "CONTACT", "YEAR", "REF_TYPE", "TITLE", "DOI", "ABSTRACT", "AUTHORS"]
+MANDATORY_FIELDS = ["DATA_LICENCE", "CONTACT", "YEAR", "REF_TYPE", "TITLE", "DOI", "ABSTRACT", "AUTHORS"]
 CONDITIONAL_MANDATORY_FIELDS = ["PUBMED_ID"]  # Mandatory (if the REF_TYPE is "Publication")
 # Template sheet row indices (0-based)
 _ROW_COLNAMES = 1

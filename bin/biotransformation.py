@@ -62,6 +62,7 @@ import pandas as pd
 CHEMBL_COLS = [
     "CIDX",
     "RIDX",
+    "CRIDX",
     "AIDX",
     "TYPE",
     "TEXT_VALUE",
@@ -73,7 +74,7 @@ CHEMBL_COLS = [
     "ACTION_TYPE",
 ]
 
-MANDATORY_FIELDS = ["CIDX", "CRIDX", "RIDX", "AIDX", "ACTIVITY_COMMENT", "TYPE"] #CRIDX is same as RIDX
+MANDATORY_FIELDS = ["CIDX", "RIDX", "CRIDX", "AIDX", "ACTIVITY_COMMENT", "TYPE"]
 
 VALID_ACTION_TYPES = {"ACTIVATOR", "ALLOSTERIC ANTAGONIST","ANTAGONIST",
 "ANTISENSE INHIBITOR","BINDING AGENT", "BLOCKER",
@@ -388,7 +389,7 @@ def build_activity_tsv(
         records.append({
             "CIDX":             _resolve_cidx(row, cidx_map),
             "RIDX":             ridx,
-            "CRIDX":            ridx,  # CRIDX is the same as RIDX for ChEMBL deposition
+            "CRIDX":            ridx,
             "AIDX":             _resolve_aidx(row, aidx_map),
             "TYPE":             "Biotransformation",
             "TEXT_VALUE":       text_value,
