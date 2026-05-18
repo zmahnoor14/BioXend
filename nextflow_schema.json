@@ -37,7 +37,7 @@
             "type": "object",
             "fa_icon": "fas fa-flask",
             "description": "Options that control how compound identifiers are generated.",
-            "required": [],
+            "required": ["prefix", "xenobiotic_class"],
             "properties": {
                 "prefix": {
                     "type": "string",
