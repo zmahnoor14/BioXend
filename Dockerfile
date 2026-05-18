@@ -14,5 +14,5 @@ RUN pip install --no-cache-dir \
 COPY bin/ /usr/local/bin/
 RUN chmod a+rx /usr/local/bin/*.py
 
-WORKDIR /data
+WORKDIR /app
 CMD ["reference.py", "--help"]
