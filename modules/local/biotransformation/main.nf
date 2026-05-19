@@ -19,6 +19,7 @@
 process GENERATE_ACTIVITY {
     tag "biotransformation"
     label 'process_single'
+    container 'zmahnoor/bioxend:latest'
 
     input:
     path ods
