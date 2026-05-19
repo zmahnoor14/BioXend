@@ -1,0 +1,197 @@
+# PR Version Bump Preview
+#
+# Posts (and keeps updated) a single sticky comment on every PR targeting
+# `main`, showing exactly which component versions will be bumped and what
+# the new framework version will be once the PR is merged.
+#
+# The actual bump + release still happens in `auto-version.yml` after merge.
+# This workflow is read-only: it never modifies repo files or executes PR
+# code. It just inspects the diff via the GitHub API and writes a comment.
+#
+# SECURITY NOTE:
+#   This uses `pull_request_target` so that PRs from forks also get a
+#   preview comment (forked `pull_request` runs have a read-only token and
+#   cannot comment). `pull_request_target` runs with the base-branch token,
+#   which is privileged — DO NOT add `actions/checkout` of the PR head, and
+#   DO NOT execute any code from the PR. This workflow only reads file
+#   metadata + base-branch contents via the API, which is safe. No `run:`
+#   step ever interpolates untrusted PR data (titles, branch names, commit
+#   messages) into a shell — all logic lives inside actions/github-script.
+
+name: PR Version Bump Preview
+
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened, labeled, unlabeled]
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  preview:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Compute and post version preview
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const pr = context.payload.pull_request;
+            const { owner, repo } = context.repo;
+            const baseRef = pr.base.ref;
+
+            // ---------------------------------------------------------- //
+            // 1. Determine bump type from PR labels (same rules as       //
+            //    auto-version.yml: default = patch)                       //
+            // ---------------------------------------------------------- //
+            const labels = pr.labels.map(l => l.name);
+            let bumpType = 'patch';
+            let bumpLabelExplicit = false;
+            if (labels.includes('bump:major'))      { bumpType = 'major'; bumpLabelExplicit = true; }
+            else if (labels.includes('bump:minor')) { bumpType = 'minor'; bumpLabelExplicit = true; }
+            else if (labels.includes('bump:patch')) { bumpType = 'patch'; bumpLabelExplicit = true; }
+
+            // ---------------------------------------------------------- //
+            // 2. List changed files in the PR                             //
+            // ---------------------------------------------------------- //
+            const files = await github.paginate(github.rest.pulls.listFiles, {
+              owner, repo, pull_number: pr.number, per_page: 100
+            });
+            const changedFiles = files.map(f => f.filename);
+
+            const match = (patterns) =>
+              changedFiles.some(f => patterns.some(p => f.match(p)));
+
+            // ---------------------------------------------------------- //
+            // 3. Component definitions (mirror of auto-version.yml)       //
+            // ---------------------------------------------------------- //
+            const components = [
+              { file: 'versions/standards-xenobiotics.txt',
+                label: 'MIX-MB(X) Xenobiotics Standard',
+                patterns: [/^Standards\/MIXMB_Xenobiotics/] },
+              { file: 'versions/standards-microbes.txt',
+                label: 'MIX-MB(M) Microbes Standard',
+                patterns: [/^Standards\/MIXMB_Microbes/] },
+              { file: 'versions/standards-biotransformation.txt',
+                label: 'MIX-MB(B) Biotransformation Standard',
+                patterns: [/^Standards\/MIXMB_Biotransformation/] },
+              { file: 'versions/standards-main.txt',
+                label: 'MIX-MB Standards Overview',
+                patterns: [/^Standards\/MIXMB_Standards_main/] },
+              { file: 'versions/template.txt',
+                label: 'Submission Template',
+                patterns: [/^Standards\/Templates\//] },
+              { file: 'versions/workflow.txt',
+                label: 'Nextflow Workflow',
+                patterns: [/^main\.nf$/, /^nextflow\.config$/, /^bin\//, /^modules\//] }
+            ];
+
+            // ---------------------------------------------------------- //
+            // 4. Helpers                                                  //
+            // ---------------------------------------------------------- //
+            const getVersion = async (path) => {
+              try {
+                const { data } = await github.rest.repos.getContent({
+                  owner, repo, path, ref: baseRef
+                });
+                return Buffer.from(data.content, 'base64').toString('utf8').trim();
+              } catch (e) {
+                core.warning(`Could not read ${path}@${baseRef}: ${e.message}`);
+                return null;
+              }
+            };
+
+            const bumpSemver = (version, level) => {
+              const [maj, min, pat] = version.split('.').map(Number);
+              if (level === 'major') return `${maj + 1}.0.0`;
+              if (level === 'minor') return `${maj}.${min + 1}.0`;
+              return `${maj}.${min}.${pat + 1}`;
+            };
+
+            // ---------------------------------------------------------- //
+            // 5. Compute per-component bumps                              //
+            // ---------------------------------------------------------- //
+            const bumps = [];
+            for (const c of components) {
+              if (!match(c.patterns)) continue;
+              const oldV = await getVersion(c.file);
+              if (oldV) {
+                bumps.push({ label: c.label, file: c.file, old: oldV, new: bumpSemver(oldV, bumpType) });
+              }
+            }
+
+            // ---------------------------------------------------------- //
+            // 6. Framework bump (only if any component bumped)            //
+            // ---------------------------------------------------------- //
+            let framework = null;
+            if (bumps.length > 0) {
+              const oldFw = await getVersion('versions/framework.txt');
+              if (oldFw) {
+                framework = { old: oldFw, new: bumpSemver(oldFw, bumpType) };
+              }
+            }
+
+            // ---------------------------------------------------------- //
+            // 7. Build comment body                                       //
+            // ---------------------------------------------------------- //
+            const marker = '<!-- bioxend:version-preview -->';
+            const bumpTypeLine = bumpLabelExplicit
+              ? `**Bump type:** \`${bumpType}\` (from \`bump:${bumpType}\` label)`
+              : `**Bump type:** \`${bumpType}\` _(default — add a \`bump:minor\` or \`bump:major\` label to change)_`;
+
+            let body;
+            if (bumps.length === 0) {
+              body = [
+                marker,
+                '## Version Bump Preview',
+                '',
+                'No versionable files changed in this PR — **no release will be cut on merge**.',
+                '',
+                '_Versionable paths: `Standards/MIXMB_*.md`, `Standards/Templates/**`, `main.nf`, `nextflow.config`, `bin/**`, `modules/**`._'
+              ].join('\n');
+            } else {
+              const rows = bumps.map(b => `| ${b.label} | \`${b.old}\` | \`${b.new}\` |`).join('\n');
+              body = [
+                marker,
+                '## Version Bump Preview',
+                '',
+                bumpTypeLine,
+                '',
+                framework
+                  ? `**Framework:** \`v${framework.old}\` → \`v${framework.new}\``
+                  : '**Framework:** _could not read `versions/framework.txt` from base — check workflow logs_',
+                '',
+                '### Component Bumps',
+                '',
+                '| Component | Current | After Merge |',
+                '|---|---|---|',
+                rows,
+                '',
+                '---',
+                '_This is a preview. The actual bump commit and GitHub Release are created by `auto-version.yml` when this PR is merged into `main`._'
+              ].join('\n');
+            }
+
+            // ---------------------------------------------------------- //
+            // 8. Upsert the sticky comment                                //
+            // ---------------------------------------------------------- //
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner, repo, issue_number: pr.number, per_page: 100
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+
+            if (existing) {
+              if (existing.body === body) {
+                core.info('Preview comment already up to date.');
+              } else {
+                await github.rest.issues.updateComment({ owner, repo, comment_id: existing.id, body });
+                core.info(`Updated preview comment ${existing.id}.`);
+              }
+            } else {
+              await github.rest.issues.createComment({
+                owner, repo, issue_number: pr.number, body
+              });
+              core.info('Created preview comment.');
+            }
