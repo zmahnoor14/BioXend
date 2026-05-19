@@ -5,6 +5,21 @@ Versions follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
 ---
 
+## [0.7.0](https://github.com/zmahnoor14/BioXend/compare/v0.6.4...v0.7.0) (2026-05-19)
+
+
+### Features
+
+* Add GitHub Actions workflow for release management ([028adf9](https://github.com/zmahnoor14/BioXend/commit/028adf99f5fd242c4a281070be6037335af7ec31))
+* Add GitHub Actions workflow for release management ([53651a8](https://github.com/zmahnoor14/BioXend/commit/53651a81b4fb962e51ec53b8dc2eea1fac8239d9))
+* Add GitHub Actions workflow for release management ([d8d2fe2](https://github.com/zmahnoor14/BioXend/commit/d8d2fe25b24f42fa79b5bf862b68ffb49659e172))
+
+
+### Bug Fixes
+
+* fixed package name ([6b563dd](https://github.com/zmahnoor14/BioXend/commit/6b563dd338975d36e284779358caa8f00a9e9f5d))
+* fixed package name ([f1cda54](https://github.com/zmahnoor14/BioXend/commit/f1cda5416a9010429074acc99ff31689157624e3))
+
 ## [Unreleased]
 
 ### Added
@@ -56,5 +71,3 @@ When opening a PR to `main`, use these section labels:
 - **Fixed** — bug fixes
 - **Removed** — removed features or files
 - **Deprecated** — features to be removed in future versions
-
-
