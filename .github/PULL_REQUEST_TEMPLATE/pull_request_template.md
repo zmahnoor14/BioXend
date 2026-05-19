@@ -21,7 +21,7 @@ Closes #
 
 ## Checklist
 
-- [ ] This PR targets the `devel` branch (never `main` directly)
+- [ ] This PR targets the `main` branch from `development` (never push directly to `main`)
 - [ ] Commit messages follow the convention: `[component] Brief description`
       e.g. `[standards] update MIX-MB(X) mandatory fields`
 - [ ] I have **not** manually edited any file in `versions/` — version bumps are automated via PR labels

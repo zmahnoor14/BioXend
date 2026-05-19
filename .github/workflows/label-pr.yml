@@ -1,7 +1,9 @@
 # Auto-labeler workflow for BioXend / MIX-MB
 #
-# Automatically applies component labels to PRs targeting devel based on
+# Automatically applies component labels to PRs targeting main based on
 # which files are changed. Labels are defined in .github/labeler.yml.
+# Labels are read by auto-version.yml (on merge to main) to determine the
+# semver bump level (bump:major / bump:minor / bump:patch, default patch).
 #
 # Contributors: labels are applied automatically — no manual labelling needed.
 # Maintainers: add bump:major or bump:minor labels manually when required;
@@ -12,7 +14,7 @@ name: Label PR
 on:
   pull_request:
     branches:
-      - devel
+      - main
 
 jobs:
   label:
