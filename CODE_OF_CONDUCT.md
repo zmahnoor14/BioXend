@@ -10,8 +10,6 @@ We expect all participants to:
 - Attribute ideas and contributions appropriately
 - Engage in good faith during consensus-building for standards development
 
-Unacceptable behavior includes harassment, personal attacks, publishing private information without consent, and any conduct inappropriate in a professional or scientific setting.
-
 ## Scientific Integrity
 
 Contributors are expected to uphold honest scientific practice. In particular:
@@ -24,10 +22,6 @@ Contributors are expected to uphold honest scientific practice. In particular:
 ## Scope
 
 This applies to all community spaces: GitHub issues, pull requests, discussions, mailing lists, and meetings.
-
-## Enforcement
-
-Report violations to the project maintainers at **[mahnoor.zulfiqar@embl.de](mailto:mahnoor.zulfiqar@embl.de)**. All reports will be handled confidentially. 
 
 ## Attribution
 
