@@ -18,5 +18,5 @@ All versions follow [Semantic Versioning 2.0.0](https://semver.org/): `MAJOR.MIN
 | **Standards: Xenobiotics** | Minimum information standards for chemical/xenobiotic metadata |
 | **Standards: Microbes** | Minimum information standards for microbe metadata |
 | **Standards: Biotransformation** | Minimum information standards for biotransformation activity metadata |
-| **Template** | The Excel data submission template |
+| **Template** | The ODS data submission template |
 | **Workflow** | The Nextflow BioXend data submission workflow |

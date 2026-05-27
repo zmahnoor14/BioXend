@@ -8,28 +8,102 @@
 ![Contributors](https://img.shields.io/github/contributors/zmahnoor14/BioXend)
 
 # BioXend 
-BioXend is a new computational framework for submitting Microbial Biotransformation of Xenobiotics data. You can check the webpage for BioXend project here: https://zmahnoor14.github.io/BioXend/
-<br>
+BioXend is a new computational framework to assist in submitting FAIR and AI-ready Microbial Biotransformation of Xenobiotics data to ChEMBL. You can check the webpage for BioXend project here: https://zmahnoor14.github.io/BioXend/. You can test and run the [BioXend workflow on CloWM](https://clowm.bi.denbi.de/workflows/019e411d-57d0-7c11-b67a-7ac13ccafa2d/version/539170f7e55df6577aef1007977fcc5e6390acef) by [NFDI4Microbiota](https://nfdi4microbiota.de/).
 
-<p align="center">
-  <img src="WP_BioXend.png" />
-</p>
 
-<br>
-We welcome community participation especially for developing the minimum standards called Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB).
+## 1. BioXend Submission Workflow
 
-## 1. Submission Workflow
+### 1.1 Target users checklist
+This checklist helps you decide whether you shold use BioXend for your data submission to ChEMBL. If you check atleast one box from all categories, this workflow is the right fit for your data submission. 
 
-### 1.1 For workflow users
+**Domain:**
+- [ ] Microbiome Biotransformation of Chemical compounds/ Xenobiotics
 
-For details of usage, check the [docs/usage.md](/docs/usage.md) file. This workflow takes the filled out [`Template_open.ods`](/Standards/Templates/Template_open.ods) and converts it into chembl submission ready files described in [docs/output.md](/docs/output.md). 
+**Type of assay:**
+- [ ] Individual bacterial strain(/s)
+- [ ] Bacterial protein/ enzyme (gene/protein identified)
+- [ ] Undefined microbial community (gut metagenome, soil microbiome etc,)
 
-### 1.2 For data submitters
+**Xenobiotics:**
+- [ ] Drugs / Pharmaceuticals
+- [ ] Pesticides / Agrochemicals
+- [ ] Environmental pollutants
+- [ ] Food additives/ other small molecules
+- [ ] Natural products / metabolites
 
-1. Download the latest [`Template_open.ods`](/Standards/Templates/Template_open.ods)
-2. Read the `Template_Description` sheet for instructions. This template defines mandatory, recommended and optional fields based on ChEMBL submission guidelines and also the current version of MIX-MB.
-3. Fill in your data — green columns are mandatory, blue are recommended, yellow are optional
-4. Submit feedback on ease of use via [issues](https://github.com/zmahnoor14/BioXend/issues/new/choose) or [discussion](https://github.com/zmahnoor14/BioXend/discussions) -- This template will be used as input to generate ready to submit ChEMBL files.
+**Endpoints:**
+- [ ] Qualitative (compound metabolized / not metabolized)
+- [ ] Quantitative (numerical: IC50, % biotransformation, etc.)
+- [ ] Kinetic parameters (Km, Vmax, kcat)
+- [ ] Metabolite detection (m/z, retention time, annotation)
+
+**Measurement instruments:**
+- [ ] LCMS(/MS)
+- [ ] GCMS(/MS)
+
+
+Based on the checklist above you can contact ChEMBL prior to filling out your template or afterwards to show interest in submitting to their next release by contacting them at [chembl-depositors@ebi.ac.uk](mailto:chembl-depositors@ebi.ac.uk).
+
+### 1.2 How to use the template
+BioXend workflow takes a filled Template as input. in order to use the workflow, you have to fill out the template first. You can find the template in [`exampledata/Template_filled.ods`](/exampledata/Template_filled.ods). For details on how template maps to chembl data format, check the [MIX-MB Standards documentation](https://embl.gitbook.io/embl-docs/component-standards/mixmb_standards_main#template). <br>
+The template is in ODS format and currently the workflow only accpets ODS template. You can however fill out the ODS file with MS-Excel and then save it in ODS format.
+
+**Template explanation:** First sheet is the template description
+- Each sheet description (Reference, Chemical, Micorbes, Experiment, Biotransformation)
+- Row description, what each row mean, column name, description, actual values etc.
+- Which columns are mandatory, recommended and optional
+- What different data types mean
+
+Actual template sheets are given below. Each column in each of the sheets has its description on how to fill out each column. 
+
+**1. Reference:** This sheet requires dataset metadata such as:
+- DOIs, and other identifiers
+- Dataset metadata such as authors, abstract, whether its a publication 
+- Submission metadata such as number of compounds and assays, endpoints etc.
+
+**2. Chemicals:** This sheet requires xenobiotics data and metadata such as:
+- Chemical identifiers (e.g: SMILES, common name)
+- Stocks
+- Chemical properties 
+- Mass spectrometry relevant metadata such as instrument used, parent m/z values etc.
+
+**3. Microbes:** This sheet requires bacterial assays data and metadata such as:
+- Bacterial metadata (single strain, community TAX ID etc.)
+- Assay metadata (e.g: is it ADMET assay or functional assay; the source of the assay)
+- Target metadata (applicable if protein/ gene was identified that performs biotransformation)
+
+**4. Experiment:** This sheet requires experimental metadata such as:
+- Pre culture conditions
+- Incubation period and whether multiple time points were measured
+- oxygen conditions for microbes and so on.
+
+**5. Biotransformation:** This sheet requires actual measured biotransformation of the xenobiotic mediated by microbe(s):
+- biotransformation value
+- activity type and comments
+- kinetic parameters
+- identified biotransformation product
+
+Once you fill out the template, the next step is to test out the workflow on CloWM.
+
+### 1.3 How to run the workflow
+
+Access the workflow with the link: [BioXend workflow on CloWM](https://clowm.bi.denbi.de/workflows/019e411d-57d0-7c11-b67a-7ac13ccafa2d/version/539170f7e55df6577aef1007977fcc5e6390acef). 
+
+**Steps to run the workflow:**
+
+1. Access CloWM anonymously or via LifeScience account. With anonymous login, you have 2 days of access to the results of the workflow.
+2. After you login anonymously or with LS account, go to `Files` and select `My Data Bucket`. Here you can select your `initial-bucket-id`. Upload your filled out template here.
+3. Now select `Workflows` from the navigation bar and then click on `Available Workflows`, find `BioXend` and launch the workflow.
+4. You will see a page with workflow parameters, such as `--input`, `--outdir`, `prefix`, and `--xenobiotic_class`.  
+5. Select the filled out template from you initial-bucket as your workflow `--input`.
+6. Also for the `--outdir`, select your initial-bucket.
+7. Aside from the filled template, there are two parameters: `--prefix` where you can add a prefix for the list of compounds. You can use the default as well. And there is the `--xenobiotic_class` parameter, where you can mention singular form of the type of xenobiotics you are working on, e.g: drug, pollutant etc. This will be used in the assay description section of the submission files.
+8. Launch the workflow, and wait for the workflow to finish. The output files will appear in the initial-bucket.
+
+### 1.4 How to submit the workflow output files
+1. Contact the ChEMBL team at [chembl-depositors@ebi.ac.uk](mailto:chembl-depositors@ebi.ac.uk) with README.toml file. They will send you the instructions.
+2. You can upload your workflow outputs to [Globus](https://docs.google.com/document/d/1Rwpswq4wI8RPK_fHYNwf7RKDLzJ5t-PoUn5VUfNJKJc/edit?usp=sharing). 
+3. Submit feedback on ease of use via [issues](https://github.com/zmahnoor14/BioXend/issues/new/choose) or [discussion](https://github.com/zmahnoor14/BioXend/discussions) -- This template will be used as input to generate ready to submit ChEMBL files.
 
 ## 2. MIX-MB Standards
 
@@ -37,21 +111,18 @@ For details of usage, check the [docs/usage.md](/docs/usage.md) file. This workf
 
 📖 Full standards documentation: **[embl.gitbook.io/embl-docs](https://embl.gitbook.io/embl-docs)**
 
-BioXend framework defines community-driven minimum reporting standards for xenobiotic microbial biotransformation data, enabling consistent data deposition to databases such as ChEMBL. <br>
-We would like to invite you to participate in this community driven project. The standards are informed by 
-
-- already existing standards, 
+BioXend framework defines community-driven minimum reporting standards for xenobiotic microbial biotransformation data, enabling consistent data deposition to databases such as ChEMBL. The standards are informed by 
+- already existing standards such as MSI, 
 - ChEMBL submission guidelines, and 
 - an [open survey](https://forms.gle/towuMVYYuqDi7pEJ7). 
 
 Please view the current results from the survey in [Standards/MIX-MB_Survey_Analysis.ipynb](Standards/MIX-MB_Survey_Analysis.ipynb) notebook.
 
-
 ### How to participate as contributor:
 
-All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md). Also check thelink to the current project board: [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6)
+All participants are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md).
 <br>
-We welcome contributions to the standards, template, and nf workflow for submission! See our [Contributing Guide](CONTRIBUTING.md) for details. There are different ways to contribute, either via an issue, via dicussions, via Pull Requests (PR) or via endorsement of the already submitted changes that you can easily view in the [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6).
+We welcome contributions to the MIX-MB standards, template, and BioXend workflow for submission. See our [Contributing Guide](CONTRIBUTING.md) for details. There are different ways to contribute, either via an issue, via dicussions, via Pull Requests (PR) or via endorsement of the already submitted changes that you can easily view in the [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6).
 <br>
 
 **Easy:**
@@ -64,36 +135,12 @@ We welcome contributions to the standards, template, and nf workflow for submiss
 **Requires git knowledge:**
 - **Submit a pull request (PR)** targeting the `devel` branch
 
-## Repository Structure for files important for contributors
+## Project Work packages
 
-```
-BioXend/
-├── .github/                          # GitHub Actions workflows, PR and issue templates
-├── Standards/                        # MIX-MB standards documents and templates
-│   ├── Templates/                    # Submission template (ODS)
-│   ├── MIX-MB_Survey_Analysis.ipynb  # Community survey results and analysis
-│   ├── MIXMB_Biotransformation.md    # MIX-MB(B): Biotransformation process standards
-│   ├── MIXMB_Microbes.md             # MIX-MB(M): Microorganism standards
-│   ├── MIXMB_Standards_main.md       # Top-level MIX-MB standards overview
-│   ├── MIXMB_Xenobiotics.md          # MIX-MB(X): Chemical substrate standards
-│   └── Versioning.md                 # Versioning policy for standards
-├── bin/                              # Executable scripts and generated ChEMBL output files
-├── modules/                          # Nextflow DSL2 process modules
-├── versions/                         # Independent version tracking per component
-├── workflows/                        # bioxend workflow with all 5 processes
-├── docs/                             # index.html for webpage and usage.md + output.md
-├── conf/                             # config files for modules and base processes
-├── CODE_OF_CONDUCT.md
-├── CONTRIBUTING.md
-├── CHANGELOG.md
-├── nextflow.config
-├── nextflow_schema.json
-├── main.nf
-├── Dockerfile
-├── LICENSE
-├── README.md
-└── VERSION.md
-```
+<p align="center">
+  <img src="WP_BioXend.png" />
+</p>
+
 
 ## Versioning
 
@@ -103,10 +150,9 @@ Each standard document, the template, and the nf workflow are versioned independ
 
 This project is licensed under the [MIT License](LICENSE).
 
-## Contact
-
-- **Maintainers**: Mahnoor Zulfiqar — [ORCID](https://orcid.org/0000-0002-8330-4071), Eleonora Mastrorilli - [ORCID](https://orcid.org/0000-0003-2127-4150)
-- **Institution**: EMBL, Molecular Systems Biology (MSB) Unit
+## Institutions:
+1. Michael Zimmermann group, Molecular Systems Biology (MSB) Unit, EMBL
+2. Chemical Biology Group, EBI
 
 ## Funding
 - [NFDI4Microbiota FlexFund 2026](https://nfdi4microbiota.de/newsroom/flexfunds/)

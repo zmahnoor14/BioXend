@@ -114,7 +114,7 @@ jobs:
               microbes:         match([/^Standards\/MIXMB_Microbes/]),
               biotransformation:match([/^Standards\/MIXMB_Biotransformation/]),
               standards_main:   match([/^Standards\/MIXMB_Standards_main/]),
-              template:         match([/^Standards\/Templates\//]),
+              template:         match([/^Standards\/Templates\//, /^exampledata\//]),
               workflow:         match([/^main\.nf$/, /^nextflow\.config$/, /^bin\//, /^modules\//])
             };
 
