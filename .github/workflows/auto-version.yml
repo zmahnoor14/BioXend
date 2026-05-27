@@ -172,10 +172,13 @@ jobs:
           CHANGELOG=""
 
           # ---- bump one component ----
+          # Always read the pre-merge main version (HEAD^1) so stale version
+          # files from a feature branch never cause a regression.
           bump_component() {
             local file="$1" label="$2"
             local old new
-            old=$(tr -d '[:space:]' < "$file")
+            old=$(git show HEAD^1:"$file" 2>/dev/null | tr -d '[:space:]') \
+              || old=$(tr -d '[:space:]' < "$file")
             new=$(bump_semver "$old" "$BUMP")
             printf '%s\n' "$new" > "$file"
             CHANGELOG+=$'\n'"- **${label}**: \`${old}\` → \`${new}\`"
@@ -207,7 +210,8 @@ jobs:
           fi
 
           # ---- bump framework ----
-          OLD_FW=$(tr -d '[:space:]' < versions/framework.txt)
+          OLD_FW=$(git show HEAD^1:versions/framework.txt 2>/dev/null | tr -d '[:space:]') \
+            || OLD_FW=$(tr -d '[:space:]' < versions/framework.txt)
           NEW_FW=$(bump_semver "$OLD_FW" "$MAX_BUMP")
           printf '%s\n' "$NEW_FW" > versions/framework.txt
           echo "  Bumped framework: ${OLD_FW} → ${NEW_FW} (via ${MAX_BUMP})"
@@ -274,14 +278,29 @@ jobs:
 
             const isPrerelease = FRAMEWORK_NEW.startsWith('0.');
 
-            await github.rest.repos.createRelease({
-              owner:      context.repo.owner,
-              repo:       context.repo.repo,
-              tag_name:   `v${FRAMEWORK_NEW}`,
-              name:       `BioXend v${FRAMEWORK_NEW}`,
-              body,
-              draft:      false,
-              prerelease: isPrerelease
-            });
+            // Check whether this tag already has a release; skip if so to
+            // avoid a 422 "already_exists" error on duplicate merges.
+            let existingRelease = null;
+            try {
+              const { data } = await github.rest.repos.getReleaseByTag({
+                owner:   context.repo.owner,
+                repo:    context.repo.repo,
+                tag:     `v${FRAMEWORK_NEW}`
+              });
+              existingRelease = data;
+            } catch (_) { /* 404 = does not exist, proceed */ }
 
-            core.info(`Created release v${FRAMEWORK_NEW}`);
+            if (existingRelease) {
+              core.info(`Release v${FRAMEWORK_NEW} already exists (id: ${existingRelease.id}) — skipping.`);
+            } else {
+              await github.rest.repos.createRelease({
+                owner:      context.repo.owner,
+                repo:       context.repo.repo,
+                tag_name:   `v${FRAMEWORK_NEW}`,
+                name:       `BioXend v${FRAMEWORK_NEW}`,
+                body,
+                draft:      false,
+                prerelease: isPrerelease
+              });
+              core.info(`Created release v${FRAMEWORK_NEW}`);
+            }
