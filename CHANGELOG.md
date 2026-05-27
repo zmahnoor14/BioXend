@@ -5,6 +5,13 @@ Versions follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
 ---
 
+## [0.8.0](https://github.com/zmahnoor14/BioXend/compare/v0.7.0...v0.8.0) (2026-05-27)
+
+
+### Features
+
+* **ci:** add PR version bump preview comment workflow ([8a206cf](https://github.com/zmahnoor14/BioXend/commit/8a206cfd57a8711e8d973242c3578be7166a7839))
+
 ## [0.7.0](https://github.com/zmahnoor14/BioXend/compare/v0.6.4...v0.7.0) (2026-05-19)
 
 
