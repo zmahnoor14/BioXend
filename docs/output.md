@@ -2,6 +2,84 @@
 
 BioXend generates 7 files from a filled-out `Template_open.ods`. Seven are ChEMBL-ready deposition files published to `--outdir` (default: `results/`); three are internal intermediate files not written to the output directory.
 
+### Pipeline overview
+
+```mermaid
+%%{
+  init: {
+    'theme': 'base',
+    'themeVariables': {
+      'primaryColor': '#B6ECE2',
+      'primaryTextColor': '#160F26',
+      'primaryBorderColor': '#065647',
+      'lineColor': '#545555',
+      'clusterBkg': '#BABCBD22',
+      'clusterBorder': '#DDDEDE',
+      'fontFamily': 'arial'
+    }
+  }
+}%%
+flowchart LR
+
+    subgraph inputs [" "]
+        direction TB
+        T["Template (.ods)"]
+        P["prefix"]
+        X["xenobiotic_class"]
+    end
+
+    subgraph pipeline ["BIOXEND"]
+        direction LR
+        REF(["GENERATE_REFERENCE"])
+        CHEM(["GENERATE_CHEMICALS"])
+        ASSAY(["GENERATE_ASSAY"])
+        PARAM(["GENERATE_ASSAY_PARAM"])
+        ACT(["GENERATE_ACTIVITY"])
+    end
+
+    subgraph outputs [" "]
+        direction TB
+        o1["REFERENCE.tsv"]
+        o2["README.toml"]
+        o3["COMPOUND_RECORD.tsv"]
+        o4["COMPOUND_CTAB.sdf"]
+        o5["ASSAY.tsv"]
+        o6["ASSAY_PARAM.tsv"]
+        o7["ACTIVITY.tsv"]
+    end
+
+    T --> REF
+    P --> CHEM
+    X --> ASSAY
+
+    REF --> o1
+    REF --> o2
+    REF --> CHEM
+    REF --> ASSAY
+    REF --> ACT
+
+    CHEM --> o3
+    CHEM --> o4
+    CHEM --> ACT
+
+    ASSAY --> o5
+    ASSAY --> PARAM
+    ASSAY --> ACT
+
+    PARAM --> o6
+    ACT --> o7
+
+    style o1 fill:#FFF3CD,stroke:#F0AD4E,color:#000
+    style o2 fill:#FFF3CD,stroke:#F0AD4E,color:#000
+    style o3 fill:#FFF3CD,stroke:#F0AD4E,color:#000
+    style o4 fill:#FFF3CD,stroke:#F0AD4E,color:#000
+    style o5 fill:#FFF3CD,stroke:#F0AD4E,color:#000
+    style o6 fill:#FFF3CD,stroke:#F0AD4E,color:#000
+    style o7 fill:#FFF3CD,stroke:#F0AD4E,color:#000
+    style P  fill:#D6EAF8,stroke:#2E86C1,color:#000
+    style X  fill:#D5F5E3,stroke:#1E8449,color:#000
+```
+
 ---
 
 ### Output files
