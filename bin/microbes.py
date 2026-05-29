@@ -41,8 +41,9 @@ import re
 import sys
 from pathlib import Path
 
-import odf  
+import odf
 import pandas as pd
+import requests
 
 # ---------------------------------------------------------------------------
 # Constants
@@ -92,6 +93,217 @@ VALID_TARGET_TYPES = {"3D CELL CULTURE", "ADMET", "CELL-LINE","CHIMERIC PROTEIN"
 #   row 4+ — data rows
 _ROW_COLNAMES   = 1
 _ROW_DATA_START = 4
+
+
+# ---------------------------------------------------------------------------
+# UniProt lookup — protein name, organism, TaxID from accession
+# ---------------------------------------------------------------------------
+
+_UNIPROT_API = "https://rest.uniprot.org/uniprotkb"
+
+_uniprot_cache: dict[str, dict] = {}
+
+
+def _uniprot_lookup(accession: str) -> dict:
+    """Fetch TARGET metadata from UniProt by accession number.
+
+    Returns a dict with keys 'name', 'organism', 'taxid' (all strings).
+    Empty strings are returned for any field that cannot be resolved.
+    Results are cached per accession for the run lifetime.
+
+    Fields resolved:
+      proteinDescription.recommendedName.fullName.value → name
+        (falls back to uniProtkbId, e.g. 'DNAK_ECOLI', when absent)
+      organism.scientificName                           → organism
+      organism.taxonId                                  → taxid
+        (strain-level TaxID, e.g. 83333 for E. coli K12, not just 562)
+    """
+    empty: dict = {"name": "", "organism": "", "taxid": ""}
+    if not accession:
+        return empty
+    if accession in _uniprot_cache:
+        return _uniprot_cache[accession]
+
+    result = dict(empty)
+    try:
+        resp = requests.get(
+            f"{_UNIPROT_API}/{requests.utils.quote(accession)}.json",
+            timeout=15,
+        )
+        if resp.status_code == 404:
+            print(
+                f"[WARN] UniProt accession '{accession}' not found.",
+                file=sys.stderr,
+            )
+            _uniprot_cache[accession] = result
+            return result
+        resp.raise_for_status()
+        data = resp.json()
+
+        # Protein name: recommended name, else entry ID
+        rec_name = (
+            data.get("proteinDescription", {})
+                .get("recommendedName", {})
+                .get("fullName", {})
+                .get("value", "")
+        )
+        result["name"] = rec_name or data.get("uniProtkbId", "")
+
+        # Organism name and TaxID
+        organism = data.get("organism", {})
+        result["organism"] = organism.get("scientificName", "")
+        taxid = organism.get("taxonId")
+        result["taxid"] = str(taxid) if taxid else ""
+
+        filled = [k for k, v in result.items() if v]
+        print(
+            f"[INFO] UniProt '{accession}': resolved {', '.join(filled)}.",
+            file=sys.stderr,
+        )
+
+    except requests.exceptions.RequestException as exc:
+        print(
+            f"[WARN] UniProt lookup failed for '{accession}': {exc}",
+            file=sys.stderr,
+        )
+
+    _uniprot_cache[accession] = result
+    return result
+
+
+# ---------------------------------------------------------------------------
+# TaxID lookup — StrainInfo (DSMZ) with NCBI Taxonomy fallback
+# ---------------------------------------------------------------------------
+
+_STRAININFO_API   = "https://api.straininfo.dsmz.de"
+_NCBI_ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+
+# Culture collection accession pattern: 2–5 uppercase letters + optional space + digits
+# e.g. DSM 2840, ATCC 11775, NCTC 10537, LMG 2093
+_ACCESSION_RE = re.compile(r'^[A-Z]{2,5}\s*\d+', re.ASCII)
+
+_taxid_cache: dict[str, str] = {}
+
+
+def _looks_like_accession(strain: str) -> bool:
+    """Return True when strain resembles a culture collection accession number."""
+    return bool(_ACCESSION_RE.match(strain.strip()))
+
+
+def _straininfo_by_accession(accession: str) -> str:
+    """Resolve NCBI TaxID from a culture collection accession number via StrainInfo.
+
+    StrainInfo (https://straininfo.dsmz.de) links accession numbers from
+    culture collections (DSM, ATCC, NCTC, LMG, …) to taxonomy.  This is
+    its core use case: a strain number → species TaxID.
+
+    Uses the v2 API (two calls):
+      1. GET /v2/search/deposit/cc_no/{accession}  → list of siDP integers
+      2. GET /v2/data/deposit/min/{siDP}            → deposit record with taxon.ncbi
+    """
+    try:
+        search_resp = requests.get(
+            f"{_STRAININFO_API}/v2/search/deposit/cc_no/"
+            f"{requests.utils.quote(accession)}",
+            timeout=15,
+        )
+        if search_resp.status_code == 404:
+            return ""
+        search_resp.raise_for_status()
+        si_dp_ids = search_resp.json()
+        if not si_dp_ids or not isinstance(si_dp_ids, list):
+            return ""
+
+        detail_resp = requests.get(
+            f"{_STRAININFO_API}/v2/data/deposit/min/{si_dp_ids[0]}",
+            timeout=15,
+        )
+        detail_resp.raise_for_status()
+        records = detail_resp.json()
+        record = records[0] if isinstance(records, list) and records else records
+        taxid = str(
+            (record.get("deposit") or {}).get("taxon", {}).get("ncbi") or ""
+        ).strip()
+        return taxid if taxid and taxid != "0" else ""
+
+    except requests.exceptions.RequestException as exc:
+        print(
+            f"[WARN] StrainInfo accession lookup failed for '{accession}': {exc}",
+            file=sys.stderr,
+        )
+    return ""
+
+
+def _ncbi_taxid(organism: str) -> str:
+    """Resolve NCBI TaxID from a species name via NCBI Taxonomy esearch.
+
+    NCBI Taxonomy is the authoritative source for TaxIDs.  This is the
+    primary lookup path for organism names.
+    """
+    try:
+        resp = requests.get(
+            _NCBI_ESEARCH_URL,
+            params={
+                "db": "taxonomy",
+                "term": organism,
+                "retmode": "json",
+                "retmax": 1,
+            },
+            timeout=15,
+        )
+        resp.raise_for_status()
+        ids = resp.json().get("esearchresult", {}).get("idlist", [])
+        if ids:
+            return str(ids[0])
+    except requests.exceptions.RequestException as exc:
+        print(
+            f"[WARN] NCBI taxonomy lookup failed for '{organism}': {exc}",
+            file=sys.stderr,
+        )
+    return ""
+
+
+def lookup_taxid(organism: str, strain: str = "") -> str:
+    """Return NCBI TaxID for *organism* / *strain*.
+
+    Resolution order:
+      1. If *strain* looks like a culture collection accession (e.g. DSM 2840,
+         ATCC 11775) → StrainInfo deposit lookup.  This is StrainInfo's primary
+         use case: mapping strain accession numbers to taxonomy.
+      2. NCBI Taxonomy esearch by *organism* name.  NCBI is the authoritative
+         source for TaxIDs and handles species names, metagenomes, and
+         reclassified taxa.
+
+    Results are cached per (organism, strain) pair for the run lifetime.
+    Returns '' when both sources fail.
+    """
+    if not organism:
+        return ""
+    cache_key = f"{organism}\t{strain}"
+    if cache_key in _taxid_cache:
+        return _taxid_cache[cache_key]
+
+    taxid  = ""
+    source = ""
+
+    if strain and _looks_like_accession(strain):
+        taxid  = _straininfo_by_accession(strain)
+        source = "StrainInfo"
+
+    if not taxid:
+        taxid  = _ncbi_taxid(organism)
+        source = "NCBI"
+
+    label = f"'{organism}'" + (f" strain '{strain}'" if strain else "")
+    if taxid:
+        print(f"[INFO] TaxID '{taxid}' resolved for {label} via {source}.",
+              file=sys.stderr)
+    else:
+        print(f"[WARN] Could not resolve TaxID for {label}. "
+              "Fill ASSAY_TAX_ID manually.", file=sys.stderr)
+
+    _taxid_cache[cache_key] = taxid
+    return taxid
 
 
 # ---------------------------------------------------------------------------
@@ -335,6 +547,7 @@ def build_assay_tsv(
     ridx: str,
     exp_df: pd.DataFrame,
     xenobiotic_class: str,
+    taxid_lookup: bool = True,
 ) -> "tuple[pd.DataFrame, dict[str, str]]":
     """
     Build the ASSAY.tsv records from the Microbes sheet DataFrame.
@@ -386,7 +599,25 @@ def build_assay_tsv(
             except (ValueError, TypeError):
                 target_tax_id = str(raw_ttax).strip()
 
-        # AIDX 
+        # UniProt: fill blank TARGET_NAME / TARGET_ORGANISM / TARGET_TAX_ID
+        # from TARGET_ACCESSION.  Runs before the StrainInfo/NCBI fallback so
+        # UniProt's strain-level TaxID takes priority when available.
+        if target_accession and taxid_lookup:
+            needs = not target_name or not target_organism or not target_tax_id
+            if needs:
+                uni = _uniprot_lookup(target_accession)
+                if not target_name and uni["name"]:
+                    target_name = uni["name"]
+                if not target_organism and uni["organism"]:
+                    target_organism = uni["organism"]
+                if not target_tax_id and uni["taxid"]:
+                    target_tax_id = uni["taxid"]
+
+        # StrainInfo / NCBI fallback: only runs if TARGET_TAX_ID is still blank
+        if not target_tax_id and taxid_lookup and target_organism:
+            target_tax_id = lookup_taxid(target_organism)
+
+        # AIDX
         user_key = str(row.get("assay_identifier") or "").strip()
         if not user_key:
             # Fallback key so Biotransformation sheet rows can still reference
@@ -413,6 +644,9 @@ def build_assay_tsv(
                 assay_tax_id = str(int(float(str(raw_tax))))
             except (ValueError, TypeError):
                 assay_tax_id = str(raw_tax).strip()
+
+        if not assay_tax_id and taxid_lookup and organism:
+            assay_tax_id = lookup_taxid(organism, strain)
 
         # --- Join Experiment row for this assay ---
         # Experiment sheet identifiers are user short keys (e.g. 'assay1'),
@@ -521,6 +755,14 @@ def main() -> None:
         "--strict", action="store_true",
         help="Exit non-zero if any validation warnings are raised",
     )
+    parser.add_argument(
+        "--no_taxid_lookup", action="store_true",
+        help=(
+            "Skip all remote metadata lookups (UniProt, StrainInfo, NCBI). "
+            "Blank ASSAY_TAX_ID, TARGET_TAX_ID, TARGET_NAME, and "
+            "TARGET_ORGANISM fields will remain empty."
+        ),
+    )
     args = parser.parse_args()
 
     ods_path = Path(args.input)
@@ -547,6 +789,7 @@ def main() -> None:
         ridx=args.ridx,
         exp_df=exp_df,
         xenobiotic_class=args.xenobiotic_class,
+        taxid_lookup=not args.no_taxid_lookup,
     )
 
     # --- Validate ---
