@@ -17,7 +17,6 @@ from pathlib import Path
 import odf
 
 import pandas as pd
-import requests
 from rdkit import Chem
 from rdkit.Chem import AllChem
 
@@ -262,11 +261,10 @@ def main() -> None:
     seen_names: set = set()
     for _, row in record_df.iterrows():
         cidx = str(row.get("CIDX") or "").strip()
-        for name_col in ("COMPOUND_NAME",):
-            name = str(row.get(name_col) or "").strip()
-            if name and name not in seen_names:
-                mapping_rows.append({"Common_Name": name, "CIDX": cidx})
-                seen_names.add(name)
+        name = str(row.get("COMPOUND_NAME") or "").strip()
+        if name and name not in seen_names:
+            mapping_rows.append({"Common_Name": name, "CIDX": cidx})
+            seen_names.add(name)
     mapping_df = pd.DataFrame(mapping_rows, columns=["Common_Name", "CIDX"])
     mapping_path = outdir / "COMPOUND_MAPPING.tsv"
     mapping_df.to_csv(mapping_path, sep="\t", index=False)

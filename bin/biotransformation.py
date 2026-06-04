@@ -74,7 +74,7 @@ CHEMBL_COLS = [
     "ACTION_TYPE",
 ]
 
-MANDATORY_FIELDS = ["CIDX", "RIDX", "CRIDX", "AIDX", "ACTIVITY_COMMENT", "TYPE"]
+MANDATORY_FIELDS = ["CIDX", "RIDX", "CRIDX", "AIDX", "TYPE"]
 
 VALID_ACTION_TYPES = {"ACTIVATOR", "ALLOSTERIC ANTAGONIST","ANTAGONIST",
 "ANTISENSE INHIBITOR","BINDING AGENT", "BLOCKER",
@@ -381,6 +381,14 @@ def build_activity_tsv(
     records = []
 
     for _, row in df.iterrows():
+        # Skip rows with no compound or assay identifier — these are trailing
+        # blank rows that survive dropna because RIDX/TYPE are injected by code.
+        has_compound = bool(str(row.get("Common_Name") or "").strip() or
+                            str(row.get("Chemical_identifier") or "").strip())
+        has_assay    = bool(str(row.get("ASSAY_Identifier") or "").strip())
+        if not has_compound and not has_assay:
+            continue
+
         activity_comment = _build_activity_comment(row)
 
         value = _coerce_numeric(row.get("VALUE"))
@@ -435,8 +443,6 @@ def validate(activity_df: pd.DataFrame) -> list:
 
         # VALUE requires RELATION and UNITS
         if value:
-            # no TEXT_VALUE required so skip it
-            text_val = ""
             if not relation:
                 errors.append(f"{label}: RELATION is required when VALUE is set.")
             if not units:

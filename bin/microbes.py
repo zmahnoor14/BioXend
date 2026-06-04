@@ -58,15 +58,16 @@ CHEMBL_COLS = [
     "ASSAY_GROUP",                 
     "ASSAY_ORGANISM",              
     "ASSAY_STRAIN",                
-    "ASSAY_TAX_ID",               # of no taxid present, then use StrainInfo to fetch the taxid from assay organism name
+    "ASSAY_TAX_ID",               
     "ASSAY_SOURCE",                
     "ASSAY_TISSUE",                
     "ASSAY_CELL_TYPE",             
     "ASSAY_SUBCELLULAR_FRACTION",  
-    "TARGET_TYPE",                 
-    "TARGET_NAME",                 
-    "TARGET_ACCESSION",            
-    "TARGET_TAX_ID",               # of no taxid present, then use StrainInfo to fetch the taxid from target organism name
+    "TARGET_TYPE",
+    "TARGET_NAME",
+    "TARGET_ACCESSION",
+    "TARGET_ORGANISM",
+    "TARGET_TAX_ID",
 ]
 
 MANDATORY_FIELDS = [
@@ -79,11 +80,21 @@ MANDATORY_FIELDS = [
 ]
 
 VALID_ASSAY_TYPES = {"A", "F", "B", "U", "P", "T"}
-VALID_TARGET_TYPES = {"3D CELL CULTURE", "ADMET", "CELL-LINE","CHIMERIC PROTEIN"
-"LIPID","MACROMOLECULE", "METAL","MOLECULAR", "NO TARGET", "NON-MOLECULAR", "NUCLEIC-ACID",
-"OLIGOSACCHARIDE", "ORGANISM","PHENOTYPE", "PROTEIN","PROTEIN COMPLEX","PROTEIN COMPLEX GROUP",
-"PROTEIN FAMILY","PROTEIN NUCLEIC-ACID COMPLEX","PROTEIN-PROTEIN INTERACTION",
-"SELECTIVITY GROUP","SINGLE PROTEIN","SMALL MOLECULE","SUBCELLULAR","TISSUE","UNCHECKED","UNDEFINED","UNKNOWN"}
+
+# UniProt accession format (both canonical forms, uppercase only):
+#   Old (SwissProt, 6 chars): [OPQ][0-9][A-Z0-9]{3}[0-9]          e.g. P0A6Y8
+#   New (TrEMBL, 6 or 10 chars): [A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2}  e.g. A2BC19, A0A023GPI8
+_UNIPROT_ACCESSION_RE = re.compile(
+    r"^([OPQ][0-9][A-Z0-9]{3}[0-9]|[A-NR-Z][0-9]([A-Z][A-Z0-9]{2}[0-9]){1,2})$"
+)
+VALID_TARGET_TYPES = {
+    "3D CELL CULTURE", "ADMET", "CELL-LINE", "CHIMERIC PROTEIN",
+    "LIPID", "MACROMOLECULE", "METAL", "MOLECULAR", "NO TARGET", "NON-MOLECULAR", "NUCLEIC-ACID",
+    "OLIGOSACCHARIDE", "ORGANISM", "PHENOTYPE", "PROTEIN", "PROTEIN COMPLEX", "PROTEIN COMPLEX GROUP",
+    "PROTEIN FAMILY", "PROTEIN NUCLEIC-ACID COMPLEX", "PROTEIN-PROTEIN INTERACTION",
+    "SELECTIVITY GROUP", "SINGLE PROTEIN", "SMALL MOLECULE", "SUBCELLULAR", "TISSUE",
+    "UNCHECKED", "UNDEFINED", "UNKNOWN",
+}
 
 # Template sheet row offsets (0-based, read with header=None)
 #   row 0 — section group headers  (skip)
@@ -172,7 +183,7 @@ def _uniprot_lookup(accession: str) -> dict:
 
 
 # ---------------------------------------------------------------------------
-# TaxID lookup — StrainInfo (DSMZ) with NCBI Taxonomy fallback
+# TaxID lookup — StrainInfo (DSMZ) and NCBI Taxonomy 
 # ---------------------------------------------------------------------------
 
 _STRAININFO_API   = "https://api.straininfo.dsmz.de"
@@ -349,7 +360,7 @@ def read_experiment_sheet(ods_path: Path) -> pd.DataFrame:
 
     Key columns used:
       identifier                                  — links rows to assay(s)
-      Instrument_4_measurement
+      Instrument_for_measurement
       Time-course information (i.e., number of timepoints)
       Time_unit
       Oxygen conditions
@@ -417,17 +428,17 @@ def _build_description(
     Build ASSAY_DESCRIPTION according to organism type:
 
     Single-bacteria template:
-      The {xenobiotic_class} is tested on {organism} strain {strain} for
+      The {xenobiotic_class} is tested with {organism} strain {strain} for
       biotransformation. The {xenobiotic_class} is measured with
       {instrument}, over {n} time points, between {t_min} to {t_max}
-      {unit}, over oxygen condition: {oxygen}.
+      {unit}, over following condition: {oxygen}.
 
     Community template (triggered when 'metagenome' is in organism name):
-      The {xenobiotic_class} is tested on {organism} community with study
+      The {xenobiotic_class} is tested with {organism} community with study
       accession number {ENA_project} and sample accession number
       {ENA_sample} for biotransformation. The {xenobiotic_class} is
       measured with {instrument}, over {n} time points, between {t_min}
-      to {t_max} {unit}, over oxygen condition: {oxygen}.
+      to {t_max} {unit}, over following condition: {oxygen}.
 
     Fields that are empty are omitted gracefully.
     """
@@ -439,7 +450,7 @@ def _build_description(
 
     # Experimental context (may be absent)
     if exp_row is not None:
-        instrument   = str(exp_row.get("Instrument_4_measurement") or "").strip()
+        instrument   = str(exp_row.get("Instrument_for_measurement") or "").strip()
         timecourse   = str(exp_row.get(
             "Time-course information (i.e., number of timepoints)") or "").strip()
         time_unit    = str(exp_row.get("Time_unit") or "").strip()
@@ -453,14 +464,14 @@ def _build_description(
 
     # Sentence 1: 
     if is_community:
-        s1 = f"The {xeno} is tested on {organism} community"
+        s1 = f"The {xeno} is tested with {organism} community"
         if ena_proj:
             s1 += f" with study accession number {ena_proj}"
         if ena_samp:
             s1 += f" and sample accession number {ena_samp}"
         s1 += " for biotransformation."
     else:
-        s1 = f"The {xeno} is tested on {organism}"
+        s1 = f"The {xeno} is tested with {organism}"
         if strain:
             s1 += f" strain {strain}"
         s1 += " for biotransformation."
@@ -475,7 +486,7 @@ def _build_description(
             unit_str = f" {time_unit}" if time_unit else ""
             parts2.append(f"between {t_min} to {t_max}{unit_str}")
     if oxygen:
-        parts2.append(f"over oxygen condition: {oxygen}")
+        parts2.append(f"over following condition: {oxygen}")
 
     s2 = ", ".join(parts2) + "." if len(parts2) > 1 else ""
 
@@ -582,7 +593,7 @@ def build_assay_tsv(
         assay_group     = str(row.get("ASSAY_GROUP") or "").strip()
 
         # --- Target fields (needed early for AIDX generation) ---
-        target_type      = str(row.get("TARGET_TYPE") or "").strip()
+        target_type      = str(row.get("TARGET_TYPE") or "").strip().upper()
         target_name      = (
             str(row.get("TARGET_NAME") or "").strip()
             or str(row.get("Gene_name") or "").strip()
@@ -701,6 +712,13 @@ def validate(assay_df: pd.DataFrame) -> list:
                 f"{sorted(VALID_ASSAY_TYPES)}."
             )
 
+        target_type = str(row.get("TARGET_TYPE") or "").strip().upper()
+        if target_type and target_type not in VALID_TARGET_TYPES:
+            errors.append(
+                f"{label}: TARGET_TYPE '{target_type}' not in "
+                f"{sorted(VALID_TARGET_TYPES)}."
+            )
+
         # TARGET_TAX_ID required when TARGET_ORGANISM is filled
         if str(row.get("TARGET_ORGANISM") or "").strip():
             if not str(row.get("TARGET_TAX_ID") or "").strip():
@@ -716,6 +734,14 @@ def validate(assay_df: pd.DataFrame) -> list:
                     f"{label}: TARGET_ACCESSION (UniProt ID) is recommended "
                     f"when TARGET_NAME is provided."
                 )
+
+        # TARGET_ACCESSION format check (when non-empty)
+        target_acc = str(row.get("TARGET_ACCESSION") or "").strip()
+        if target_acc and not _UNIPROT_ACCESSION_RE.match(target_acc):
+            errors.append(
+                f"{label}: TARGET_ACCESSION '{target_acc}' is not a valid UniProt "
+                f"accession format (expected e.g. 'P0A6Y8' or 'A0A023GPI8')."
+            )
 
     return errors
 
