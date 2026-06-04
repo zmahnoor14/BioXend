@@ -1,6 +1,6 @@
 ## Outputs
 
-BioXend generates 7 files from a filled-out `Template_open.ods`. Seven are ChEMBL-ready deposition files published to `--outdir` (default: `results/`); three are internal intermediate files not written to the output directory.
+BioXend generates 8 files from a filled-out `Template_open.ods`. Seven are ChEMBL-ready deposition files and one is an interactive HTML report, all published to `--outdir` (default: `results/`); three are internal intermediate files not written to the output directory.
 
 ### Pipeline overview
 
@@ -35,6 +35,7 @@ flowchart LR
         ASSAY(["GENERATE_ASSAY"])
         PARAM(["GENERATE_ASSAY_PARAM"])
         ACT(["GENERATE_ACTIVITY"])
+        RPT(["GENERATE_REPORT"])
     end
 
     subgraph outputs [" "]
@@ -46,6 +47,7 @@ flowchart LR
         o5["ASSAY.tsv"]
         o6["ASSAY_PARAM.tsv"]
         o7["ACTIVITY.tsv"]
+        o8["report.html"]
     end
 
     T --> REF
@@ -68,6 +70,9 @@ flowchart LR
 
     PARAM --> o6
     ACT --> o7
+    T --> RPT
+    ACT --> RPT
+    RPT --> o8
 
     style o1 fill:#FFF3CD,stroke:#F0AD4E,color:#000
     style o2 fill:#FFF3CD,stroke:#F0AD4E,color:#000
@@ -76,6 +81,7 @@ flowchart LR
     style o5 fill:#FFF3CD,stroke:#F0AD4E,color:#000
     style o6 fill:#FFF3CD,stroke:#F0AD4E,color:#000
     style o7 fill:#FFF3CD,stroke:#F0AD4E,color:#000
+    style o8 fill:#FFF3CD,stroke:#F0AD4E,color:#000
     style P  fill:#D6EAF8,stroke:#2E86C1,color:#000
     style X  fill:#D5F5E3,stroke:#1E8449,color:#000
 ```
@@ -91,6 +97,7 @@ flowchart LR
 5. `ASSAY.tsv`: Assay descriptions per organism/condition in ChEMBL deposition format.
 6. `ASSAY_PARAM.tsv`: Experimental parameters linked to each assay entry by AIDX.
 7. `ACTIVITY.tsv`: Compound–assay activity links in ChEMBL deposition format. This is the primary output connecting chemicals to biotransformation assays.
+8. `report.html`: Self-contained interactive HTML report summarising the dataset. Includes an activity heatmap, UMAP chemical space plot, microbial assay table, full biotransformation details, and a QC completeness summary. Works without an internet connection.
 
 ### Intermediates (not published)
 
