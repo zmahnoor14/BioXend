@@ -194,7 +194,6 @@ def validate(df: pd.DataFrame) -> list[str]:
                 if not str(row.get(field) or "").strip():
                     errors.append(f"{label}: conditional mandatory field '{field}' is empty.")
 
-        ref_type = str(row.get("REF_TYPE") or "").strip()
         allowed = {"Publication", "Patent", "Dataset", "Book"}
         if ref_type and ref_type not in allowed:
             errors.append(f"{label}: REF_TYPE '{ref_type}' not in {allowed}.")

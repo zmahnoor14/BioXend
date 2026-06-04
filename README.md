@@ -45,7 +45,7 @@ This checklist helps you decide whether you shold use BioXend for your data subm
 Based on the checklist above you can contact ChEMBL prior to filling out your template or afterwards to show interest in submitting to their next release by contacting them at [chembl-depositors@ebi.ac.uk](mailto:chembl-depositors@ebi.ac.uk).
 
 ### 1.2 How to use the template
-BioXend workflow takes a filled Template as input. in order to use the workflow, you have to fill out the template first. You can find the template in [`exampledata/Template_filled.ods`](/exampledata/Template_filled.ods). For details on how template maps to chembl data format, check the [MIX-MB Standards documentation](https://embl.gitbook.io/embl-docs/component-standards/mixmb_standards_main#template). <br>
+BioXend workflow takes a filled Template as input. in order to use the workflow, you have to fill out the template first. You can find the template in [`exampledata/Template_filled.ods`](/exampledata/Template_filled.ods). The template uses ODS format which can be opened with MIcrosoft excel as well, and after filling it out, can be saved as ODS file again. ODS is open format and hence is used for this project. For details on how template maps to chembl data format and other information, check the [MIX-MB Standards documentation](https://embl.gitbook.io/embl-docs/component-standards/mixmb_standards_main#template). <br>
 The template is in ODS format and currently the workflow only accpets ODS template. You can however fill out the ODS file with MS-Excel and then save it in ODS format.
 
 **Template explanation:** First sheet is the template description

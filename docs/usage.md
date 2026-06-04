@@ -47,16 +47,16 @@ docker build -t zmahnoor/bioxend:latest .
 Then run the pipeline — Docker is enabled by default, no profile flag needed:
 
 ```bash
-nextflow run main.nf \
-  --input  path/to/template_filled.ods \
+nextflow run main.nf -profile docker \
+  --input  exampledata/Template_filled.ods \
   --prefix HMDM \
   --xenobiotic_class drug
 ```
 
-Or run directly from GitHub (uses the `devel` branch):
+Or run directly from GitHub (uses the `main` branch):
 
 ```bash
-nextflow run zmahnoor14/BioXend -r devel \
+nextflow run zmahnoor14/BioXend -r main \
   --input  path/to/template_filled.ods \
   --prefix HMDM \
   --xenobiotic_class drug
@@ -83,34 +83,4 @@ nextflow run main.nf -profile singularity,slurm \
   --prefix HMDM \
   --xenobiotic_class drug
 ```
-
 ---
-
-### Run with Apptainer (HPC)
-
-Apptainer is a drop-in replacement for Singularity on newer HPC systems. Use the same `singularity` profile — Nextflow handles Apptainer transparently:
-
-```bash
-nextflow run main.nf -profile singularity \
-  --input  path/to/template_filled.ods \
-  --prefix HMDM \
-  --xenobiotic_class drug
-```
-
-If your HPC requires pulling the image manually first:
-
-```bash
-apptainer pull bioxend.sif docker://zmahnoor/bioxend:latest
-
-nextflow run main.nf -profile singularity \
-  -with-singularity bioxend.sif \
-  --input  path/to/template_filled.ods \
-  --prefix HMDM \
-  --xenobiotic_class drug
-```
-
----
-
-### Outputs
-
-See [output.md](output.md) for a description of all generated files.

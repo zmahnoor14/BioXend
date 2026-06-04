@@ -1,0 +1,32 @@
+name: GENERATE_REPORT
+description: |
+  Generates a self-contained interactive HTML report from all sheets of a
+  filled MIX-MB Template_open.ods. Includes activity heatmap, force-directed
+  network, compound structure gallery (RDKit SVGs), microbial assay table,
+  full biotransformation details, and a QC completeness summary.
+keywords:
+  - report
+  - visualization
+  - HTML
+  - MIX-MB
+  - BioXend
+tools:
+  - generate_report.py:
+      description: BioXend HTML report generator
+      licence: Apache-2.0
+input:
+  - ods:
+      type: file
+      description: Filled MIX-MB Template_open.ods
+      pattern: "*.ods"
+  - activity_tsv:
+      type: file
+      description: ACTIVITY.tsv (ordering dependency — ensures report runs after main pipeline)
+      pattern: "ACTIVITY.tsv"
+output:
+  - report:
+      type: file
+      description: Self-contained interactive HTML report
+      pattern: "report.html"
+authors:
+  - "@zmahnoor14"

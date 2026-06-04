@@ -1,21 +1,8 @@
 # Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)
 
 **Author:** Mahnoor Zulfiqar
-**Version:** 0.1.1  
-**Release Date:** March 16, 2026 (Draft)  
+**Version:** please refer to [versions/standards-main.txt](https://github.com/zmahnoor14/BioXend/blob/main/versions/standards-main.txt) for latest version
 **Status:** Draft Standard  
-
-
----
-
-## Document structure overview
-
-<p align="center">
-  <img src="standards-main.png" width="600" />
-</p>
-
-
----
 
 ## Abstract
 Microbial biotransformation of xenobiotics — the enzymatic conversion of drugs, environmental contaminants, and dietary compounds by microorganisms — is a research area of growing importance for human health, toxicology, and drug development. Despite increasing scientific output, data from these studies are rarely reported in a standardised or FAIR-compliant manner, limiting their reuse and integration across laboratories and databases.
@@ -23,15 +10,19 @@ Microbial biotransformation of xenobiotics — the enzymatic conversion of drugs
 The **Minimum Information about Xenobiotics-Microbiome Biotransformation (MIX-MB)** standard defines the minimum metadata and data elements required to describe, share, and deposit xenobiotic biotransformation experiments. MIX-MB covers three interconnected aspects of every study: 
 - the chemical substrate (MIX-MB(X)), 
 - the microbial organism or community (MIX-MB(M)), and 
-- the biotransformation assay and its outcomes (MIX-MB(B)). 
-Together, these components ensure that study results are reproducible, comparable across research groups, and directly depositable into community databases such as [ChEMBL](https://www.ebi.ac.uk/chembl/).
+- the biotransformation assay and its outcomes (MIX-MB(B)). <br>
 
-This document is the top-level overview of the MIX-MB standard. It describes the component sub-standards, the ChEMBL submission file specifications, controlled vocabularies, and data quality tiers. It is intended for researchers generating biotransformation data, data curators, and software developers building tools that process or submit such data.
+Together, these components prepare and present the study results as reproducible, comparable across research groups that follow the standards and submission template, and directly depositable into community database: [ChEMBL](https://www.ebi.ac.uk/chembl/).
 
----
+This document is the top-level overview of the MIX-MB standard. It describes:
+- scope of the standards,
+- component sub-standards, 
+- the template and how it maps to ChEMBL submission file, 
+- controlled vocabularies.
+
+It is intended for researchers generating biotransformation data, data curators, and software developers building tools that process or submit such data.
 
 ## Scope and Applicability
-
 ### In scope
 MIX-MB applies to experimental studies that measure the biotransformation of one or more xenobiotic compounds by microbial organisms or microbial-derived systems. This includes:
 
@@ -40,9 +31,9 @@ MIX-MB applies to experimental studies that measure the biotransformation of one
 - **Time-course experiments** — measuring substrate depletion or product formation over time
 <!--- - **Dose-response experiments** — measuring activity across a range of substrate concentrations --->
 <!--- - **Ex vivo assays** — tissue or organ preparations with microbial activity --->
-- **Product identification studies** — structural characterisation of biotransformation products
-- **Non-xenobiotic substrates** — The standard focuses on Xenobiotics, however, the same fgramework can also be used for endogenous metabolites transformed by the bacteria
-- **In vivo animal or human studies** — metabolic data from whole organisms without isolated microbial components
+- **Product identification studies** — structural annotation and identification of biotransformation products using mass spectrometry. 
+- **Non-xenobiotic substrates** — The standard focuses on Xenobiotics, however, the same framework can also be used for endogenous metabolites transformed by the bacteria
+- **In vivo animal or human studies** — metabolic data from whole organisms without isolated microbial components, such as gut microbiome, soil microbiome community
 - **Microbial Kingdom** - The standard currently focuses on bacteria but can be applied to all microbial kingdoms: bacteria, archaea, and fungi.
 
 ### Out of scope
@@ -50,30 +41,25 @@ MIX-MB applies to experimental studies that measure the biotransformation of one
 MIX-MB does not currently cover:
 
 - **Purely computational predictions** of biotransformation (e.g. metabolite prediction tools with no experimental validation)
-- **Metabolomics, Genomics or transcriptomics data** describing biotransformation enzymes or metabolites or equivalent sequence standards. This standard is for reporting biotransformation (bioactivity), and not for the experimental omics data (which have already their own established standards)
-
----
+- **Metabolomics, Genomics or transcriptomics data** describing biotransformation enzymes or metabolites or equivalent sequence standards. This standard is for reporting biotransformation (bioactivity), and not for the experimental omics data (which have already their own established standards).
 
 ## Component Standards
+This standard comprises three interconnected sub-standards: 
 
-This standard comprises three interconnected sub-standards: (individual components under construction)
-
-| Component | Description | Version | Last Updated (YYYY-MM-DD) | Document |
-|-----------|-------------|---------|--------------------------|----------|
-| **MIX-MB(X)** - Xenobiotics | Minimum metadata required to describe the chemical substrate, including structural identity, physicochemical properties, and source information. | 0.1.1 | 2026-03-16 | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
-| **MIX-MB(M)** - Microbes | Minimum metadata required to describe the microbial organism or community used in the experiment, including taxonomy, strain, and culture conditions. | 0.1.1 | 2026-03-16 | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
-| **MIX-MB(B)** - Biotransformation | Minimum metadata required to describe the biotransformation assay design, experimental conditions, and quantitative or qualitative activity outcomes. | 0.1.1 | 2026-03-16 | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
+| Component | Description | Document |
+|-----------|-------------|----------|
+| **MIX-MB(X)** - Xenobiotics | Minimum metadata required to describe the chemical substrate, including structural identity, physicochemical properties, and source information. | [MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md) |
+| **MIX-MB(M)** - Microbes | Minimum metadata required to describe the microbial organism or community used in the experiment, including taxonomy, strain, and culture conditions. | [MIXMB_Microbes.md](MIXMB_Microbes.md) |
+| **MIX-MB(B)** - Biotransformation | Minimum metadata required to describe the biotransformation assay design, experimental conditions, and quantitative or qualitative activity outcomes. | [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md) |
 
 Please check the individual standards document above to understand each component.
-
----
 
 ## Template 
 
 The template is based on the above 3 components ([MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md), [MIXMB_Microbes.md](MIXMB_Microbes.md), [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md)) and the [ChEMBL submission guidelines](https://chembl.gitbook.io/chembl-data-deposition-guide). To understand the template, we first have to understand the ChEMBL submission file formats. [**ChEMBL** ](https://www.ebi.ac.uk/chembl/) is a database of bioactivity associated with small molecules, and is used within academia and industry as a highly curated repository. 
 
 <p align="center">
-  <img src="chembl-files.jpg" />
+  <img src="Chembl_Files.png" />
 </p>
 
 ### 1. Study metadata files
@@ -81,32 +67,51 @@ The template is based on the above 3 components ([MIXMB_Xenobiotics.md](MIXMB_Xe
 **1.1. REFERENCE.tsv:** <br>
 Reference file provides metadata regarding the study, including the DOI/ PMID, title, abstract, authors, journal, or dataset (if unpublished). For details please refer to the tutorial provided by ChEMBL on how to generate the [REFERENCE.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/reference.tsv). 
 
-**1.2. INFO.txt:** <br>
-Optional file with free text space to mention any additional information about the study. For details please refer to the tutorial provided by ChEMBL on how to generate the [INFO.txt file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/supplementary-data-files/info.txt).
+> **_NOTE:_** If you would like to submit unpublished dataset, and don't already have a DOI for it, you can either contact ChEMBL team before to provide you one. Or you can submit your data to Zenodo (embargoed or not - depends on the confidentiality of the data decided by the depositor). Zenodod generates a DOI for the dataset whether its private (embragoed) or public.
+ 
+**1.2. README.toml:** <br>
+Optional configuration file to mention any additional information about the study. For details please refer to the tutorial provided by ChEMBL on how to generate the [README.toml file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/readme.toml)
 
-#### How are study data files are integrated into the Template.xlsx
+#### How are study data files integrated into the Template.xlsx
 
-The **Reference** sheet in `Template.xlsx` maps directly to `REFERENCE.tsv` and one column for `INFO.txt`. Fill in one row per study. Columns marked **Mandatory** must be completed; all others are optional or even can be automatically extracted by the nf workflow.
+The **Reference** sheet in `Template.xlsx` maps directly to `REFERENCE.tsv` and `README.toml`. Fill in one row per study. Columns marked **Mandatory** must be completed; all others are optional or even can be automatically extracted by BioXend.
 
 | Template Column | Maps to REFERENCE.tsv | Required | Description |
 |----------------|----------------------|----------|-------------|
-| `Reference_identifier` | `RIDX` | **Mandatory** | Meaningful unique identifier for each reference; if not provided, BioXend workflow will create one automatically |
 | `DOI` | `DOI` | **Mandatory** | Must be present; if no DOI exists, contact ChEMBL to provide one |
-| `PUBMED_ID` | `PUBMED_ID` | Mandatory only if no DOI | PubMed identifier; if DOI is present this field can be left empty |
 | `DATA_LICENCE` | `DATA_LICENCE` | **Mandatory** | Licence for the deposited data; use `CC0` for public domain |
-| `CONTACT` | — | Recommended | Contact person ORCID and/or email (e.g. `https://orcid.org/0000-0000-0000-0000`) |
-| `JOURNAL_NAME` | `JOURNAL_NAME` | Optional | If published: use the standard NIH NLM Catalog abbreviated journal name |
-| `YEAR` | `YEAR` | Recommended | Year of publication, dataset or submission |
+| `CONTACT` | `CONTACT` | **Mandatory**  | Contact person ORCID and/or email (e.g. `https://orcid.org/0000-0000-0000-0000`) |
+| `Reference_identifier` | `RIDX` | **Mandatory** | Meaningful unique identifier for each reference e.g: `HumanMicrobial_DrugMetabolism` |
+| `PUBMED_ID` | `PUBMED_ID` | **Mandatory only if no DOI** | PubMed identifier; if DOI is present this field can be left empty |
+| `REF_TYPE` | `REF_TYPE` | **Mandatory** | Type of reference: `Publication`, `Patent`, `Dataset`, or `Book` |
+| `YEAR` | `YEAR` | **Mandatory** | Year of publication, dataset or submission |
+| `AUTHORS` | `AUTHORS` | **Mandatory** | List of the authors |
+| `TITLE` | `TITLE` | **Mandatory** | Title of the article or dataset description |
+| `ABSTRACT` | `ABSTRACT` | **Mandatory** | Abstract of the article or dataset description |
 | `VOLUME` | `VOLUME` | Optional | Volume number of the publication |
 | `ISSUE` | `ISSUE` | Optional | Issue number of the publication |
 | `FIRST_PAGE` | `FIRST_PAGE` | Optional | First page of the article |
 | `LAST_PAGE` | `LAST_PAGE` | Optional | Last page of the article |
-| `REF_TYPE` | `REF_TYPE` | Recommended | Type of reference: `Publication`, `Patent`, `Dataset`, or `Book` |
-| `TITLE` | `TITLE` | Recommended | Title of the article or dataset description |
 | `PATENT_ID` | `PATENT_ID` | Optional | Patent identifier (only relevant for ChEMBL internal use) |
-| `ABSTRACT` | `ABSTRACT` | Recommended | Abstract of the article or dataset description |
-| `AUTHORS` | `AUTHORS` | Recommended | List of the authors |
-| `INFO` | — | Optional | Any additional context to include with the deposited data (ChEMBL internal usage only) |
+| `JOURNAL_NAME` | `JOURNAL_NAME` | Optional | If published: use the standard NIH NLM Catalog abbreviated journal name |
+
+
+
+For README.toml, all fields are mentioned as mandatory. However, if something doesnt apply to your case you can simply mention "Not applicable".
+| Template Column | Maps to README.toml | Required | Description |
+|----------------|----------------------|----------|-------------|
+| `Endpoints` | `Endpoints` | **Mandatory** | Assay endpoints measured E.g. IC50, cytotoxicity, etc. if your deposition contains multiple different categories of assay, it will be better to subset these into different datasets. |
+| `Compounds` | `Compounds` | **Mandatory** | Number of compounds tested |
+| `Assays` | `Assays` | **Mandatory**  | Number of assays performed |
+| `Goal_of_submission` | `Goal_of_submission` | **Mandatory** | Briefly describe what is your goal in submitting your data source to ChEMBL.|
+| `Names` | `Names` | **Mandatory** | Submittors, could be different than authors of the paper |
+| `Institutions` | `Institutions` | **Mandatory** | Name of your institute |
+| `Links` | `Links` | **Mandatory** | any link associated with your data |
+| `Description` | `Description` | **Mandatory** | Please briefly describe your dataset: study aim, organism(s), and scientific audience |
+| `Recent_changes` | `Recent_changes` | **Mandatory** | List any changes since you submitted the last dataset related to this project or mention no |
+| `Multiplexed` | `Multiplexed` | **Mandatory** | Do your data contain multiple assays that were performed in the same plate well?  |
+| `Chembl_version` | `Chembl_version` | **Mandatory** | Ask Chembl team which version you are submitting your data for. |
+
 
 ### 2. Xenobiotics metadata files
 
@@ -118,7 +123,7 @@ These files contain reference identifiers and chemical identifiers, along with t
 
 The CTAB is an sdf file (V2000 molfile format) storing the chemical strcuture of the compounds mentioned in the `COMPOUNDS_RECORD.tsv`, together with the same chemical identifiers. For details please refer to the tutorial provided by ChEMBL on how to generate the [COMPOUND_CTAB.sdf file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/compound_ctab.sdf).
 
-#### How are xenobiotics data files are integrated into the Template.xlsx
+#### How are xenobiotics data files integrated into the Template.xlsx
 
 The **Chemicals** sheet in `Template.xlsx` maps to `COMPOUND_RECORD.tsv` and `COMPOUND_CTAB.sdf`. Fill in one row per compound. Columns auto-filled by BioXend (powered by RDKit) can be left empty; all others should be completed where available.
 
@@ -126,7 +131,7 @@ The **Chemicals** sheet in `Template.xlsx` maps to `COMPOUND_RECORD.tsv` and `CO
 |----------------|---------|----------|------------------------|-------------|
 | `Chemical_identifier` | `CIDX` | **Mandatory** | Yes (if left empty) | Unique compound index; BioXend auto-generates if not provided — or supply your own |
 | `Common_Name` | `COMPOUND_NAME` | **Mandatory** | No | Common name of the xenobiotic, chemical, drug, or pesticide |
-| `SMILES` | `COMPOUND_CTAB.sdf file` | **Mandatory** | No | SMILES string of the compound |
+| `SMILES` | `COMPOUND_CTAB.sdf file` | **Mandatory** | No | SMILES string of the compound. Use [ChEMET](chemet.embl.org) web app to check whether SMILES are valid. |
 | `Local_Synonym` | `COMPOUND_KEY` | **Mandatory**  | Yes (if left empty, COMPOUND_NAME will be used) | Any local synonym used in the manuscript (e.g. "compound 23") |
 | `IUPAC_Name` | - | Recommended | Yes (if left empty) | Systematic IUPAC name; auto-filled by BioXend if not provided |
 | `InChI` | - | Recommended | Yes (if left empty) | Standard InChI; auto-filled by BioXend if not provided |

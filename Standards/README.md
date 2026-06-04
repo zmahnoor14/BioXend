@@ -4,7 +4,7 @@
 
 {% hint style="info" %}
 **Version:** 0.1.1 · **Status:** Draft Standard · **Last updated:** March 2026\
-**Maintainers:** Mahnoor Zulfiqar & Eleonora Mastrorilli (EMBL, Molecular Systems Biology Unit)\
+**Maintainers:** Mahnoor Zulfiqar (EMBL, Molecular Systems Biology Unit)\
 **Funding:** NFDI4Microbiota FlexFund 2026
 {% endhint %}
 

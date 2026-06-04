@@ -43,9 +43,10 @@ Usage:
 
 import argparse
 import sys
+import unicodedata
 from pathlib import Path
 
-import odf 
+import odf
 import pandas as pd
 
 
@@ -112,7 +113,9 @@ def _clean(v) -> str:
             return "" if pd.isna(v) else str(v)
         except (TypeError, ValueError):
             return str(v)
-    v = v.strip()
+    # NFC normalization preserves symbols like ° (U+00B0) and − (U+2212) in
+    # their canonical composed form, avoiding garbled output in downstream tools.
+    v = unicodedata.normalize("NFC", v).strip()
     return "" if v in ("nan", "None", "NaN") else v
 
 
@@ -502,7 +505,7 @@ def main() -> None:
 
     # --- Write ---
     out_path = outdir / "ASSAY_PARAM.tsv"
-    param_df.to_csv(out_path, sep="\t", index=False)
+    param_df.to_csv(out_path, sep="\t", index=False, encoding="utf-8")
     print(f"Written: {out_path}")
     print(f"[SUCCESS] {len(param_df)} parameter row(s) written for {len(aidx_list)} assay(s).")
 

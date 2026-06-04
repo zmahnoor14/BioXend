@@ -21,6 +21,7 @@ include { GENERATE_CHEMICALS   } from '../modules/local/chemicals'
 include { GENERATE_ASSAY       } from '../modules/local/microbes'
 include { GENERATE_ASSAY_PARAM } from '../modules/local/experiment'
 include { GENERATE_ACTIVITY    } from '../modules/local/biotransformation'
+include { GENERATE_REPORT      } from '../modules/local/report'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Workflow
@@ -75,5 +76,13 @@ workflow BIOXEND {
         ridx_ch,
         GENERATE_CHEMICALS.out.compound_mapping,
         GENERATE_ASSAY.out.assay_mapping
+    )
+
+    // GENERATE_REPORT runs after GENERATE_ACTIVITY (ordering dependency).
+    // The script reads from the ODS template directly; ACTIVITY.tsv is passed
+    // only to guarantee this step runs after the full pipeline completes.
+    GENERATE_REPORT(
+        template_ch,
+        GENERATE_ACTIVITY.out.activity
     )
 }
