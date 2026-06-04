@@ -22,7 +22,7 @@ process GENERATE_REFERENCE {
     def args = task.ext.args ?: ''
     """
     reference.py \\
-        --input ${ods} \\
+        --input "${ods}" \\
         --outdir . \\
         ${args}
     """

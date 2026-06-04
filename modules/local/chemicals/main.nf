@@ -25,7 +25,7 @@ process GENERATE_CHEMICALS {
     def args = task.ext.args ?: ''
     """
     chemicals.py \\
-        --input ${ods} \\
+        --input "${ods}" \\
         --ridx  "${ridx}" \\
         --prefix "${prefix}" \\
         --outdir . \\
