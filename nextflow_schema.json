@@ -2,7 +2,7 @@
     "$schema": "http://json-schema.org/draft-07/schema",
     "$id": "https://raw.githubusercontent.com/zmahnoor14/BioXend/main/nextflow_schema.json",
     "title": "BioXend pipeline parameters",
-    "description": "MIX-MB ChEMBL submission file generator — converts a filled MIX-MB template into six ChEMBL-ready deposition files.",
+    "description": "MIX-MB ChEMBL submission file generator — converts a filled MIX-MB template into seven ChEMBL-ready deposition files plus an interactive HTML report.",
     "type": "object",
     "definitions": {
         "input_output_options": {
@@ -26,8 +26,8 @@
                     "type": "string",
                     "format": "directory-path",
                     "fa_icon": "fas fa-folder-open",
-                    "description": "Directory where the seven ChEMBL deposition files will be written. Choose your output directory from your data bucket on CloWM.",
-                    "help_text": "The pipeline writes `REFERENCE.tsv`, `README.toml`, `COMPOUND_RECORD.tsv`, `COMPOUND_CTAB.sdf`, `ASSAY.tsv`, `ASSAY_PARAM.tsv`, and `ACTIVITY.tsv` into this directory. The directory is created automatically if it does not exist."
+                    "description": "Directory where the seven ChEMBL deposition files and the interactive HTML report will be written. Choose your output directory from your data bucket on CloWM.",
+                    "help_text": "The pipeline writes `REFERENCE.tsv`, `README.toml`, `COMPOUND_RECORD.tsv`, `COMPOUND_CTAB.sdf`, `ASSAY.tsv`, `ASSAY_PARAM.tsv`, `ACTIVITY.tsv`, and `report.html` into this directory. The directory is created automatically if it does not exist."
                 }
             }
         },
