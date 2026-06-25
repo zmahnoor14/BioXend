@@ -16,8 +16,9 @@ process GENERATE_ASSAY {
     val  xenobiotic_class
 
     output:
-    path "ASSAY.tsv",         emit: assay
-    path "ASSAY_MAPPING.tsv", emit: assay_mapping
+    path "ASSAY.tsv",                   emit: assay
+    path "ASSAY_MAPPING.tsv",           emit: assay_mapping
+    path "ORGANISM_NAME_CHANGES.tsv",   emit: name_changes
 
     script:
     def args = task.ext.args ?: ''

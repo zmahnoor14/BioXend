@@ -22,6 +22,7 @@ include { GENERATE_ASSAY       } from '../modules/local/microbes'
 include { GENERATE_ASSAY_PARAM } from '../modules/local/experiment'
 include { GENERATE_ACTIVITY    } from '../modules/local/biotransformation'
 include { GENERATE_REPORT      } from '../modules/local/report'
+include { FILL_TEMPLATE        } from '../modules/local/fill_template'
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Workflow
@@ -81,8 +82,21 @@ workflow BIOXEND {
     // GENERATE_REPORT runs after GENERATE_ACTIVITY (ordering dependency).
     // The script reads from the ODS template directly; ACTIVITY.tsv is passed
     // only to guarantee this step runs after the full pipeline completes.
+    // ORGANISM_NAME_CHANGES.tsv is read by the report to show QC corrections.
     GENERATE_REPORT(
         template_ch,
-        GENERATE_ACTIVITY.out.activity
+        GENERATE_ACTIVITY.out.activity,
+        GENERATE_ASSAY.out.name_changes
+    )
+
+    // FILL_TEMPLATE writes back auto-resolved fields into a copy of the
+    // original template (CIDX, molecular properties, TaxIDs, canonical names).
+    // Runs in parallel with GENERATE_REPORT — no ordering dependency between them.
+    FILL_TEMPLATE(
+        template_ch,
+        GENERATE_CHEMICALS.out.compound_mapping,
+        GENERATE_ASSAY.out.assay,
+        GENERATE_ASSAY.out.assay_mapping,
+        GENERATE_ASSAY.out.name_changes
     )
 }

@@ -15,7 +15,8 @@ process GENERATE_REPORT {
 
     input:
     path ods
-    path activity_tsv   // ordering dependency — ensures report runs last
+    path activity_tsv       // ordering dependency — ensures report runs last
+    path name_changes_tsv   // organism name corrections from microbes.py
 
     output:
     path "report.html", emit: report
@@ -24,7 +25,8 @@ process GENERATE_REPORT {
     def args = task.ext.args ?: ''
     """
     generate_report.py \\
-        --input  "${ods}" \\
+        --input        "${ods}" \\
+        --name_changes "${name_changes_tsv}" \\
         --outdir . \\
         ${args}
     """
