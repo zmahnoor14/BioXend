@@ -32,7 +32,7 @@ chmod +x nextflow && mv nextflow $HOME/.local/bin/
 | `--outdir` | no | Output directory (default: `./results`) |
 | `--strict` | no | Exit on validation warnings (default: `false`) |
 
-An example template is at `exampledata/template_filled.ods`.
+An example template is at `exampledata/Template_filled.ods`.
 
 ---
 
@@ -44,7 +44,7 @@ Docker Desktop must be running. Build the image once:
 docker build -t zmahnoor/bioxend:latest .
 ```
 
-Then run the pipeline — Docker is enabled by default, no profile flag needed:
+Then run the pipeline:
 
 ```bash
 nextflow run main.nf -profile docker \
@@ -61,6 +61,25 @@ nextflow run zmahnoor14/BioXend -r main \
   --prefix HMDM \
   --xenobiotic_class drug
 ```
+
+---
+
+### Running from a network-mounted volume (NFS / SMB)
+
+Nextflow's cache database requires file-locking support. Network mounts (e.g. `/Volumes/...` on macOS) do not support this. If your project lives on a network volume, redirect both the cache and work directories to a local path:
+
+```bash
+NXF_CACHE_DIR=/tmp/nextflow_cache \
+nextflow run /full/path/to/main.nf \
+  -profile docker \
+  -w /tmp/nextflow_work \
+  --input  /full/path/to/exampledata/Template_filled.ods \
+  --prefix HMDM \
+  --xenobiotic_class drug \
+  --outdir /full/path/to/results
+```
+
+`--outdir` can still point back to the network volume — only the cache and intermediate work files need to be local.
 
 ---
 

@@ -56,7 +56,7 @@ Please check the individual standards document above to understand each componen
 
 ## Template 
 
-The template is based on the above 3 components ([MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md), [MIXMB_Microbes.md](MIXMB_Microbes.md), [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md)) and the [ChEMBL submission guidelines](https://chembl.gitbook.io/chembl-data-deposition-guide). To understand the template, we first have to understand the ChEMBL submission file formats. [**ChEMBL** ](https://www.ebi.ac.uk/chembl/) is a database of bioactivity associated with small molecules, and is used within academia and industry as a highly curated repository. 
+The template is based on the above 3 components ([MIXMB_Xenobiotics.md](MIXMB_Xenobiotics.md), [MIXMB_Microbes.md](MIXMB_Microbes.md), [MIXMB_Biotransformation.md](MIXMB_Biotransformation.md)) and the [ChEMBL submission guidelines](https://chembl.gitbook.io/chembl-data-deposition-guide). To understand the template, we first have to understand the ChEMBL submission file formats. [**ChEMBL** ](https://www.ebi.ac.uk/chembl/) is a database of bioactivity associated with small molecules, and is used within academia and industry as a highly curated repository. You can also add more columns to your template if you would like to submit the template with your publication. Follow the BioSchemas. 
 
 <p align="center">
   <img src="Chembl_Files.png" />
@@ -129,31 +129,29 @@ The **Chemicals** sheet in `Template.xlsx` maps to `COMPOUND_RECORD.tsv` and `CO
 
 | Template Column | Maps to | Required | Auto-filled by BioXend | Description |
 |----------------|---------|----------|------------------------|-------------|
-| `Chemical_identifier` | `CIDX` | **Mandatory** | Yes (if left empty) | Unique compound index; BioXend auto-generates if not provided — or supply your own |
 | `Common_Name` | `COMPOUND_NAME` | **Mandatory** | No | Common name of the xenobiotic, chemical, drug, or pesticide |
 | `SMILES` | `COMPOUND_CTAB.sdf file` | **Mandatory** | No | SMILES string of the compound. Use [ChEMET](chemet.embl.org) web app to check whether SMILES are valid. |
-| `Local_Synonym` | `COMPOUND_KEY` | **Mandatory**  | Yes (if left empty, COMPOUND_NAME will be used) | Any local synonym used in the manuscript (e.g. "compound 23") |
+| `Chemical_identifier` | `CIDX` | Recommended | Yes (if left empty) | Unique compound index; BioXend auto-generates if not provided. `prefix` parameter in the workflow defines the prefix for the compounds, e.g: if `prefix` is `CIDX`, then the first compound would be: `CIDX001`. |
 | `IUPAC_Name` | - | Recommended | Yes (if left empty) | Systematic IUPAC name; auto-filled by BioXend if not provided |
 | `InChI` | - | Recommended | Yes (if left empty) | Standard InChI; auto-filled by BioXend if not provided |
 | `InChIKey` | - | Recommended | Yes (if left empty) | InChIKey; auto-filled by BioXend if not provided |
-| `database_ID` | - | Optional | No | ChEMBL, PubChem, or other database identifier; prefix with database name (e.g. `ChEMBL:CHEMBL25`) |
-| `CAS_number` | — | Optional | No | CAS registry number of the xenobiotic |
-| `Vendor` | — | Optional | No | Vendor who supplied the compound |
-| `Purity` | — | Optional | No | Purity of the compound (%) |
-| `Solubility` | — | Optional | No | Solubility value |
+| `CAS_number` | — | Recommended | No | CAS registry number of the xenobiotic |
+| `Local_Synonym` | `COMPOUND_KEY` | Optional | Yes (if left empty, COMPOUND_NAME will be used) | Any local synonym used in the manuscript (e.g. "compound 23") |
+| `database_ID` | - | Optional | No | ChEMBL, PubChem, or other database identifier; prefix with database name (e.g. `pubchem:441384`, `chebi:2361`) |
 | `Stock_concentration` | — | Optional | No | Concentration of the stock solution |
 | `Stock_solvent` | — | Optional | No | Solvent used to prepare the stock solution |
+| `Purity` | — | Optional | No | Purity of the compound (%) |
+| `Solubility` | — | Optional | No | Solubility value |
+| `Vendor` | `COMPOUND_SOURCE` | Optional | No | Vendor who supplied the compound |
 | `Molecular_formula` | - | Recommended | Yes (if left empty) | Molecular formula; auto-filled by BioXend if empty |
 | `Molecular_weight` | - | Recommended | Yes (if left empty) | Molecular weight; auto-filled by BioXend if empty |
 | `Monoisotopic_mass` | — | Optional | Yes (if left empty) | Monoisotopic mass; auto-filled by BioXend if empty |
-| `m/z` | — | Optional | No | Measured m/z of the xenobiotic |
+| `m/z` | - | Optional | No | Measured m/z of the xenobiotic |
 | `Column_separation` | — | Optional | No | Separation technique used (e.g. LC, GC) |
-| `Retention_time` | — | Optional | No | Retention time recorded; fill if `Column_separation` is provided |
-| `Time_unit` | — | Optional | No | Unit for retention time: `sec`, `min`, or `hr` |
+| `Retention_time` | - | Optional | No | Retention time recorded; fill if `Column_separation` is provided |
+| `Time_unit` | - | Optional | No | Unit for retention time: `sec`, `min`, or `hr` |
 | `Eluted_compound` | — | Optional | No | Was the eluted compound the same as the original? Note if different (relevant for MS/biotransformation studies) |
 | `Eluted_compound_SMILES` | — | Optional | No | SMILES of the eluted compound if different from the original |
-| `Physicochemical_properties` | — | Optional | Yes (partial) | LogP, functional groups, etc.; BioXend will auto-extract where possible — select from drop-down |
-| `mzML_file_source` | — | Optional | No | Source file for MSI (mass spectrometry imaging) fragment data, if applicable |
 
 ### 3. Microbe/ Assay metadata files
 

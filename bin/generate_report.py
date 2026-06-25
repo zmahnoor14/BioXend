@@ -254,6 +254,20 @@ def _build_umap(chemicals_df, bioT_df):
     return points
 
 
+def _read_name_changes(path: str | None) -> list[dict]:
+    """Read ORGANISM_NAME_CHANGES.tsv produced by microbes.py."""
+    if not path:
+        return []
+    p = Path(path)
+    if not p.exists() or p.stat().st_size == 0:
+        return []
+    try:
+        df = pd.read_csv(p, sep="\t", dtype=str).fillna("")
+        return df.to_dict("records")
+    except Exception:
+        return []
+
+
 def _build_qc(ref_df, chemicals_df, microbes_df, bioT_df):
     results = []
 
@@ -309,7 +323,8 @@ def _build_qc(ref_df, chemicals_df, microbes_df, bioT_df):
 # ── HTML assembly ──────────────────────────────────────────────────────────────
 
 def build_html(ref_df, chemicals_df, microbes_df, exp_df, bioT_df,
-               plotly_js: str | None) -> str:
+               plotly_js: str | None,
+               name_changes: list[dict] | None = None) -> str:
 
     ref = ref_df.iloc[0] if not ref_df.empty else pd.Series(dtype=str)
     title    = _clean(ref.get("TITLE",   "MIX-MB Biotransformation Report"))
@@ -451,6 +466,10 @@ def build_html(ref_df, chemicals_df, microbes_df, exp_df, bioT_df,
             "is_community": "metagenome" in org.lower(),
             "active_count": microbe_activity.get(aid, 0),
         })
+
+    # ── Name changes section
+    nc_list = name_changes or []
+    name_changes_html = _render_name_changes(nc_list)
 
     # ── Serialise
     report_data = {
@@ -644,6 +663,7 @@ def build_html(ref_df, chemicals_df, microbes_df, exp_df, bioT_df,
         '      </table>\n'
         '    </div>\n'
         '  </div>\n'
+        f'{name_changes_html}'
         '</section>\n'
 
         '</main>\n'
@@ -695,6 +715,58 @@ def _render_microbe_rows(microbe_table) -> str:
             f'</tr>\n'
         )
     return html
+
+
+def _render_name_changes(nc_list: list[dict]) -> str:
+    """Render the organism name corrections card for the QC tab.
+
+    Returns an empty string when there are no corrections so the card is hidden.
+    """
+    if not nc_list:
+        return ""
+
+    rows = ""
+    for nc in nc_list:
+        taxid = nc.get("taxid", "")
+        taxid_cell = (
+            f'<a href="https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id={taxid}"'
+            f' target="_blank">{taxid}</a>'
+            if taxid else "—"
+        )
+        rows += (
+            f'<tr class="name-change-row">'
+            f'<td><code>{nc.get("AIDX", "")}</code></td>'
+            f'<td>{nc.get("field", "")}</td>'
+            f'<td class="warn-icon">⚠</td>'
+            f'<td><span style="color:#92400e">{nc.get("provided", "")}</span></td>'
+            f'<td><i>{nc.get("ncbi_canonical", "")}</i></td>'
+            f'<td>{taxid_cell}</td>'
+            f'</tr>\n'
+        )
+
+    n = len(nc_list)
+    return (
+        '  <div class="card full-width" style="margin-top:20px">\n'
+        '    <h2 class="card-title">Organism Name Corrections</h2>\n'
+        '    <p class="card-desc">The following organism names differed from the '
+        'current NCBI Taxonomy canonical name for the provided TaxID and were '
+        'automatically updated. Your original entry is shown in the '
+        '<span style="color:#92400e">Provided</span> column. '
+        'TaxIDs are stable identifiers — names are not.</p>\n'
+        '    <div class="qc-summary">\n'
+        f'      <span class="qc-pill warn-pill">⚠ {n} name correction{"s" if n != 1 else ""}</span>\n'
+        '    </div>\n'
+        '    <div class="table-wrap">\n'
+        '      <table class="data-table">\n'
+        '        <thead><tr>'
+        '<th>AIDX</th><th>Field</th><th></th>'
+        '<th>Provided</th><th>NCBI Canonical</th><th>TaxID</th>'
+        '</tr></thead>\n'
+        f'        <tbody>{rows}</tbody>\n'
+        '      </table>\n'
+        '    </div>\n'
+        '  </div>\n'
+    )
 
 
 def _render_qc_rows(qc_data) -> str:
@@ -807,6 +879,9 @@ body{font-family:var(--font);background:var(--bg);color:var(--text)}
 .qc-bad-row td{background:#fef2f2}
 .ok-icon{color:#16a34a;font-weight:700;text-align:center}
 .bad-icon{color:#dc2626;font-weight:700;text-align:center}
+.warn-pill{background:#fef3c7;color:#92400e}
+.name-change-row td{background:#fffbeb}
+.warn-icon{color:#d97706;font-weight:700;text-align:center}
 
 /* Controls */
 .table-controls{display:flex;gap:12px;margin-bottom:12px;align-items:center}
@@ -1013,8 +1088,10 @@ def main() -> None:
         description="Generate interactive HTML report from MIX-MB Template_open.ods",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    parser.add_argument("--input",   required=True, help="Path to Template_open.ods")
-    parser.add_argument("--outdir",  default=".",   help="Output directory")
+    parser.add_argument("--input",        required=True, help="Path to Template_open.ods")
+    parser.add_argument("--outdir",       default=".",   help="Output directory")
+    parser.add_argument("--name_changes", default=None,
+                        help="Path to ORGANISM_NAME_CHANGES.tsv from microbes.py")
     parser.add_argument(
         "--no-embed-js", action="store_true",
         help="Use CDN links instead of embedding JS (smaller file, needs internet to render)",
@@ -1051,9 +1128,13 @@ def main() -> None:
         if not plotly_js:
             print("  [WARN] Plotly could not be fetched — falling back to CDN link.")
 
+    name_changes = _read_name_changes(args.name_changes)
+    if name_changes:
+        print(f"  {len(name_changes)} organism name correction(s) to report.")
+
     print("Building report...")
     html = build_html(ref_df, chem_df, microbes_df, exp_df, bioT_df,
-                      plotly_js)
+                      plotly_js, name_changes)
 
     out_path = outdir / "report.html"
     out_path.write_text(html, encoding="utf-8")

@@ -186,14 +186,15 @@ def _uniprot_lookup(accession: str) -> dict:
 # TaxID lookup — StrainInfo (DSMZ) and NCBI Taxonomy 
 # ---------------------------------------------------------------------------
 
-_STRAININFO_API   = "https://api.straininfo.dsmz.de"
-_NCBI_ESEARCH_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esearch.fcgi"
+_STRAININFO_API    = "https://api.straininfo.dsmz.de"
+_NCBI_ESUMMARY_URL = "https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi"
 
 # Culture collection accession pattern: 2–5 uppercase letters + optional space + digits
 # e.g. DSM 2840, ATCC 11775, NCTC 10537, LMG 2093
 _ACCESSION_RE = re.compile(r'^[A-Z]{2,5}\s*\d+', re.ASCII)
 
 _taxid_cache: dict[str, str] = {}
+_ncbi_name_cache: dict[str, str] = {}
 
 
 def _looks_like_accession(strain: str) -> bool:
@@ -245,48 +246,57 @@ def _straininfo_by_accession(accession: str) -> str:
     return ""
 
 
-def _ncbi_taxid(organism: str) -> str:
-    """Resolve NCBI TaxID from a species name via NCBI Taxonomy esearch.
+def _ncbi_name_from_taxid(taxid: str) -> str:
+    """Fetch the current canonical scientific name from NCBI Taxonomy by TaxID.
 
-    NCBI Taxonomy is the authoritative source for TaxIDs.  This is the
-    primary lookup path for organism names.
+    Uses esummary (JSON) — the stable direction: TaxID → name.
+    Bacterial names change when taxonomy is revised; TaxIDs remain stable.
+    Results are cached per TaxID for the run lifetime.
+    Returns '' if the TaxID cannot be resolved.
     """
+    if not taxid:
+        return ""
+    if taxid in _ncbi_name_cache:
+        return _ncbi_name_cache[taxid]
+
+    name = ""
     try:
         resp = requests.get(
-            _NCBI_ESEARCH_URL,
-            params={
-                "db": "taxonomy",
-                "term": organism,
-                "retmode": "json",
-                "retmax": 1,
-            },
+            _NCBI_ESUMMARY_URL,
+            params={"db": "taxonomy", "id": taxid, "retmode": "json"},
             timeout=15,
         )
         resp.raise_for_status()
-        ids = resp.json().get("esearchresult", {}).get("idlist", [])
-        if ids:
-            return str(ids[0])
+        name = str(
+            resp.json()
+                .get("result", {})
+                .get(str(taxid), {})
+                .get("scientificname", "")
+        ).strip()
+        if name:
+            print(f"[INFO] NCBI canonical name for TaxID {taxid}: '{name}'.",
+                  file=sys.stderr)
+        else:
+            print(f"[WARN] NCBI returned no name for TaxID {taxid}.",
+                  file=sys.stderr)
     except requests.exceptions.RequestException as exc:
-        print(
-            f"[WARN] NCBI taxonomy lookup failed for '{organism}': {exc}",
-            file=sys.stderr,
-        )
-    return ""
+        print(f"[WARN] NCBI name lookup failed for TaxID {taxid}: {exc}",
+              file=sys.stderr)
+
+    _ncbi_name_cache[taxid] = name
+    return name
 
 
 def lookup_taxid(organism: str, strain: str = "") -> str:
-    """Return NCBI TaxID for *organism* / *strain*.
+    """Return NCBI TaxID for *organism* / *strain* via StrainInfo.
 
-    Resolution order:
-      1. If *strain* looks like a culture collection accession (e.g. DSM 2840,
-         ATCC 11775) → StrainInfo deposit lookup.  This is StrainInfo's primary
-         use case: mapping strain accession numbers to taxonomy.
-      2. NCBI Taxonomy esearch by *organism* name.  NCBI is the authoritative
-         source for TaxIDs and handles species names, metagenomes, and
-         reclassified taxa.
+    Only resolves when *strain* is a culture collection accession (e.g. DSM 2840,
+    ATCC 11775). For all other cases, fill ASSAY_TAX_ID directly in the template —
+    TaxIDs are stable identifiers that survive taxonomy revisions; organism names
+    are not.
 
     Results are cached per (organism, strain) pair for the run lifetime.
-    Returns '' when both sources fail.
+    Returns '' when StrainInfo lookup fails or is not applicable.
     """
     if not organism:
         return ""
@@ -294,24 +304,24 @@ def lookup_taxid(organism: str, strain: str = "") -> str:
     if cache_key in _taxid_cache:
         return _taxid_cache[cache_key]
 
-    taxid  = ""
-    source = ""
+    taxid = ""
 
     if strain and _looks_like_accession(strain):
-        taxid  = _straininfo_by_accession(strain)
-        source = "StrainInfo"
+        taxid = _straininfo_by_accession(strain)
+        if taxid:
+            print(
+                f"[INFO] TaxID '{taxid}' resolved for '{organism}' "
+                f"strain '{strain}' via StrainInfo.",
+                file=sys.stderr,
+            )
 
     if not taxid:
-        taxid  = _ncbi_taxid(organism)
-        source = "NCBI"
-
-    label = f"'{organism}'" + (f" strain '{strain}'" if strain else "")
-    if taxid:
-        print(f"[INFO] TaxID '{taxid}' resolved for {label} via {source}.",
-              file=sys.stderr)
-    else:
-        print(f"[WARN] Could not resolve TaxID for {label}. "
-              "Fill ASSAY_TAX_ID manually.", file=sys.stderr)
+        print(
+            f"[WARN] Could not resolve TaxID for '{organism}'"
+            + (f" strain '{strain}'" if strain else "")
+            + ". Fill ASSAY_TAX_ID directly in the template.",
+            file=sys.stderr,
+        )
 
     _taxid_cache[cache_key] = taxid
     return taxid
@@ -559,11 +569,11 @@ def build_assay_tsv(
     exp_df: pd.DataFrame,
     xenobiotic_class: str,
     taxid_lookup: bool = True,
-) -> "tuple[pd.DataFrame, dict[str, str]]":
+) -> "tuple[pd.DataFrame, dict[str, str], list[dict]]":
     """
     Build the ASSAY.tsv records from the Microbes sheet DataFrame.
 
-    Returns (assay_df, aidx_map).
+    Returns (assay_df, aidx_map, name_changes).
 
     aidx_map maps each user-provided AIDX key (from the template assay_identifier column,
     e.g. 'assay1') to the pipeline-generated ChEMBL AIDX (e.g.
@@ -573,6 +583,10 @@ def build_assay_tsv(
     exactly as COMPOUND_RECORD.tsv lets biotransformation.py resolve
     Common_Name to CIDX.
 
+    name_changes records every ASSAY_ORGANISM or TARGET_ORGANISM value that was
+    overwritten with the current NCBI canonical name (looked up by TaxID).
+    Written to ORGANISM_NAME_CHANGES.tsv and surfaced in the QC report.
+
     The assay_identifier column in the template is the user's short cross-reference key.
     The pipeline ALWAYS derives the ChEMBL AIDX from organism / strain /
     source / target metadata using _make_aidx, regardless of the user key.
@@ -580,6 +594,7 @@ def build_assay_tsv(
     records = []
     aidx_map: "dict[str, str]" = {}   # user_key → generated AIDX
     aidx_counter: dict = {}
+    name_changes: list[dict] = []     # organism name overwrites for QC report
 
     for _, row in df.iterrows():
         organism = str(row.get("ASSAY_ORGANISM") or "").strip()
@@ -624,9 +639,27 @@ def build_assay_tsv(
                 if not target_tax_id and uni["taxid"]:
                     target_tax_id = uni["taxid"]
 
-        # StrainInfo / NCBI fallback: only runs if TARGET_TAX_ID is still blank
+        # StrainInfo fallback: only runs if TARGET_TAX_ID is still blank
         if not target_tax_id and taxid_lookup and target_organism:
             target_tax_id = lookup_taxid(target_organism)
+
+        # Canonical name check for TARGET_ORGANISM (TaxID → name, stable direction)
+        if target_tax_id and taxid_lookup:
+            ncbi_target_org = _ncbi_name_from_taxid(target_tax_id)
+            if ncbi_target_org and ncbi_target_org != target_organism:
+                name_changes.append({
+                    "AIDX":           "",   # filled after AIDX is generated below
+                    "field":          "TARGET_ORGANISM",
+                    "provided":       target_organism,
+                    "ncbi_canonical": ncbi_target_org,
+                    "taxid":          target_tax_id,
+                })
+                print(
+                    f"[INFO] TARGET_ORGANISM updated: "
+                    f"'{target_organism}' → '{ncbi_target_org}' (TaxID {target_tax_id}).",
+                    file=sys.stderr,
+                )
+                target_organism = ncbi_target_org
 
         # AIDX
         user_key = str(row.get("assay_identifier") or "").strip()
@@ -659,6 +692,31 @@ def build_assay_tsv(
         if not assay_tax_id and taxid_lookup and organism:
             assay_tax_id = lookup_taxid(organism, strain)
 
+        # Canonical name check for ASSAY_ORGANISM (TaxID → name, stable direction).
+        # Must run before _build_description so the description uses the corrected name.
+        if assay_tax_id and taxid_lookup:
+            ncbi_org = _ncbi_name_from_taxid(assay_tax_id)
+            if ncbi_org and ncbi_org != organism:
+                name_changes.append({
+                    "AIDX":           aidx,
+                    "field":          "ASSAY_ORGANISM",
+                    "provided":       organism,
+                    "ncbi_canonical": ncbi_org,
+                    "taxid":          assay_tax_id,
+                })
+                print(
+                    f"[INFO] ASSAY_ORGANISM updated for {aidx}: "
+                    f"'{organism}' → '{ncbi_org}' (TaxID {assay_tax_id}).",
+                    file=sys.stderr,
+                )
+                organism = ncbi_org
+
+        # Backfill AIDX into any TARGET_ORGANISM change entries just appended above
+        # (AIDX wasn't available yet when those entries were added)
+        for entry in name_changes:
+            if entry["field"] == "TARGET_ORGANISM" and entry["AIDX"] == "":
+                entry["AIDX"] = aidx
+
         # --- Join Experiment row for this assay ---
         # Experiment sheet identifiers are user short keys (e.g. 'assay1'),
         # not the generated ChEMBL AIDXs, so look up by user_key.
@@ -687,7 +745,7 @@ def build_assay_tsv(
             "TARGET_TAX_ID":              target_tax_id,
         })
 
-    return pd.DataFrame(records, columns=CHEMBL_COLS), aidx_map
+    return pd.DataFrame(records, columns=CHEMBL_COLS), aidx_map, name_changes
 
 
 # ---------------------------------------------------------------------------
@@ -810,7 +868,7 @@ def main() -> None:
               "ASSAY_DESCRIPTION will omit measurement context.", file=sys.stderr)
 
     # --- Build ---
-    assay_df, aidx_map = build_assay_tsv(
+    assay_df, aidx_map, name_changes = build_assay_tsv(
         microbes_df,
         ridx=args.ridx,
         exp_df=exp_df,
@@ -832,12 +890,22 @@ def main() -> None:
     print(f"Written: {out_path}")
 
     # --- Write ASSAY_MAPPING.tsv ---
- 
     mapping_path = outdir / "ASSAY_MAPPING.tsv"
     pd.DataFrame(
         list(aidx_map.items()), columns=["assay_identifier", "AIDX"]
     ).to_csv(mapping_path, sep="\t", index=False)
     print(f"Written: {mapping_path}")
+
+    # --- Write ORGANISM_NAME_CHANGES.tsv (always written; empty if no changes) ---
+    changes_path = outdir / "ORGANISM_NAME_CHANGES.tsv"
+    pd.DataFrame(
+        name_changes,
+        columns=["AIDX", "field", "provided", "ncbi_canonical", "taxid"],
+    ).to_csv(changes_path, sep="\t", index=False)
+    if name_changes:
+        print(f"Written: {changes_path} ({len(name_changes)} name correction(s))")
+    else:
+        print(f"Written: {changes_path} (no name corrections)")
 
     print(f"[SUCCESS] {len(assay_df)} assay(s) written.")
 
