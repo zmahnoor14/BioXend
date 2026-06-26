@@ -11,7 +11,7 @@
 process GENERATE_REPORT {
     tag "report"
     label 'process_low'
-    container 'zmahnoor/bioxend:latest'
+    container 'zmahnoor/bioxend:1.0.1'
 
     input:
     path ods

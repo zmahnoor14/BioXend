@@ -8,7 +8,7 @@
 process GENERATE_REFERENCE {
     tag "reference"
     label 'process_single'
-    container 'zmahnoor/bioxend:latest'
+    container 'zmahnoor/bioxend:1.0.1'
 
     input:
     path ods
