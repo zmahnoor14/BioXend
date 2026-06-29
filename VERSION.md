@@ -15,8 +15,6 @@ All versions follow [Semantic Versioning 2.0.0](https://semver.org/): `MAJOR.MIN
 | Component | What it tracks |
 |-----------|---------------|
 | **Framework** | Overall BioXend/MIX-MB release. Increments whenever any component is released. |
-| **Standards: Xenobiotics** | Minimum information standards for chemical/xenobiotic metadata |
-| **Standards: Microbes** | Minimum information standards for microbe metadata |
-| **Standards: Biotransformation** | Minimum information standards for biotransformation activity metadata |
+| **Standards: Main** | Minimum information standards |
 | **Template** | The ODS data submission template |
 | **Workflow** | The Nextflow BioXend data submission workflow |

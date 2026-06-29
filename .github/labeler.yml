@@ -7,21 +7,6 @@ standards:
     - any-glob-to-any-file:
       - 'Standards/MIXMB_Standards_main*'
 
-standards-xenobiotics:
-  - changed-files:
-    - any-glob-to-any-file:
-      - 'Standards/MIXMB_Xenobiotics*'
-
-standards-microbes:
-  - changed-files:
-    - any-glob-to-any-file:
-      - 'Standards/MIXMB_Microbes*'
-
-standards-biotransformation:
-  - changed-files:
-    - any-glob-to-any-file:
-      - 'Standards/MIXMB_Biotransformation*'
-
 template:
   - changed-files:
     - any-glob-to-any-file:

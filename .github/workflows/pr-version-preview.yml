@@ -68,17 +68,8 @@ jobs:
             // 3. Component definitions (mirror of auto-version.yml)       //
             // ---------------------------------------------------------- //
             const components = [
-              { file: 'versions/standards-xenobiotics.txt',
-                label: 'MIX-MB(X) Xenobiotics Standard',
-                patterns: [/^Standards\/MIXMB_Xenobiotics/] },
-              { file: 'versions/standards-microbes.txt',
-                label: 'MIX-MB(M) Microbes Standard',
-                patterns: [/^Standards\/MIXMB_Microbes/] },
-              { file: 'versions/standards-biotransformation.txt',
-                label: 'MIX-MB(B) Biotransformation Standard',
-                patterns: [/^Standards\/MIXMB_Biotransformation/] },
               { file: 'versions/standards-main.txt',
-                label: 'MIX-MB Standards Overview',
+                label: 'MIX-MB Standards',
                 patterns: [/^Standards\/MIXMB_Standards_main/] },
               { file: 'versions/template.txt',
                 label: 'Submission Template',
