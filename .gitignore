@@ -2,7 +2,6 @@ emulated_clowm.config
 .DS_Store
 .nextflow/
 results/
-dag.html
 result_cp.zip
 *.xlsx~
 Standards/.DS_Store

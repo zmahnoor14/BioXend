@@ -56,9 +56,7 @@ This project uses independent semantic versioning per component. See `VERSION.md
 
 All contributors are expected to follow our [Code of Conduct](CODE_OF_CONDUCT.md). Please read it before participating.
 
-## Citing This Work
 
-The first release of BioXend / MIX-MB will be archived on [Zenodo](https://zenodo.org) and assigned a DOI, making the standards citable in academic publications.
 
 ## Questions?
 

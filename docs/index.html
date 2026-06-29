@@ -431,7 +431,7 @@
     <h2 class="section-title">Minimum Information about Xenobiotics-Microbiome Biotransformation</h2>
     <p class="section-intro">
       Three interconnected sub-standards define exactly what metadata must be reported for reproducible and database-ready experiments.
-      The standards are continuously undergoing updates and are versioned. We appreciate your feedback.
+      All standards are consolidated in the single <strong>MIX-MB Standards</strong> document, continuously updated and versioned. We appreciate your feedback.
     </p>
 
     <div class="standards-grid">
@@ -454,7 +454,7 @@
           <li><span class="field-code">COMPOUND_NAME</span> Preferred chemical name</li>
           <li><span class="field-code">ChEBI / ChEMBL ID</span> Cross-reference identifiers</li>
         </ul>
-        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Xenobiotics.md" class="std-link">View MIX-MB(X) standard →</a>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Standards_main.md#2-xenobiotics-metadata-files-chemicals-sheet-in-template" class="std-link">View MIX-MB(X) standard →</a>
       </div>
 
       <div class="std-card std-m">
@@ -468,7 +468,7 @@
           <li><span class="field-code">SAMPLE_TYPE</span> Bacterium, community, enzyme</li>
           <li><span class="field-code">ENA / BioSample ID</span> Sequencing data links</li>
         </ul>
-        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Microbes.md" class="std-link">View MIX-MB(M) standard →</a>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Standards_main.md#3-microbe-or-assay-metadata-files--micorbes-sheet-in-template" class="std-link">View MIX-MB(M) standard →</a>
       </div>
 
       <div class="std-card std-b">
@@ -482,7 +482,7 @@
           <li><span class="field-code">TEXT_VALUE</span> Measured activity value</li>
           <li><span class="field-code">ASSAY_DESCRIPTION</span> Free-text assay description</li>
         </ul>
-        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Biotransformation.md" class="std-link">View MIX-MB(B) standard →</a>
+        <a href="https://github.com/zmahnoor14/BioXend/blob/main/Standards/MIXMB_Standards_main.md#4-biotransformation-metadata-files" class="std-link">View MIX-MB(B) standard →</a>
       </div>
 
     </div>
@@ -492,17 +492,17 @@
       <div style="background:var(--teal); padding:1rem 1.75rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:1rem;">
         <div>
           <p style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.7);margin-bottom:.2rem;">Submission Template</p>
-          <p style="font-size:1rem;font-weight:700;color:#fff;">Template_open.ods — 5 sheets covering all three standards</p>
+          <p style="font-size:1rem;font-weight:700;color:#fff;">Template_filled.ods — filled example covering all three standards</p>
         </div>
-        <a href="https://github.com/zmahnoor14/BioXend/raw/main/Standards/Templates/Template_open.ods"
+        <a href="https://github.com/zmahnoor14/BioXend/raw/main/exampledata/Template_filled.ods"
            style="background:#fff;color:var(--teal);font-weight:700;font-size:.875rem;padding:.55rem 1.3rem;border-radius:7px;text-decoration:none;white-space:nowrap;flex-shrink:0;">
-          Download Template_open.ods ↓
+          Download Template_filled.ods ↓
         </a>
       </div>
       <div style="padding:1rem 1.75rem; display:flex; gap:2rem; flex-wrap:wrap;">
         <div>
           <p style="font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:.35rem;">5 template sheets</p>
-          <p style="font-size:.8rem;color:var(--muted);">Reference · Chemical · Microbe · Experiment · Activity</p>
+          <p style="font-size:.8rem;color:var(--muted);">Reference · Chemicals · Microbes · Experiment · Biotransformation</p>
         </div>
         <div style="border-left:1px solid var(--border);padding-left:2rem;">
           <p style="font-size:.8rem;font-weight:600;color:var(--text);margin-bottom:.35rem;">Color coding</p>
@@ -551,8 +551,8 @@
       </div>
       <div class="contrib-card">
         <span class="contrib-label">PR</span>
-        <h3>Submit a Pull Request</h3>
-        <p>Comfortable with Git? Submit PRs against the <code>devel</code> branch. Standards changes require a 14-day review period.</p>
+        <h3>Fork &amp; Contribute</h3>
+        <p>The project is currently in low-bandwidth mode — PRs are not actively reviewed. You're welcome to fork and adapt it. Open an issue to record proposed changes.</p>
         <a href="https://github.com/zmahnoor14/BioXend/blob/main/CONTRIBUTING.md">Read Contributing Guide →</a>
       </div>
       <div class="contrib-card">
@@ -572,8 +572,8 @@
     <p class="section-label">Nextflow Pipeline</p>
     <h2 class="section-title">Automated ChEMBL Submission Workflow</h2>
     <p class="section-intro">
-      A Nextflow pipeline that generates seven ChEMBL-ready submission files
-      from a single filled-out <code style="font-family:'JetBrains Mono',monospace;font-size:.9em;background:var(--code-bg);padding:.1rem .35rem;border-radius:4px;">Template_open.ods</code>.
+      A Nextflow pipeline that generates eight ChEMBL-ready output files (including an interactive QC report)
+      from a single filled-out <code style="font-family:'JetBrains Mono',monospace;font-size:.9em;background:var(--code-bg);padding:.1rem .35rem;border-radius:4px;">Template_filled.ods</code>.
     </p>
 
     <!-- Pipeline steps -->
@@ -612,20 +612,41 @@
         <p>Links compounds to assays and writes activity records</p>
         <span class="step-out">ACTIVITY.tsv</span>
       </div>
+      <div class="step-card">
+        <div class="step-num">6</div>
+        <h4>Report</h4>
+        <p>Generates interactive QC report with UMAP and heatmap visualisations</p>
+        <span class="step-out">report.html</span>
+      </div>
     </div>
 
     <!-- Quickstart -->
     <hr class="section-divider" />
     <p class="sub-heading">Quickstart</p>
+
+    <!-- CloWM option (recommended) -->
+    <div style="background:#f0fdf4;border:1px solid #86efac;border-radius:var(--radius);padding:1.4rem 1.75rem;margin-bottom:1.5rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:1rem;">
+      <div>
+        <p style="font-size:.7rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#15803d;margin-bottom:.25rem;">Easiest — no local setup required</p>
+        <p style="font-size:.95rem;font-weight:700;color:#111;">Run BioXend on CloWM (NFDI4Microbiota cloud)</p>
+        <p style="font-size:.85rem;color:var(--muted);margin-top:.25rem;">Upload your filled template, launch, and download the ChEMBL-ready output files. Anonymous or LifeScience login.</p>
+      </div>
+      <a href="https://clowm.bi.denbi.de/workflows/019e411d-57d0-7c11-b67a-7ac13ccafa2d/version/539170f7e55df6577aef1007977fcc5e6390acef"
+         target="_blank"
+         style="background:#16a34a;color:#fff;font-weight:700;font-size:.875rem;padding:.6rem 1.4rem;border-radius:7px;text-decoration:none;white-space:nowrap;flex-shrink:0;">
+        Launch on CloWM ↗
+      </a>
+    </div>
+
     <p style="color:var(--muted);font-size:.95rem;margin-bottom:.5rem;">
-      Requires <a href="https://www.nextflow.io/" style="color:var(--teal);text-decoration:none;font-weight:500;">Nextflow</a> ≥ 22.10.0 and <a href="https://www.docker.com/" style="color:var(--teal);text-decoration:none;font-weight:500;">Docker</a>.
+      Or run locally with <a href="https://www.nextflow.io/" style="color:var(--teal);text-decoration:none;font-weight:500;">Nextflow</a> ≥ 22.10.0 and <a href="https://www.docker.com/" style="color:var(--teal);text-decoration:none;font-weight:500;">Docker</a>:
     </p>
     <div class="code-block">
 <span class="comment"># 1. Build the Docker image (once)</span>
 $ docker build -t bioxend:latest .
 
 <span class="comment"># 2. Run the pipeline</span>
-$ nextflow run main.nf -profile docker --input Standards/Templates/Template_open.ods --outdir results/ --prefix HMDM --xenobiotic_class drug
+$ nextflow run main.nf -profile docker --input exampledata/Template_filled.ods --outdir results/ --prefix HMDM --xenobiotic_class drug
     </div>
 
     <div style="margin-top:1.5rem;display:flex;gap:1rem;flex-wrap:wrap;">
@@ -663,7 +684,7 @@ $ nextflow run main.nf -profile docker --input Standards/Templates/Template_open
       <div class="team-card">
         <div class="team-avatar" style="background:var(--teal-dark);font-size:.7rem;">ZG</div>
         <h3>Zimmermann Group</h3>
-        <p class="role">Host Lab · EMBL, Molecular Systems Biology Unit</p>
+        <p class="role">Host Lab &amp; Primary Development Home · EMBL, Molecular Systems Biology Unit</p>
         <a href="https://www.embl.org/groups/zimmermann/">embl.org/groups/zimmermann ↗</a>
       </div>
       <div class="team-card">

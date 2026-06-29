@@ -151,7 +151,7 @@ The **Chemicals** sheet in `Template_filled.ods` maps to `COMPOUND_RECORD.tsv` a
 
 > **_NOTE 3 ON MASS SPECTROMETRY:_** If mass spectrometry was used to measure the endpoints, which is a major component of the stanadards, and hence will be mandatory in most cases, please fill out the relevant columns even if they are mentioned as optional columns.
 
- **_NOTE 4 ON SALT FORMULATIONS:_** Mass spec measures the biotransformation of the active compound, and not the whole formulation. In certain cases, the drugs are sold with salt formulations, e.g: `ABACAVIR SULFATE` with SMILES: `C1CC1NC2=C3C(=NC(=N2)N)N(C=N3)[C@@H]4C[C@@H](C=C4)CO.C1CC1NC2=C3C(=NC(=N2)N)N(C=N3)[C@@H]4C[C@@H](C=C4)CO.OS(=O)(=O)O`. The `.OS(=O)(=O)O` of the SMILES represents the sulfate part which is dissociated from the main compound `ABACAVIR` during LC-MS. So technically the activity of bacteria is reported only for the main compound, i.e. `ABACAVIR`, but to properly report this, ChEMBL asks for the whole SMILES for the compound administered, i.e. `ABACAVIR SULFATE` in their SDF file, and hence should be filled in SMILES column of the Chemicals sheet in the template. For such compounds, also fill out the column called: `Eluted_compound` with TRUE, and fill out the main component SMILES `C1CC1NC2=C3C(=NC(=N2)N)N(C=N3)[C@@H]4C[C@@H](C=C4)CO`. If such as a case doesnt apply, you can fill the `Eluted_compound` as FALSE.
+> **_NOTE 4 ON SALT FORMULATIONS:_** Mass spec measures the biotransformation of the active compound, and not the whole formulation. In certain cases, the drugs are sold with salt formulations, e.g: `ABACAVIR SULFATE` with SMILES: `C1CC1NC2=C3C(=NC(=N2)N)N(C=N3)[C@@H]4C[C@@H](C=C4)CO.C1CC1NC2=C3C(=NC(=N2)N)N(C=N3)[C@@H]4C[C@@H](C=C4)CO.OS(=O)(=O)O`. The `.OS(=O)(=O)O` of the SMILES represents the sulfate part which is dissociated from the main compound `ABACAVIR` during LC-MS. So technically the activity of bacteria is reported only for the main compound, i.e. `ABACAVIR`, but to properly report this, ChEMBL asks for the whole SMILES for the compound administered, i.e. `ABACAVIR SULFATE` in their SDF file, and hence should be filled in SMILES column of the Chemicals sheet in the template. For such compounds, also fill out the column called: `Eluted_compound` with TRUE, and fill out the main component SMILES `C1CC1NC2=C3C(=NC(=N2)N)N(C=N3)[C@@H]4C[C@@H](C=C4)CO`. If such as a case doesnt apply, you can fill the `Eluted_compound` as FALSE.
 
 ### 3. Microbe or Assay metadata files / Micorbes sheet in template
 
@@ -162,7 +162,7 @@ The **Chemicals** sheet in `Template_filled.ods` maps to `COMPOUND_RECORD.tsv` a
 **3.2. ASSAY_PARAM.tsv:**  
 Assay parameters associated with `ASSAY.tsv` are mentioned within this optional file. For details please refer to the tutorial provided by ChEMBL on how to generate the [ASSAY_PARAM.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/supplementary-data-files/assay_param.tsv-adding-additional-assay-information.).
 
-#### How are assay/microbe data files are integrated into the Micorbes and Experiment sheet in [Template_filled.ods](exampledata/Template_filled.ods)
+#### How are assay/microbe data files are integrated into the Microbes and Experiment sheet in [Template_filled.ods](exampledata/Template_filled.ods)
 
 The **Microbes** and **Experiment** sheets in [Template_filled.ods](exampledata/Template_filled.ods) map to `ASSAY.tsv` and `ASSAY_PARAM.tsv`. 
 
@@ -185,37 +185,38 @@ The **Microbes** and **Experiment** sheets in [Template_filled.ods](exampledata/
 | `ASSAY_SOURCE` | `ASSAY_SOURCE` | Recommended | No | Source of the assay, e.g: research group name or group leader name. This is an identifier, so no spaces or special characters should be included. |
 | `ASSAY_GROUP` | `ASSAY_GROUP` | Optional | No | Group label for assays considered comparable by the depositor |
 | `TARGET_TYPE` | `TARGET_TYPE` | Recommended | No | Type of target being assayed. Please use `ADMET` for all biotransformation assays where enzyme is not isolated and tested for biotransformation. In case if enzyme biotransformation is tested, please use `SINGLE PROTEIN`. Please refer to ChEMBL for all TARGET_TYPES. |
-| `TARGET_ORGANISM` | `TARGET_ORGANISM` | Recommended | If left empty: Yes (from `Bacteria_scientific_name`) but if the target organism is different then dont leave empty and fill the scientific name of the organism | Auto-filled from scientific name if not provided |
-| `Protein_name` | — | Optional | No | Name of the protein if a protein/enzyme assay |
-| `UniProt_ID` | — | Optional | Yes (from protein name via UniProt API) | BioXend will look up from `Protein_name` if left empty |
-
-| `TARGET_TAX_ID` | `TARGET_TAX_ID` | Recommended | Yes (from `NCBI_Tax_ID`) | Auto-filled from `NCBI_Tax_ID` if not provided |
+| `TARGET_ACCESSION` | `TARGET_ACCESSION` | Optional/Mandatory if enzyme assay | No | UniProt ID of the enzyme if a protein/enzyme assay |
+| `TARGET_ORGANISM` | `TARGET_ORGANISM` | Recommended | Yes: If left empty: Yes if left empty by UniProt API | target organism name |
+| `TARGET_TAX_ID` | `TARGET_TAX_ID` | Recommended | Yes: If left empty: Yes if left empty by UniProt API | NCBI Taxonomy id of target organism |
 | `Gene_name` | — | Optional | No | Gene name associated with the target protein |
 
 
 
 **Experimental conditions** (maps to `ASSAY_PARAM.tsv`):
 
-You can ass more columns and they will appear as assay parameters for all your files.
+You can add more columns and they will appear as assay parameters for the associated assays. Certain mandatory fields might not apply to your use-case, in that case leave empty.
 
 | Template Column | Required | Description |
 |----------------|----------|-------------|
-| `Oxygen_conditions` | Recommended | if these conditions apply to all your assays, write `all` or `most` if most of the assays have these conditions; add another row if some of the assays have different conditions, and mention your self defined assay_identifier here, wither single, or a list of idenfiers with those conditions as a comma separated list |
+| `identifier` | **Mandatory** | if same experimental conditions apply to all your assays, write `all`, or `most` if most of the assays have these conditions; add another row if some of the assays have different conditions, and mention your self defined assay_identifier from the microbes sheet here, either single, or a list of idenfiers with those conditions as a comma separated list |
+| `Pre-culture_preparation_and_conditions` | **Mandatory** | Pre-culture conditions before the main assay |
+| `Sample_preparation` | **Mandatory** | Details of how the sample was prepared for analysis |
+| `Incubation temperature in celsius` | **Mandatory** | Incubation temperature in °C |
+| `Incubation_duration` | **Mandatory** | Total incubation time (numeric value, e.g., `24`) |
+| `Time_unit of incubation duration` | **Mandatory** | Unit for incubation duration: `hr` or `day`; use one consistently |
+| `Time-course_information` |  **Mandatory** | Number and timing of timepoints for time-course studies (e.g., 0, 3, 6, 12, 24 hr) |
+| `DOSE` |  **Mandatory** | dose of the compound such as 20 |
+| `DOSE_unit` |  **Mandatory** | unit of the dose such as uM (micromolar) |
+| `Instrument_and_measurement` | Recommended | Instrument used for measurement; mention technology and instrument name (e.g., LC-MS, Orbitrap) |
 | `Oxygen_conditions` | Recommended | Oxygen conditions (e.g., anaerobic/aerobic/CO2)|
 | `Media_composition` | Recommended | Growth medium used (e.g., GMM, mBHI, minimal media) |
-| `Incubation_temperature_celsius` | Recommended | Incubation temperature in °C |
-| `Shaking_speed` | Optional | Shaking speed (rpm) during incubation |
+| `Shaking_speed` | Recommended | Shaking speed (rpm) during incubation |
 | `Negative_controls` | Recommended | Negative controls used (e.g., heat-killed or sterile media) |
-| `Pre-culture_preparation_and_conditions` | Optional | Pre-culture conditions before the main assay |
-| `Antibiotic_pre-treatment` | Optional | Whether antibiotics were used; include name(s) of antibiotic(s) |
-| `Biomass_inoculum_density_at_start` | Recommended | Biomass or inoculum density at the start of incubation |
-| `Incubation_duration` | **Mandatory** | Total incubation time (numeric value, e.g., `24`) |
-| `Time_unit` | **Mandatory** | Unit for incubation duration: `hr` or `day`; use one consistently |
-| `Time-course_information` | Optional | Number and timing of timepoints for time-course studies (e.g., 0, 3, 6, 12, 24 hr) |
-| `Biomass_inoculum_density_at_end` | Optional | Biomass or inoculum density at end of incubation |
-| `Sample_storage` | Recommended | How and where samples were stored |
-| `Sample_preparation` | Recommended | Details of how the sample was prepared for analysis |
-| `Instrument_and_measurement` | Recommended | Instrument used for measurement; mention technology and instrument name (e.g., LC-MS, Orbitrap) |
+| `Antibiotic_pre-treatment` | Recommended | Whether antibiotics were used; include name(s) of antibiotic(s) |
+| `Sample_storage` | Optional | How and where samples were stored |
+| `Biomass/inoculum density at the start` | Optional | Biomass or inoculum density at the start of incubation |
+| `Biomass/inoculum density at the end` | Optional | Biomass or inoculum density at end of incubation |
+| `Sample_isolation_source ` |  **Mandatory** | stool, soil, blood etc... |
 
 ### 4. Biotransformation metadata file(s)
 
@@ -223,19 +224,18 @@ You can ass more columns and they will appear as assay parameters for all your f
 All biotransformation events occurring between `COMPOUND` and `ASSAY`, are mentioned in the `ACTIVITY.tsv`, including `no biotransformation` events. For details please refer to the tutorial provided by ChEMBL on how to generate the [ACTIVITY.tsv file](https://chembl.gitbook.io/chembl-data-deposition-guide/file-structure/field-names-and-data-types-minimal-data-submission/activity.tsv).
 
 
-**4.2. Other optional activity files -  not part of the MIX-MB template**
+**4.2. Other optional activity files -  not part of the template**
 - `ACTIVITY_PROPERTIES.tsv` - Adding context to experimental results. <br>
 - `ACTIVITY_SUPP.tsv` - Multiplex assays, supporting data, and complex results sets. <br>
 
-#### How are biotransformation data files are integrated into the Template.xlsx
+#### How  biotransformation data files are integrated the Biotransformation sheet in [Template_filled.ods](exampledata/Template_filled.ods)
 
-The **Biotransformation** sheet in `Template.xlsx` maps to `ACTIVITY.tsv`. Each row links one compound to one assay and records the outcome of the biotransformation event.
+The **Biotransformation** sheet in `Template_filled.ods` maps to `ACTIVITY.tsv`. Each row links one compound to one assay and records the outcome of the biotransformation event.
 
 | Template Column | Maps to | Required | Auto-filled by BioXend | Description |
 |----------------|---------|----------|------------------------|-------------|
-| `Chemical_identifier` | `CIDX` | **Mandatory** | Yes (from Xenobiotics sheet) | Auto-filled from the Xenobiotics sheet; supply your own defined identifier if preferred |
-| `Common_Name` | — | **Mandatory**  | Yes (from Xenobiotics sheet) | Common name of the compound; auto-filled by BioXend |
-| `SMILES` | — | Optional | Yes (from Xenobiotics sheet) | SMILES of the compound; auto-filled by BioXend |
+| `Chemical_identifier` | `CIDX` | **Mandatory** | Yes  | Auto-filled by bioXend |
+| `Common_Name` | — | **Mandatory**  | No | Common name of the compound, please make sure the spellings and spaces are exactly same as the Common_Name in Chemicals sheet |
 | `ASSAY_identifier` | `AIDX` | **Mandatory** | No | Must match the `assay_identifier` from the Microbes sheet exactly; used to link activities to assays |
 | `TEXT_VALUE` | `TEXT_VALUE` | Conditional | No | Use for non-numerical activity values (e.g., "biotransformed", "not detected"); leave empty if filling `VALUE` |
 | `VALUE` | `VALUE` | Conditional | No | Numerical value of the activity measurement (e.g., IC50, % biotransformation); leave empty if filling `TEXT_VALUE` |
@@ -243,20 +243,22 @@ The **Biotransformation** sheet in `Template.xlsx` maps to `ACTIVITY.tsv`. Each 
 | `UPPER_VALUE` | `UPPER_VALUE` | Optional | No | Upper limit if the activity measurement is a range; use `VALUE` for the lower limit in that case |
 | `UNITS` | `UNITS` | Recommended | No | Unit of the activity value (e.g., `%`, `µM`, `nM`) |
 | `ACTIVITY_COMMENT` | `ACTIVITY_COMMENT` | Recommended | Yes (partial, if left empty) | Free-text details: thresholds, p-values, which rows are actives; BioXend will auto-populate from `VALUE` or `TEXT_VALUE` if left empty |
-| `Metabolite_mz` | — | Optional | No | Measured m/z of the xenobiotic metabolite |
-| `Metabolite_retention_time` | — | Optional | No | Measured retention time of the xenobiotic metabolite |
-| `Metabolite_annotation` | — | Optional | No | Top annotation as SMILES, compound name, or chemical class (ChemONT); leave empty if no annotation was performed |
-| `Metabolite_annotation_level` | — | Optional | No | Annotation confidence level 1–5; refer to MIX-MB documentation for level definitions |
 | `Kinetic_parameter_type` | — | Optional | No | Type of kinetic parameter measured (e.g., `Km`, `Vmax`, `kcat`); fill only if kinetic data are available |
 | `Kinetic_parameter_value` | — | Optional | No | Numerical value associated with the kinetic parameter type |
-| `Reaction_type` | — | Recommended | No | Type of biotransformation reaction (e.g., hydrolysis, hydroxylation, reduction); for biotransformation assays only |
-| `Activity_type` | `ACTIVITY_TYPE` | Recommended | No | User-defined activity label (e.g., `biotransformation`, `inhibition`); populate only for confirmed active compounds |
-| `ACTION_TYPE` | `ACTION_TYPE` | Optional | No | ChEMBL-controlled vocabulary for the effect on the target (e.g., `INHIBITOR`, `SUBSTRATE`); populate only for confirmed active compounds; must match the ChEMBL ACTION_TYPE list |
+| `Activity_type` | `ACTIVITY_TYPE` | Recommended | No | User-defined activity label (e.g., `biotransformation`, `inhibition`); populate only for all rows |
+| `ACTION_TYPE` | `ACTION_TYPE` | **Mandatory** | No | ChEMBL-controlled vocabulary for the effect on the target (e.g., `INHIBITOR`, `SUBSTRATE`); populate **only** for confirmed active compounds and leave empty for no activity/ not confirmed activity. In most cases for biotransformation, its `SUBSTRATE`. This column will be used by BioXend to produce heatmap and UMAP for defining activity vs no acvtivity |
 | `Classify_activity` | — | Optional | No | Binary or categorical activity label (e.g., `0` = no activity, `1` = active); populate only for confirmed outcomes |
+| `Reaction_type` | — | Recommended | No | Type of biotransformation reaction (e.g., hydrolysis, hydroxylation, reduction); for biotransformation assays only |
+| `Metabolite_mz` | — | Optional/ Mandatory if measured | No | Measured m/z of the xenobiotic metabolite |
+| `Metabolite_rt` | — | Optional/ Mandatory if measured  | No | Measured retention time of the xenobiotic metabolite |
+| `Metabolite_annotation` | — | Optional/ Mandatory if measured  | No | Top annotation as SMILES, compound name, or chemical class (ChemONT); leave empty if no annotation was performed |
+| `Metabolite_annotation_level` | — | Optional/ Mandatory if measured  | No | Annotation confidence level 1–5; refer to MIX-MB documentation for level definitions |
 
-> **Note on TEXT_VALUE vs VALUE:** Use `TEXT_VALUE` when the result is qualitative (e.g., "metabolised", "no biotransformation detected"). Use `VALUE` when you have a quantitative measurement. Do not fill both columns in the same row.
 
-## Naming convention for identifiers and cross-referencing in ChEMBL
+> **_NOTE 5 QUALTITATIVE/ QUANTITATIVE ACTIVITY:_**  Use `TEXT_VALUE` when the result is qualitative (e.g., "metabolised", "no biotransformation detected"). Use `VALUE` when you have a quantitative measurement. Do not fill both columns in the same row.
+> **_NOTE 6 DEFINE WHAT IS ACTIVE:_** This entirely depends on the experiment and what is set as a threshold by the researcher. In most cases, we can confirm biotransformation event; but in no bactivity cases, we cannot confirm a "no biotransformation event" rather "no confirmed bioactivity".
+
+## Naming convention for understanding identifiers and cross-referencing in ChEMBL
 
 **This is the first practical step before entering any data: assign identifiers to every entity in your study.**
 
@@ -316,26 +318,12 @@ Once an unknown entity is formally identified and registered in an external data
 
 ## Chemical Identity Guidelines
 
-### External Identifier Priority
-
-When a compound exists in an external database, use the following priority order for the `database_ID` field:
-
-| Priority | Identifier | Example |
-|----------|-----------|---------|
-| 1 | **InChIKey** | `HEFNNWSXXWATRW-UHFFFAOYSA-N` |
-| 2 | **ChEMBL ID** | `chembl:CHEMBL1201246` |
-| 3 | **PubChem CID** | `pubchem:4583` |
-| 4 | **ChEBI ID** | `chebi:3686` |
-| 5 | **CAS Number** | `cas:42399-41-7` |
-
-The InChIKey is the canonical structure identifier and is **strongly recommended** for all known compounds — it identifies structure independently of naming conventions or database numbering. BioXend auto-generates InChI, InChIKey, and molecular formula from the SMILES if left empty.
-
 ### Salt and Prodrug Handling
 
 Many drugs are supplied or measured as salts or prodrugs where the submitted structure and the analytically detected form differ (e.g., sodium ibuprofen supplied but the free acid detected by MS).
 
 - **`SMILES`** — enter the structure you have (including counter-ion / salt form if known)
-- **`Eluted_compound`** — set to `yes` if the MS detects a different form than the submitted structure
+- **`Eluted_compound`** — set to `TRUE` if the MS detects a different form than the submitted structure
 - **`Eluted_compound_SMILES`** — enter the SMILES of the form actually detected by the instrument
 
 BioXend generates InChI/InChIKey from the `SMILES` field. The `Eluted_compound_SMILES` is recorded as supplementary context and is not used for structure generation.
@@ -353,28 +341,6 @@ Use these confidence levels in `Metabolite_annotation_level` for any detected bi
 | **5** | Unidentified | Spectral data only; no structural hypothesis possible |
 
 For Levels 4–5, use the `UNKNOWN_[RIDX]_[n]` CIDX prefix and record the m/z and adduct type in `ACTIVITY_COMMENT`.
-
----
-
-## Assay Types
-
-Specify the biological system in `ASSAY_TYPE` and describe it in `ASSAY_DESCRIPTION`. Use one of the following types in `ASSAY_TYPE` column (ChEMBL code `B` for all biotransformation assays):
-
-| Assay system | Description | `ASSAY_TYPE` |
-|-------------|-------------|-------------|
-| Whole cell (pure culture) | Intact living bacterial cells; single strain | `B` |
-| Cell lysate | Disrupted cells; crude enzyme mixture | `B` |
-| Purified enzyme | Isolated single enzyme or protein | `B` |
-| Community / mixed culture | Mixed microbial population (e.g., gut microbiota) | `B` |
-| In vivo (animal/human) | Metabolic data from whole organisms | `B` |
-
-> The `ASSAY_TYPE` code is always `B` (Biotransformation) for MIX-MB submissions. The distinction between assay systems is captured in `ASSAY_DESCRIPTION` and `TARGET_TYPE`.
-
----
-
-## Controlled Vocabularies
-
-Use these terms **exactly as written** in the respective template columns.
 
 ### Reaction Types (`Reaction_type` column)
 
@@ -395,85 +361,6 @@ Use these terms **exactly as written** in the respective template columns.
 | `glucuronidation` | Addition of glucuronic acid | GO:0008194 | EC 2.4.1.17 |
 | `sulfation` | Addition of sulfate group | GO:0008146 | EC 2.8.2.x |
 
-### Activity Result (`TEXT_VALUE` column)
-
-Use `TEXT_VALUE` for qualitative results. Do **not** fill both `TEXT_VALUE` and `VALUE` in the same row.
-
-| TEXT_VALUE | Meaning |
-|------------|---------|
-| `Compound metabolized` | Parent compound consumed or depleted |
-| `Compound NOT metabolized` | No measurable transformation detected |
-| `Product detected` | Biotransformation product observed |
-| `Partial transformation` | Incomplete conversion (< 95%) |
-| `Complete transformation` | Full conversion (≥ 95%) |
-
-### Effect Classification (`ACTION_TYPE` column)
-
-Leave empty if no confirmed activity — do not guess.
-
-| ACTION_TYPE | Use when |
-|-------------|----------|
-| `SUBSTRATE` | Compound is consumed as a substrate |
-| `PRODUCT` | Compound is a detected biotransformation product |
-| `No Activity` | No transformation detected |
-| `INHIBITOR` | Compound inhibits a microbial enzyme or process |
-| `STIMULATION` | Compound stimulates a microbial process |
-
-### Oxygen Conditions (`Oxygen_conditions` column)
-
-| Term | Meaning |
-|------|---------|
-| `obligate aerobe` | Requires oxygen |
-| `facultative anaerobe` | Grows with or without oxygen |
-| `obligate anaerobe` | Cannot tolerate oxygen |
-| `microaerophile` | Requires low oxygen (2–10%) |
-| `aerotolerant anaerobe` | Tolerates oxygen but does not use it |
-
-### Sample Types (`sample_type` — for `ASSAY_DESCRIPTION` context)
-
-`pure culture` | `enrichment culture` | `mixed culture` | `community` | `cell-free lysate` | `membrane fraction` | `cytoplasmic fraction`
-
-### Growth Phases (for `ASSAY_DESCRIPTION` or `Pre-culture_preparation_and_conditions`)
-
-`lag phase` | `exponential phase` | `stationary phase` | `early exponential` | `mid exponential` | `late stationary`
-
----
-
-## Data Quality Tiers
-
-MIX-MB defines three compliance tiers. Higher tiers enable broader reuse and ChEMBL deposition.
-
-### Tier 1 — Gold (Publication-Ready)
-
-All mandatory **and** recommended fields complete across all sheets.
-
-- Valid SMILES + InChIKey verified for all compounds
-- At least one external database ID (ChEMBL, PubChem, or ChEBI)
-- NCBI TaxID present and verified for all organisms
-- Strain designation (culture collection number) provided
-- Quantitative activity data with biological replicates (n ≥ 3)
-- Detected products annotated at MSI Level 1 or 2
-- Negative controls and internal standard documented
-
-### Tier 2 — Silver (Research-Grade)
-
-All mandatory fields complete; partial recommended fields.
-
-- Valid SMILES + InChIKey for all compounds
-- NCBI TaxID present for all organisms
-- Quantitative or semi-quantitative activity (n ≥ 2 biological replicates)
-- Detected products at MSI Level 2 or 3 acceptable
-- Basic growth conditions documented (medium and temperature at minimum)
-
-### Tier 3 — Bronze (Preliminary / Screening)
-
-Mandatory fields only. Suitable for large-scale screens.
-
-- Valid SMILES and compound name present
-- CIDX and RIDX assigned
-- NCBI TaxID present
-- Qualitative activity only (`TEXT_VALUE` filled; `VALUE` optional)
-- Single measurement acceptable; no replication required
 
 ---
 
