@@ -4,11 +4,11 @@ Thank you for your interest in contributing to the Minimum Information about Xen
 
 ## Project Status
 
-> **Note:** The primary maintainer is currently unable to actively review and merge pull requests. The project is in **low-bandwidth mode**:
+> **Note:** The primary maintainer is currently unable to actively review and merge pull requests. The project is in **low-bandwidth mode**. You can fork the project to adapt to your use-case:
 >
 > - **Issues and Discussions remain open** 
 > - You are welcome to **fork this repository** and adapt it for your own use.
-> - This repository is planned to be **transferred to the [Zimmermann Group Github page](https://github.com/ZimmermannLab)**  as the primary home for ongoing development. 
+> - This primary repository is hosted at the [Zimmermann Group Github page](https://github.com/ZimmermannLab)**  as the primary home for ongoing development. 
 
 **First time here?**
 - Here is the link to the current project board: [BioXend Project Board](https://github.com/users/zmahnoor14/projects/6) to get oriented.
@@ -41,14 +41,6 @@ If you have feedback on the standards documentation and template, but aren't fam
 #### 2.2. Fork the Repository
 
 Pull requests are not being actively reviewed at this time. However, you are welcome to **fork this repository** and adapt it for your own use. If you have changes you'd like to propose, please open an [Issue](https://github.com/zmahnoor14/BioXend/issues) describing them so they are recorded.
-
-#### 2.3. Endorse or Comment on Existing Proposals
-
-Browse [open issues](https://github.com/zmahnoor14/BioXend/issues) and [pull requests](https://github.com/zmahnoor14/BioXend/pulls). You can:
-
-- Add a 👍 reaction to endorse a proposal
-- Leave a comment with your perspective or additional evidence
-- Reference relevant literature or datasets
 
 ## Versioning Reference
 

@@ -1,5 +1,9 @@
 FROM python:3.12-slim
 
+LABEL org.opencontainers.image.source="https://github.com/zmahnoor14/bioxend" \
+      org.opencontainers.image.version="1.0.1" \
+      org.opencontainers.image.description="BioXend MIX-MB ChEMBL submission pipeline"
+
 RUN apt-get update && apt-get upgrade -y && apt-get install -y --no-install-recommends \
     procps \
     libxrender1 \

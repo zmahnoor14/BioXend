@@ -5,6 +5,13 @@ Versions follow semantic versioning: `MAJOR.MINOR.PATCH`.
 
 ---
 
+## [1.0.2](https://github.com/zmahnoor14/BioXend/compare/v1.0.1...v1.0.2) (2026-06-26)
+
+### Fixed
+- Pinned all module containers from `:latest` to `zmahnoor/bioxend:1.0.1` to ensure reproducible builds; affects all six modules (`reference`, `chemicals`, `microbes`, `experiment`, `biotransformation`, `report`) and `fill_template`
+
+---
+
 ## [0.7.0](https://github.com/zmahnoor14/BioXend/compare/v0.6.4...v0.7.0) (2026-05-19)
 
 
