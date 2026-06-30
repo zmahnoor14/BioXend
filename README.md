@@ -6,7 +6,7 @@
 ![Contributors](https://img.shields.io/github/contributors/zmahnoor14/BioXend)
 
 # BioXend 
-BioXend is a computational framework to assist in submitting FAIR and AI-ready Microbial Biotransformation of Xenobiotics data to ChEMBL. You can check the webpage for BioXend project here: https://zmahnoor14.github.io/BioXend/. You can test and run the [BioXend workflow on CloWM](https://clowm.bi.denbi.de/workflows/019e411d-57d0-7c11-b67a-7ac13ccafa2d/version/12ffc8a8869178ac69c05925c312e5eb165581f9) by [NFDI4Microbiota](https://nfdi4microbiota.de/).
+BioXend is a computational framework to assist in submitting FAIR and AI-ready Microbial Biotransformation of Xenobiotics data to ChEMBL. You can check the tutorial for BioXend project [here](https://drive.google.com/file/d/11dGMwYubh3V8EAS5lXiP61E6jfzq4uc4/view?usp=sharing.). You can test and run the [BioXend workflow on CloWM](https://clowm.bi.denbi.de/workflows/019e411d-57d0-7c11-b67a-7ac13ccafa2d/version/12ffc8a8869178ac69c05925c312e5eb165581f9) by [NFDI4Microbiota](https://nfdi4microbiota.de/).
 
 
 ## 1. BioXend Submission Workflow
