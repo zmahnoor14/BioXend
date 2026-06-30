@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/1150553047.svg)](https://doi.org/10.5281/zenodo.21043203)
 ![GitHub tag](https://img.shields.io/github/v/tag/zmahnoor14/BioXend?style=flat&label=version)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![ChEMBL](https://img.shields.io/badge/ChEMBL-submission--ready-e8003d)](https://www.ebi.ac.uk/chembl/)
@@ -131,7 +132,7 @@ Please view the current results from the survey in [Standards/MIX-MB_Survey_Anal
 
 ## Citing This Work
 
-The first release of BioXend / MIX-MB will be archived on [Zenodo](https://zenodo.org) and assigned a DOI, making the standards citable in academic publications.
+The first release of BioXend / MIX-MB is archived on [Zenodo](https://zenodo.org) and assigned a DOI (10.5281/zenodo.21043203), making the standards and the workflow citable in academic publications.
 
 ## License
 
